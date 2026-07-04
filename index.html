@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2RNJ72H75W"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-2RNJ72H75W');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>ウマ娘 推しバ券メーカー ALLSTAR edition</title>
+    <meta name="description" content="ウマ娘プリティーダービーの非公式応援ツールです。あなただけのオリジナル「推しバ券」を発券してみましょう。">
+
+    <meta property="og:title" content="ウマ娘 推しバ券メーカー ALL-STAR edition">
+    <meta property="og:description" content="ウマ娘プリティーダービーの非公式応援ツールです。あなただけのオリジナル「推しバ券」を発券してみましょう。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nyaftama.github.io/uma7th-ouen-baken/">
+    <meta property="og:image" content="https://nyaftama.github.io/uma7th-ouen-baken/ogp_image.png">
+    <meta property="og:site_name" content="推しバ券メーカー">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@700;900&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css?v=1.06a">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header-meta">
+            <span class="version-text">v<span id="version">1.06a</span></span>
+            <a href="https://nyaftama.github.io/" target="_blank" rel="noopener noreferrer" class="credit-link">作った人:
+                <strong>@nyaftama</strong>
+            </a>
+        </div>
+
+        <h1 class="main-title">
+            ウマ娘 推しバ券メーカー <br>
+            <span class="sub-title">ALLSTAR edition</span>
+        </h1>
+        <div class="eng-title">UMAMUSUME OSHI-BAKEN MAKER: ALLSTAR Edition</div>
+        <div
+            style="padding: 0 10px; margin-bottom: 10px; display: flex; flex-wrap: wrap; row-gap: 5px; column-gap: 15px; align-items: center;">
+            <a href="#" id="historyBtn" class="credit-link"
+                style="font-size: 0.85rem; color: var(--primary-color); font-weight: bold; text-decoration: underline;">
+                発券履歴・印刷用PDF
+            </a>
+            <a href="https://nyaftama.github.io/uma7th-ouen-baken/" class="credit-link"
+                style="font-size: 0.85rem; color: var(--primary-color); font-weight: bold; text-decoration: underline;">
+                7th in TOKYO edition
+            </a>
+        </div>
+
+        <div id="attributeFiltersArea" style="display: none; margin: 0 10px 15px 10px;">
+        </div>
+
+        <div class="day-toggle">
+            <label class="day-label">
+                <input type="radio" name="displayMode" value="cast" checked> キャスト名優先
+            </label>
+            <label class="day-label">
+                <input type="radio" name="displayMode" value="uma"> キャラ名優先
+            </label>
+        </div>
+
+        <div
+            style="margin: 0 10px 15px 10px; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; user-select: none;">
+            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                <label class="history-checkbox-wrapper" style="width: 22px; height: 22px;">
+                    <input type="checkbox" id="reflectCharColorCheckbox" class="history-checkbox">
+                    <div class="custom-checkbox"></div>
+                </label>
+                <label for="reflectCharColorCheckbox"
+                    style="font-weight: bold; cursor: pointer; font-size: 0.8rem; color: #333;">イメージカラーを反映</label>
+            </div>
+            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                <label class="history-checkbox-wrapper" style="width: 22px; height: 22px;">
+                    <input type="checkbox" id="bitmapTextCheckbox" class="history-checkbox">
+                    <div class="custom-checkbox"></div>
+                </label>
+                <label for="bitmapTextCheckbox"
+                    style="font-weight: bold; cursor: pointer; font-size: 0.8rem; color: #333;">文字をビットマップ化</label>
+            </div>
+        </div>
+
+        <div class="event-settings-area">
+            <div class="settings-left">
+                <div class="settings-header">開催情報設定</div>
+                <div id="currentEventInfo" class="settings-info-text">ーーー</div>
+            </div>
+            <div class="settings-right">
+                <button id="openSettingsBtn" class="settings-btn">変更</button>
+            </div>
+        </div>
+
+        <div id="cartArea" class="cart-area">
+            <div class="cart-left">
+                <div class="cart-header">
+                    ウマ連・3連複 候補リスト
+                    <div class="cart-status-row">
+                        <span id="cartCount">0/3</span>
+                        <span id="cartBetType"></span>
+                    </div>
+                </div>
+                <div id="cartItems" class="cart-items"></div>
+            </div>
+
+            <div id="cartRight" class="cart-right" style="display: none;">
+                <div class="amount-control-wrapper">
+                    <div class="qty-main-row" style="justify-content: center;">
+                        <button id="cartMinusBtn" class="qty-btn">-</button>
+                        <span id="cartQtySpan" class="qty-display">100</span>
+                        <button id="cartPlusBtn" class="qty-btn">+</button>
+                    </div>
+                    <div class="qty-sub-row" style="justify-content: center;">
+                        <button id="cartMinus1000Btn" class="qty-btn-small">-1000</button>
+                        <button id="cartPlus1000Btn" class="qty-btn-small">+1000</button>
+                    </div>
+                </div>
+                <button id="cartIssueBtn" class="issue-btn" style="margin: 0; width: 100%;">発券</button>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <div class="search-input-wrapper">
+                <input type="text" id="searchInput" placeholder="キャスト名やキャラ名で検索..." autocomplete="off">
+                <button id="clearInputBtn" class="clear-input-btn" aria-label="クリア">✕</button>
+            </div>
+            <div id="suggestionsBox" class="suggestions-box"></div>
+        </div>
+
+        <div id="loading" class="loading">キャストデータを読み込んでいます...</div>
+        <div id="itemList" class="item-list" style="display: none;"></div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <div id="shareModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="modal-title">推しバ券が発券されました！</h3>
+            <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">
+                画像を長押し（または右クリック）で保存できます。<br>
+                画像のテキスト認識が可能な端末（iPhoneやPixelなど）では、文字以外の部分を長押ししてください。<br>
+                <span style="color: var(--primary-color); font-weight: bold;">Xでシェアする際には、保存した画像を手動で添付してください。</span>
+            </p>
+
+            <div id="shareImageLoading" style="padding: 20px; color: #666;">推しバ券を印刷中...</div>
+            <img id="shareImagePreview" src="" alt="推しバ券"
+                style="width: 100%; border-radius: 4px; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+
+            <div class="modal-actions">
+                <button id="shareCloseBtn" class="modal-btn cancel">閉じる</button>
+                <a id="shareTwitterBtn" class="modal-btn twitter" href="#" target="_blank" rel="noopener noreferrer">
+                    Xでシェア
+                </a>
+            </div>
+            <div style="margin-top: 15px; text-align: center;">
+                <a href="#" id="openHistoryFromShare"
+                    style="font-size: 0.9rem; color: var(--primary-color); text-decoration: underline; font-weight: bold;">▶
+                    発券履歴・印刷用PDF画面を開く</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="bakenContainer">
+        <div id="bakenSlip" class="baken-slip">
+
+            <div class="bk-left-col">
+                <div id="bkSlipDate" class="bk-date bk-tall">2026年6月8日</div>
+
+                <div id="bkSlipVenue" class="bk-tall-narrow"
+                    style="font-size: 1.5rem; line-height: 1; font-weight: bold; margin-bottom: -5px; margin-left: -1px;">
+                    東　京</div>
+
+                <div class="bk-venue-row bk-tall">
+                    <span class="bk-venue-box" id="bkSlipRaceNumber">11</span>
+                    <span class="bk-day-box bk-tall">レース</span>
+                </div>
+
+                <div id="bkSlipRaceTitle" class="bk-event-title bk-tall-narrow">皐月賞<br>(GI)</div>
+
+                <div class="bk-qr-box">
+                    <img src="images/qr_umamusu.svg" alt="QR">
+                    <img src="images/qr_baken_maker_allstar.svg" alt="QR">
+                </div>
+
+                <div class="bk-left-bottom">
+                    <div class="bk-ura-tokyo">推しバ券メーカー</div>
+                    <div class="bk-issue-date bk-tall"><span id="bkIssueDateVal">3月22日</span></div>
+                </div>
+            </div>
+
+            <div class="bk-right-col">
+                <div class="bk-bet-type-area">
+                    <div id="bkBetTypeBox" class="bk-bet-type-box bk-tall">
+                        <div class="bk-small-en">WIN</div>
+                        <div class="bk-vert-text">単<br>勝</div>
+                    </div>
+                </div>
+
+                <div class="bk-bet-details">
+                    <div id="bkMessage" class="bk-ganbare bk-wide">がんばれ！</div>
+
+                    <div id="bkNameArea" class="bk-horse-info">
+                        <div class="bk-cast-row">
+                            <div id="bkNumber" class="bk-horse-number bk-tall">1</div>
+                            <div id="bkCast" class="bk-cast-name bk-tall">Machico</div>
+                        </div>
+                        <div id="bkName" class="bk-uma-name bk-tall">トウカイテイオー</div>
+                    </div>
+
+                    <div class="bk-amount-row bk-tall">
+                        各<span class="bk-stars" id="bkStarsSub">☆☆☆</span><span id="bkVal" class="bk-val">100</span>
+                        ジュエル
+                    </div>
+
+                    <div class="bk-total-row bk-tall">
+                        合計<span class="bk-stars" id="bkStarsTotal">★★★</span><span id="bkTotalVal"
+                            class="bk-val">200</span> ジュエル
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal-overlay">
+        <div class="modal-content"
+            style="max-width: 600px; width: 90%; height: 80vh; display: flex; flex-direction: column;">
+            <h3 class="modal-title">発券履歴・印刷用PDF</h3>
+            <p style="font-size: 0.8rem; color: #666; text-align: left;">
+                最近発券したバ券（最大8枚）が保存されています。チェックを入れてPDF保存ボタンを押すと、A4サイズの印刷用PDFをダウンロードできます。</p>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <a href="#" id="deleteAllHistoryBtn"
+                    style="color: #d32f2f; font-weight: bold; text-decoration: underline; font-size: 0.9rem;">すべて削除...</a>
+                <a href="#" id="selectAllHistoryBtn"
+                    style="color: var(--primary-color); text-decoration: underline; font-size: 0.9rem; font-weight: bold;">すべて選択
+                    / 解除</a>
+            </div>
+
+            <div id="historyList"
+                style="flex: 1; overflow-y: auto; text-align: left; margin: 5px 0 15px 0; border: 1px solid #eee; padding: 10px; border-radius: 8px;">
+            </div>
+
+            <div class="modal-actions">
+                <button id="closeHistoryBtn" class="modal-btn cancel">閉じる</button>
+                <button id="printSelectedBtn" class="modal-btn primary">PDF保存</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="settingsModal" class="modal-overlay">
+        <div class="modal-content" style="text-align: left; max-width: 450px;">
+            <h3 class="modal-title">開催情報設定</h3>
+
+
+
+            <div class="settings-grid">
+                <div class="settings-form-group">
+                    <label for="setEventDate">開催日</label>
+                    <input type="date" id="setEventDate">
+                </div>
+                <div class="settings-form-group">
+                    <label for="setRacecourse">開催レース場</label>
+                    <select id="setRacecourse"></select>
+                </div>
+                <div class="settings-form-group">
+                    <label for="setRaceNumber">レース番号</label>
+                    <select id="setRaceNumber"></select>
+                </div>
+                <div class="settings-form-group">
+                    <label for="setGrade">レースのグレード</label>
+                    <select id="setGrade"></select>
+                </div>
+            </div>
+
+            <div class="settings-form-group" style="position: relative; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label for="setRaceName" style="margin-bottom: 0;">レース名</label>
+                    <a href="#" id="openRaceListBtn"
+                        style="font-size: 0.85rem; color: var(--primary-color); font-weight: bold; text-decoration: underline; padding-left: 4px;">レース一覧</a>
+                </div>
+
+                <div class="search-input-wrapper">
+                    <input type="text" id="setRaceName" placeholder="レース名を入力・検索" autocomplete="off"
+                        style="padding-right: 30px;">
+                    <button id="clearRaceInputBtn" class="clear-input-btn" aria-label="クリア">✕</button>
+                </div>
+
+                <div id="raceSuggestionsBox" class="suggestions-box"
+                    style="left: 0; right: 0; width: 100%; display: none; z-index: 1000; position: absolute; top: 100%;">
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="closeSettingsBtn" class="modal-btn cancel">キャンセル</button>
+                <button id="saveSettingsBtn" class="modal-btn primary">適用</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="raceListModal" class="modal-overlay" style="z-index: 2100;">
+        <div class="modal-content"
+            style="max-width: 550px; width: 90%; height: 70vh; display: flex; flex-direction: column;">
+            <h3 class="modal-title">レース一覧から選択</h3>
+
+
+
+            <div id="raceGridContainer" class="race-grid-container"></div>
+
+            <div class="modal-actions">
+                <button id="closeRaceListBtn" class="modal-btn cancel" style="max-width: 150px;">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteConfirmModal" class="modal-overlay" style="z-index: 2200;">
+        <div class="modal-content" style="max-width: 400px;">
+            <h3 class="modal-title">履歴の削除</h3>
+            <p style="font-size: 0.95rem; color: #333; margin-bottom: 20px; text-align: center;">
+                すべての発券履歴を削除しますか？<br>
+                <span style="color: #d32f2f; font-weight: bold; font-size: 0.85rem;">※この操作は取り消せません</span>
+            </p>
+            <div class="modal-actions">
+                <button id="cancelDeleteBtn" class="modal-btn cancel">キャンセル</button>
+                <button id="executeDeleteBtn" class="modal-btn danger">削除する</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js?v=1.06a" defer></script>
+
+</body>
+
+</html>

@@ -35,14 +35,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=1.06e">
+    <link rel="stylesheet" href="css/style.css?v=1.06d">
 </head>
 
 <body>
 
     <div class="container">
         <div class="header-meta">
-            <span class="version-text">v<span id="version">1.06e</span></span>
+            <span class="version-text">v<span id="version">1.06d</span></span>
             <a href="https://nyaftama.github.io/" target="_blank" rel="noopener noreferrer" class="credit-link">作った人:
                 <strong>@nyaftama</strong>
             </a>
@@ -275,102 +275,19 @@
             <div class="settings-grid">
                 <div class="settings-form-group">
                     <label for="setEventDate">開催日</label>
-                    <div class="calendar-wrapper" id="setEventDateWrapper">
-                        <button type="button" id="setEventDateBtn" class="calendar-input-trigger" aria-haspopup="dialog"
-                            aria-expanded="false">
-                            <span id="setEventDateVal">日付を選択</span>
-                            <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16">
-                                <path d="M7 10l5 5 5-5z" fill="currentColor" />
-                            </svg>
-                        </button>
-                        <div class="calendar-popover" id="setEventDatePopover">
-                            <div class="calendar-header">
-                                <button type="button" class="calendar-nav-btn" id="calPrevMonthBtn" aria-label="前月">
-                                    <svg viewBox="0 0 24 24" width="16" height="16">
-                                        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor" />
-                                    </svg>
-                                </button>
-                                <div class="calendar-header-selectors">
-                                    <div class="calendar-header-select-wrapper" id="calYearSelectWrapper">
-                                        <button type="button" id="calYearSelectBtn" class="cal-header-select-btn">
-                                            <span>2026年</span>
-                                            <svg class="chevron-icon" viewBox="0 0 24 24" width="10" height="10">
-                                                <path d="M7 10l5 5 5-5z" fill="currentColor" />
-                                            </svg>
-                                        </button>
-                                        <div class="cal-header-select-options" id="calYearSelectOptions"></div>
-                                    </div>
-                                    <div class="calendar-header-select-wrapper" id="calMonthSelectWrapper">
-                                        <button type="button" id="calMonthSelectBtn" class="cal-header-select-btn">
-                                            <span>7月</span>
-                                            <svg class="chevron-icon" viewBox="0 0 24 24" width="10" height="10">
-                                                <path d="M7 10l5 5 5-5z" fill="currentColor" />
-                                            </svg>
-                                        </button>
-                                        <div class="cal-header-select-options" id="calMonthSelectOptions"></div>
-                                    </div>
-                                </div>
-                                <button type="button" class="calendar-nav-btn" id="calNextMonthBtn" aria-label="翌月">
-                                    <svg viewBox="0 0 24 24" width="16" height="16">
-                                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="calendar-days-header">
-                                <div>日</div>
-                                <div>月</div>
-                                <div>火</div>
-                                <div>水</div>
-                                <div>木</div>
-                                <div>金</div>
-                                <div>土</div>
-                            </div>
-                            <div class="calendar-grid" id="setEventDateGrid"></div>
-                        </div>
-                        <input type="date" id="setEventDate" class="hidden-native-input">
-                    </div>
+                    <input type="date" id="setEventDate">
                 </div>
                 <div class="settings-form-group">
                     <label for="setRacecourse">開催レース場</label>
-                    <div class="custom-select-wrapper" id="setRacecourseWrapper">
-                        <button type="button" id="setRacecourseBtn" class="custom-select-trigger"
-                            aria-haspopup="listbox" aria-expanded="false">
-                            <span>選択してください</span>
-                            <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16">
-                                <path d="M7 10l5 5 5-5z" fill="currentColor" />
-                            </svg>
-                        </button>
-                        <div class="custom-select-options" id="setRacecourseOptions" role="listbox"></div>
-                        <select id="setRacecourse" class="hidden-native-input"></select>
-                    </div>
+                    <select id="setRacecourse"></select>
                 </div>
                 <div class="settings-form-group">
                     <label for="setRaceNumber">レース番号</label>
-                    <div class="custom-select-wrapper" id="setRaceNumberWrapper">
-                        <button type="button" id="setRaceNumberBtn" class="custom-select-trigger"
-                            aria-haspopup="listbox" aria-expanded="false">
-                            <span>選択してください</span>
-                            <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16">
-                                <path d="M7 10l5 5 5-5z" fill="currentColor" />
-                            </svg>
-                        </button>
-                        <div class="custom-select-options" id="setRaceNumberOptions" role="listbox"></div>
-                        <select id="setRaceNumber" class="hidden-native-input"></select>
-                    </div>
+                    <select id="setRaceNumber"></select>
                 </div>
                 <div class="settings-form-group">
                     <label for="setGrade">レースのグレード</label>
-                    <div class="custom-select-wrapper" id="setGradeWrapper">
-                        <button type="button" id="setGradeBtn" class="custom-select-trigger" aria-haspopup="listbox"
-                            aria-expanded="false">
-                            <span>選択してください</span>
-                            <svg class="chevron-icon" viewBox="0 0 24 24" width="16" height="16">
-                                <path d="M7 10l5 5 5-5z" fill="currentColor" />
-                            </svg>
-                        </button>
-                        <div class="custom-select-options" id="setGradeOptions" role="listbox"></div>
-                        <select id="setGrade" class="hidden-native-input"></select>
-                    </div>
+                    <select id="setGrade"></select>
                 </div>
             </div>
 
@@ -428,7 +345,7 @@
         </div>
     </div>
 
-    <script src="js/app.js?v=1.06e" defer></script>
+    <script src="js/app.js?v=1.06d" defer></script>
 
 </body>
 

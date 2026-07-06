@@ -845,6 +845,7 @@ h1.main-title {
     position: relative;
     font-family: 'Noto Sans JP', sans-serif;
     overflow: hidden;
+    border: 4px solid var(--baken-watermark-color, #e2efdf);
 }
 
 .bk-tall {
@@ -1357,6 +1358,7 @@ body[data-display-mode="uma"] .uma-badge {
 
 .baken-slip.capture-text-only {
     background: #ffffff !important;
+    border-color: transparent !important;
 }
 
 .baken-slip.capture-text-only .bk-qr-box,

@@ -1,5 +1,5 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.06d';
+const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.06e';
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];
@@ -529,7 +529,8 @@ function renderList(data) {
         nameSpan.textContent = row.cast_name;
         nameSpan.style.marginLeft = '8px';
 
-        castDiv.appendChild(numberSelect);
+        const customNumberSelect = buildCustomSelectMarkup(numberSelect, 'uma-number-select-wrapper');
+        castDiv.appendChild(customNumberSelect);
         castDiv.appendChild(nameSpan);
 
         infoTopDiv.appendChild(badgesWrapper);
@@ -619,7 +620,8 @@ function renderList(data) {
             ticketTypes[key] = e.target.value;
         });
 
-        amountControl.appendChild(betTypeSelect);
+        const customBetTypeSelect = buildCustomSelectMarkup(betTypeSelect, 'bet-type-select-wrapper');
+        amountControl.appendChild(customBetTypeSelect);
         amountControl.appendChild(qtyMainRow);
         amountControl.appendChild(qtySubRow);
 
@@ -1543,6 +1545,7 @@ async function initEventSettings() {
 
     document.getElementById('setEventDate').value = eventSettings.date;
     updateEventSettingsUI();
+    setupCustomSelectsAndDatePicker();
 }
 
 document.getElementById('openSettingsBtn').addEventListener('click', () => {
@@ -1551,6 +1554,12 @@ document.getElementById('openSettingsBtn').addEventListener('click', () => {
     document.getElementById('setRaceNumber').value = eventSettings.raceNumber;
     document.getElementById('setGrade').value = eventSettings.grade;
     document.getElementById('setRaceName').value = eventSettings.raceName;
+
+    // Sync custom elements trigger texts and selection marks
+    syncCustomDatePickerUI();
+    syncCustomSelectUI('setRacecourse');
+    syncCustomSelectUI('setRaceNumber');
+    syncCustomSelectUI('setGrade');
 
     const currentRaceName = document.getElementById('setRaceName').value;
     document.getElementById('clearRaceInputBtn').style.display = currentRaceName ? 'block' : 'none';
@@ -1673,4 +1682,510 @@ async function captureBakenSlip(bakenDOM) {
             logging: false
         });
     }
+}
+
+/* Custom UI Inputs Support Logic */
+
+function setupCustomSelectsAndDatePicker() {
+    const selectIds = ['setRacecourse', 'setRaceNumber', 'setGrade'];
+    selectIds.forEach(id => {
+        setupCustomSelect(id);
+    });
+
+    setupCustomDatePicker();
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select-wrapper') && !e.target.closest('.calendar-wrapper')) {
+            closeAllCustomDropdowns();
+        }
+    });
+}
+
+function setupCustomSelect(selectId) {
+    const nativeSelect = document.getElementById(selectId);
+    if (!nativeSelect) return;
+
+    const wrapper = document.getElementById(selectId + 'Wrapper');
+    const trigger = document.getElementById(selectId + 'Btn');
+    const optionsContainer = document.getElementById(selectId + 'Options');
+    if (!wrapper || !trigger || !optionsContainer) return;
+
+    // Clear and rebuild options list
+    optionsContainer.innerHTML = '';
+
+    Array.from(nativeSelect.options).forEach(opt => {
+        const customOpt = document.createElement('div');
+        customOpt.className = 'custom-select-option';
+        customOpt.role = 'option';
+        customOpt.dataset.value = opt.value;
+        customOpt.textContent = opt.textContent;
+
+        if (opt.selected) {
+            customOpt.classList.add('selected');
+            trigger.querySelector('span').textContent = opt.textContent;
+        }
+
+        customOpt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            nativeSelect.value = opt.value;
+
+            // Dispatch change event on native element so event handlers run
+            const changeEvent = new Event('change', { bubbles: true });
+            nativeSelect.dispatchEvent(changeEvent);
+
+            syncCustomSelectUI(selectId);
+            closeAllCustomDropdowns();
+        });
+
+        optionsContainer.appendChild(customOpt);
+    });
+
+    // Toggle dropdown visibility
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = optionsContainer.classList.contains('open');
+        closeAllCustomDropdowns();
+        if (!isOpen) {
+            trigger.classList.add('active');
+            optionsContainer.classList.add('open');
+        }
+    });
+
+    // Keyboard accessibility navigation
+    trigger.addEventListener('keydown', (e) => {
+        const isOpen = optionsContainer.classList.contains('open');
+        const items = Array.from(optionsContainer.querySelectorAll('.custom-select-option'));
+        let index = items.findIndex(item => item.classList.contains('highlighted'));
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (!isOpen) {
+                trigger.click();
+            } else {
+                if (index < items.length - 1) {
+                    items.forEach(el => el.classList.remove('highlighted'));
+                    index++;
+                    items[index].classList.add('highlighted');
+                    items[index].scrollIntoView({ block: 'nearest' });
+                }
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (isOpen && index > 0) {
+                items.forEach(el => el.classList.remove('highlighted'));
+                index--;
+                items[index].classList.add('highlighted');
+                items[index].scrollIntoView({ block: 'nearest' });
+            }
+        } else if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (isOpen && index >= 0) {
+                items[index].click();
+            } else {
+                trigger.click();
+            }
+        } else if (e.key === 'Escape') {
+            if (isOpen) {
+                closeAllCustomDropdowns();
+                trigger.focus();
+            }
+        }
+    });
+}
+
+function syncCustomSelectUI(selectId) {
+    const nativeSelect = document.getElementById(selectId);
+    if (!nativeSelect) return;
+
+    const trigger = document.getElementById(selectId + 'Btn');
+    const optionsContainer = document.getElementById(selectId + 'Options');
+    if (!trigger || !optionsContainer) return;
+
+    const selectedVal = nativeSelect.value;
+    const items = Array.from(optionsContainer.querySelectorAll('.custom-select-option'));
+
+    let matchedText = '選択してください';
+    items.forEach(item => {
+        if (item.dataset.value === selectedVal) {
+            item.classList.add('selected');
+            matchedText = item.textContent;
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+
+    trigger.querySelector('span').textContent = matchedText;
+}
+
+function setupCustomDatePicker() {
+    const dateInput = document.getElementById('setEventDate');
+    const trigger = document.getElementById('setEventDateBtn');
+    const popover = document.getElementById('setEventDatePopover');
+    const prevBtn = document.getElementById('calPrevMonthBtn');
+    const nextBtn = document.getElementById('calNextMonthBtn');
+    const grid = document.getElementById('setEventDateGrid');
+
+    if (!dateInput || !trigger || !popover || !grid) return;
+
+    let viewDate = new Date();
+    if (dateInput.value) {
+        viewDate = new Date(dateInput.value);
+    }
+    let viewYear = viewDate.getFullYear();
+    let viewMonth = viewDate.getMonth();
+
+    const yearBtn = document.getElementById('calYearSelectBtn');
+    const yearOptions = document.getElementById('calYearSelectOptions');
+
+    function populateYearDropdown() {
+        yearOptions.innerHTML = '';
+        const startYear = 1900;
+        const endYear = 2100;
+
+        for (let y = startYear; y <= endYear; y++) {
+            const opt = document.createElement('div');
+            opt.className = 'cal-header-select-option';
+            opt.textContent = `${y}年`;
+            opt.dataset.value = y;
+            if (y === viewYear) {
+                opt.classList.add('selected');
+                yearBtn.querySelector('span').textContent = `${y}年`;
+            }
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                viewYear = y;
+                yearOptions.classList.remove('open');
+                yearBtn.classList.remove('active');
+                renderCalDays();
+                updateHeaderSelectsUI();
+            });
+            yearOptions.appendChild(opt);
+        }
+    }
+
+    yearBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = yearOptions.classList.contains('open');
+        closeAllHeaderSelects();
+        if (!isOpen) {
+            yearBtn.classList.add('active');
+            yearOptions.classList.add('open');
+
+            // Auto-scroll selected year into view
+            const selectedOpt = yearOptions.querySelector('.cal-header-select-option.selected');
+            if (selectedOpt) {
+                setTimeout(() => {
+                    selectedOpt.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+                }, 10);
+            }
+        }
+    });
+
+    const monthBtn = document.getElementById('calMonthSelectBtn');
+    const monthOptions = document.getElementById('calMonthSelectOptions');
+
+    function populateMonthDropdown() {
+        monthOptions.innerHTML = '';
+        for (let m = 0; m < 12; m++) {
+            const opt = document.createElement('div');
+            opt.className = 'cal-header-select-option';
+            opt.textContent = `${m + 1}月`;
+            opt.dataset.value = m;
+            if (m === viewMonth) {
+                opt.classList.add('selected');
+                monthBtn.querySelector('span').textContent = `${m + 1}月`;
+            }
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                viewMonth = m;
+                monthOptions.classList.remove('open');
+                monthBtn.classList.remove('active');
+                renderCalDays();
+                updateHeaderSelectsUI();
+            });
+            monthOptions.appendChild(opt);
+        }
+    }
+
+    monthBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = monthOptions.classList.contains('open');
+        closeAllHeaderSelects();
+        if (!isOpen) {
+            monthBtn.classList.add('active');
+            monthOptions.classList.add('open');
+        }
+    });
+
+    function closeAllHeaderSelects() {
+        yearOptions.classList.remove('open');
+        yearBtn.classList.remove('active');
+        monthOptions.classList.remove('open');
+        monthBtn.classList.remove('active');
+    }
+
+    function updateHeaderSelectsUI() {
+        Array.from(yearOptions.querySelectorAll('.cal-header-select-option')).forEach(el => {
+            if (parseInt(el.dataset.value) === viewYear) {
+                el.classList.add('selected');
+                yearBtn.querySelector('span').textContent = `${viewYear}年`;
+            } else {
+                el.classList.remove('selected');
+            }
+        });
+
+        Array.from(monthOptions.querySelectorAll('.cal-header-select-option')).forEach(el => {
+            if (parseInt(el.dataset.value) === viewMonth) {
+                el.classList.add('selected');
+                monthBtn.querySelector('span').textContent = `${viewMonth + 1}月`;
+            } else {
+                el.classList.remove('selected');
+            }
+        });
+    }
+
+    prevBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllHeaderSelects();
+        viewMonth--;
+        if (viewMonth < 0) {
+            viewMonth = 11;
+            viewYear--;
+        }
+        renderCalDays();
+        updateHeaderSelectsUI();
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeAllHeaderSelects();
+        viewMonth++;
+        if (viewMonth > 11) {
+            viewMonth = 0;
+            viewYear++;
+        }
+        renderCalDays();
+        updateHeaderSelectsUI();
+    });
+
+    function renderCalDays() {
+        grid.innerHTML = '';
+
+        const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+        const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-cell empty';
+            grid.appendChild(cell);
+        }
+
+        const selectedDateStr = dateInput.value;
+        const todayDateStr = new Date().toDateString();
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const cell = document.createElement('div');
+            cell.className = 'calendar-cell';
+            cell.textContent = day;
+
+            const thisDate = new Date(viewYear, viewMonth, day);
+            const thisDateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+            if (thisDate.toDateString() === todayDateStr) {
+                cell.classList.add('today');
+            }
+
+            if (selectedDateStr === thisDateStr) {
+                cell.classList.add('selected');
+            }
+
+            cell.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dateInput.value = thisDateStr;
+
+                const changeEvent = new Event('change', { bubbles: true });
+                dateInput.dispatchEvent(changeEvent);
+
+                syncCustomDatePickerUI();
+                closeAllCustomDropdowns();
+            });
+
+            grid.appendChild(cell);
+        }
+    }
+
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = popover.classList.contains('open');
+        closeAllCustomDropdowns();
+        if (!isOpen) {
+            trigger.classList.add('active');
+            popover.classList.add('open');
+
+            if (dateInput.value) {
+                const curDate = new Date(dateInput.value);
+                viewYear = curDate.getFullYear();
+                viewMonth = curDate.getMonth();
+            }
+            populateYearDropdown();
+            populateMonthDropdown();
+            renderCalDays();
+        }
+    });
+
+    populateYearDropdown();
+    populateMonthDropdown();
+    renderCalDays();
+}
+
+function syncCustomDatePickerUI() {
+    const dateInput = document.getElementById('setEventDate');
+    const trigger = document.getElementById('setEventDateBtn');
+    if (!dateInput || !trigger) return;
+
+    if (dateInput.value) {
+        const formatted = dateInput.value.replace(/-/g, '/');
+        document.getElementById('setEventDateVal').textContent = formatted;
+    } else {
+        document.getElementById('setEventDateVal').textContent = '日付を選択';
+    }
+}
+
+function closeAllCustomDropdowns() {
+    document.querySelectorAll('.custom-select-options, .calendar-popover, .cal-header-select-options').forEach(el => {
+        el.classList.remove('open');
+    });
+    document.querySelectorAll('.custom-select-trigger, .calendar-input-trigger, .cal-header-select-btn').forEach(el => {
+        el.classList.remove('active');
+    });
+}
+
+function buildCustomSelectMarkup(nativeSelect, wrapperClass = '') {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'custom-select-wrapper ' + wrapperClass;
+
+    nativeSelect.classList.add('hidden-native-input');
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'custom-select-trigger';
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+
+    const triggerText = document.createElement('span');
+    const selectedOpt = nativeSelect.options[nativeSelect.selectedIndex];
+    triggerText.textContent = selectedOpt ? selectedOpt.textContent : '選択してください';
+    trigger.appendChild(triggerText);
+
+    // Chevron SVG (no emoji)
+    const chevronSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    chevronSvg.setAttribute('class', 'chevron-icon');
+    chevronSvg.setAttribute('viewBox', '0 0 24 24');
+    chevronSvg.setAttribute('width', '16');
+    chevronSvg.setAttribute('height', '16');
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M7 10l5 5 5-5z');
+    path.setAttribute('fill', 'currentColor');
+    chevronSvg.appendChild(path);
+    trigger.appendChild(chevronSvg);
+
+    const optionsContainer = document.createElement('div');
+    optionsContainer.className = 'custom-select-options';
+    optionsContainer.setAttribute('role', 'listbox');
+
+    function populateOptions() {
+        optionsContainer.innerHTML = '';
+        Array.from(nativeSelect.options).forEach(opt => {
+            const customOpt = document.createElement('div');
+            customOpt.className = 'custom-select-option';
+            customOpt.role = 'option';
+            customOpt.dataset.value = opt.value;
+            customOpt.textContent = opt.textContent;
+
+            if (opt.selected) {
+                customOpt.classList.add('selected');
+                triggerText.textContent = opt.textContent;
+            }
+
+            customOpt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                nativeSelect.value = opt.value;
+
+                const changeEvent = new Event('change', { bubbles: true });
+                nativeSelect.dispatchEvent(changeEvent);
+
+                triggerText.textContent = opt.textContent;
+                Array.from(optionsContainer.querySelectorAll('.custom-select-option')).forEach(item => {
+                    if (item.dataset.value === opt.value) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+
+                closeAllCustomDropdowns();
+            });
+
+            optionsContainer.appendChild(customOpt);
+        });
+    }
+
+    populateOptions();
+
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = optionsContainer.classList.contains('open');
+        closeAllCustomDropdowns();
+        if (!isOpen) {
+            trigger.classList.add('active');
+            optionsContainer.classList.add('open');
+            populateOptions();
+        }
+    });
+
+    trigger.addEventListener('keydown', (e) => {
+        const isOpen = optionsContainer.classList.contains('open');
+        const items = Array.from(optionsContainer.querySelectorAll('.custom-select-option'));
+        let index = items.findIndex(item => item.classList.contains('highlighted'));
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (!isOpen) {
+                trigger.click();
+            } else {
+                if (index < items.length - 1) {
+                    items.forEach(el => el.classList.remove('highlighted'));
+                    index++;
+                    items[index].classList.add('highlighted');
+                    items[index].scrollIntoView({ block: 'nearest' });
+                }
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (isOpen && index > 0) {
+                items.forEach(el => el.classList.remove('highlighted'));
+                index--;
+                items[index].classList.add('highlighted');
+                items[index].scrollIntoView({ block: 'nearest' });
+            }
+        } else if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (isOpen && index >= 0) {
+                items[index].click();
+            } else {
+                trigger.click();
+            }
+        } else if (e.key === 'Escape') {
+            if (isOpen) {
+                closeAllCustomDropdowns();
+                trigger.focus();
+            }
+        }
+    });
+
+    wrapper.appendChild(trigger);
+    wrapper.appendChild(optionsContainer);
+    wrapper.appendChild(nativeSelect);
+
+    return wrapper;
 }

@@ -1156,7 +1156,7 @@ h1.main-title {
     left: 50%;
     transform: translateX(-50%);
     width: 3px;
-    background-color: var(--baken-theme-color, #111);
+    background-color: #111;
     height: 72px;
     z-index: -1;
 }

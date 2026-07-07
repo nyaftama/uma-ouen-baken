@@ -35,14 +35,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=1.06d">
+    <link rel="stylesheet" href="css/style.css?v=1.07">
 </head>
 
 <body>
 
     <div class="container">
         <div class="header-meta">
-            <span class="version-text">v<span id="version">1.06d</span></span>
+            <span class="version-text">v<span id="version">1.07</span></span>
             <a href="https://nyaftama.github.io/" target="_blank" rel="noopener noreferrer" class="credit-link">作った人:
                 <strong>@nyaftama</strong>
             </a>
@@ -79,13 +79,24 @@
 
         <div
             style="margin: 0 10px 15px 10px; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; user-select: none;">
-            <div style="display: inline-flex; align-items: center; gap: 6px;">
-                <label class="history-checkbox-wrapper" style="width: 22px; height: 22px;">
-                    <input type="checkbox" id="reflectCharColorCheckbox" class="history-checkbox">
-                    <div class="custom-checkbox"></div>
-                </label>
-                <label for="reflectCharColorCheckbox"
-                    style="font-weight: bold; cursor: pointer; font-size: 0.8rem; color: #333;">イメージカラーを反映</label>
+            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px;">
+                <div style="display: inline-flex; align-items: center; gap: 6px;">
+                    <label class="history-checkbox-wrapper" style="width: 22px; height: 22px;">
+                        <input type="checkbox" id="reflectCharColorCheckbox" class="history-checkbox">
+                        <div class="custom-checkbox"></div>
+                    </label>
+                    <label for="reflectCharColorCheckbox"
+                        style="font-weight: bold; cursor: pointer; font-size: 0.8rem; color: #333;">イメージカラーを反映</label>
+                </div>
+                <div id="invertColorSubItem"
+                    style="display: inline-flex; align-items: center; gap: 6px; margin-left: 28px; transition: opacity 0.15s ease;">
+                    <label class="history-checkbox-wrapper" style="width: 18px; height: 18px;">
+                        <input type="checkbox" id="invertColorCheckbox" class="history-checkbox">
+                        <div class="custom-checkbox" style="border-radius: 3px;"></div>
+                    </label>
+                    <label for="invertColorCheckbox"
+                        style="font-weight: bold; cursor: pointer; font-size: 0.75rem; color: #555;">メイン/サブを反転</label>
+                </div>
             </div>
             <div style="display: inline-flex; align-items: center; gap: 6px;">
                 <label class="history-checkbox-wrapper" style="width: 22px; height: 22px;">
@@ -158,9 +169,40 @@
                 <span style="color: var(--primary-color); font-weight: bold;">Xでシェアする際には、保存した画像を手動で添付してください。</span>
             </p>
 
-            <div id="shareImageLoading" style="padding: 20px; color: #666;">推しバ券を印刷中...</div>
+            <div id="shareImageLoading">推しバ券を発券中...</div>
             <img id="shareImagePreview" src="" alt="推しバ券"
                 style="width: 100%; border-radius: 4px; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+
+            <div
+                style="margin: 15px 0 5px 0; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; user-select: none;">
+                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px;">
+                    <div style="display: inline-flex; align-items: center; gap: 6px;">
+                        <label class="history-checkbox-wrapper" style="width: 22px; height: 22px;">
+                            <input type="checkbox" id="modalReflectCharColorCheckbox" class="history-checkbox">
+                            <div class="custom-checkbox"></div>
+                        </label>
+                        <label for="modalReflectCharColorCheckbox"
+                            style="font-weight: bold; cursor: pointer; font-size: 0.8rem; color: #333;">イメージカラーを反映</label>
+                    </div>
+                    <div id="modalInvertColorSubItem"
+                        style="display: inline-flex; align-items: center; gap: 6px; margin-left: 28px; transition: opacity 0.15s ease;">
+                        <label class="history-checkbox-wrapper" style="width: 18px; height: 18px;">
+                            <input type="checkbox" id="modalInvertColorCheckbox" class="history-checkbox">
+                            <div class="custom-checkbox" style="border-radius: 3px;"></div>
+                        </label>
+                        <label for="modalInvertColorCheckbox"
+                            style="font-weight: bold; cursor: pointer; font-size: 0.75rem; color: #555;">メイン/サブを反転</label>
+                    </div>
+                </div>
+                <div style="display: inline-flex; align-items: center; gap: 6px;">
+                    <label class="history-checkbox-wrapper" style="width: 22px; height: 22px;">
+                        <input type="checkbox" id="modalBitmapTextCheckbox" class="history-checkbox">
+                        <div class="custom-checkbox"></div>
+                    </label>
+                    <label for="modalBitmapTextCheckbox"
+                        style="font-weight: bold; cursor: pointer; font-size: 0.8rem; color: #333;">文字をビットマップ化</label>
+                </div>
+            </div>
 
             <div class="modal-actions">
                 <button id="shareCloseBtn" class="modal-btn cancel">閉じる</button>
@@ -345,7 +387,7 @@
         </div>
     </div>
 
-    <script src="js/app.js?v=1.06d" defer></script>
+    <script src="js/app.js?v=1.07" defer></script>
 
 </body>
 

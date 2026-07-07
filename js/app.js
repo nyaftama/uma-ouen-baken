@@ -1,5 +1,5 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.06d';
+const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.07';
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];
@@ -11,6 +11,7 @@ let umaNumbers = {};
 
 let cartItems = [];
 let cartAmount = 100;
+let currentGeneratingTicketParams = null;
 
 let advancedSettings = {
     bitmapText: false
@@ -19,7 +20,7 @@ let advancedSettings = {
 try {
     const savedAdvancedSettings = localStorage.getItem('uma_baken_advanced_settings_allstar');
     if (savedAdvancedSettings) {
-        advancedSettings = JSON.parse(savedAdvancedSettings);
+        advancedSettings = { ...advancedSettings, ...JSON.parse(savedAdvancedSettings) };
     }
 } catch (e) {
     console.error(e);
@@ -35,34 +36,151 @@ try {
     console.error(e);
 }
 
+let invertCharColor = false;
+try {
+    const savedInvertColor = localStorage.getItem('uma_baken_invert_color');
+    if (savedInvertColor !== null) {
+        invertCharColor = savedInvertColor === 'true';
+    }
+} catch (e) {
+    console.error(e);
+}
+
+function updateInvertColorVisibility() {
+    const invertSubItem = document.getElementById('invertColorSubItem');
+    const modalInvertSubItem = document.getElementById('modalInvertColorSubItem');
+
+    if (invertSubItem) {
+        if (reflectCharColor) {
+            invertSubItem.style.opacity = '1';
+            invertSubItem.style.pointerEvents = 'auto';
+        } else {
+            invertSubItem.style.opacity = '0.4';
+            invertSubItem.style.pointerEvents = 'none';
+        }
+    }
+    if (modalInvertSubItem) {
+        if (reflectCharColor) {
+            modalInvertSubItem.style.opacity = '1';
+            modalInvertSubItem.style.pointerEvents = 'auto';
+        } else {
+            modalInvertSubItem.style.opacity = '0.4';
+            modalInvertSubItem.style.pointerEvents = 'none';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const checkbox = document.getElementById('reflectCharColorCheckbox');
-    if (checkbox) {
-        checkbox.checked = reflectCharColor;
-        checkbox.addEventListener('change', (e) => {
-            reflectCharColor = e.target.checked;
-            try {
-                localStorage.setItem('uma_baken_reflect_color', reflectCharColor);
-            } catch (err) {
-                console.error(err);
-            }
-        });
-    }
-
+    const modalCheckbox = document.getElementById('modalReflectCharColorCheckbox');
     const bitmapCheckbox = document.getElementById('bitmapTextCheckbox');
-    if (bitmapCheckbox) {
-        bitmapCheckbox.checked = advancedSettings.bitmapText;
-        bitmapCheckbox.addEventListener('change', (e) => {
-            advancedSettings.bitmapText = e.target.checked;
-            try {
-                localStorage.setItem('uma_baken_advanced_settings_allstar', JSON.stringify(advancedSettings));
-            } catch (err) {
-                console.error(err);
-            }
-        });
+    const modalBitmapCheckbox = document.getElementById('modalBitmapTextCheckbox');
+    const invertCheckbox = document.getElementById('invertColorCheckbox');
+    const modalInvertCheckbox = document.getElementById('modalInvertColorCheckbox');
+
+    if (checkbox) checkbox.checked = reflectCharColor;
+    if (modalCheckbox) modalCheckbox.checked = reflectCharColor;
+    if (bitmapCheckbox) bitmapCheckbox.checked = advancedSettings.bitmapText;
+    if (modalBitmapCheckbox) modalBitmapCheckbox.checked = advancedSettings.bitmapText;
+    if (invertCheckbox) invertCheckbox.checked = invertCharColor;
+    if (modalInvertCheckbox) modalInvertCheckbox.checked = invertCharColor;
+
+    updateInvertColorVisibility();
+
+    const handleReflectColorChange = (isChecked, source) => {
+        reflectCharColor = isChecked;
+        try {
+            localStorage.setItem('uma_baken_reflect_color', reflectCharColor);
+        } catch (err) {
+            console.error(err);
+        }
+
+        // Sync check states
+        if (source === 'main' && modalCheckbox) {
+            modalCheckbox.checked = isChecked;
+        } else if (source === 'modal' && checkbox) {
+            checkbox.checked = isChecked;
+        }
+
+        updateInvertColorVisibility();
+
+        // If changed from modal and ticket is currently shown, regenerate it
+        if (source === 'modal' && currentGeneratingTicketParams) {
+            setTimeout(() => {
+                const { data, amount, betType } = currentGeneratingTicketParams;
+                generateTicket(data, amount, betType, true);
+            }, 50);
+        }
+    };
+
+    const handleBitmapTextChange = (isChecked, source) => {
+        advancedSettings.bitmapText = isChecked;
+        try {
+            localStorage.setItem('uma_baken_advanced_settings_allstar', JSON.stringify(advancedSettings));
+        } catch (err) {
+            console.error(err);
+        }
+
+        // Sync check states
+        if (source === 'main' && modalBitmapCheckbox) {
+            modalBitmapCheckbox.checked = isChecked;
+        } else if (source === 'modal' && bitmapCheckbox) {
+            bitmapCheckbox.checked = isChecked;
+        }
+
+        // If changed from modal and ticket is currently shown, regenerate it
+        if (source === 'modal' && currentGeneratingTicketParams) {
+            setTimeout(() => {
+                const { data, amount, betType } = currentGeneratingTicketParams;
+                generateTicket(data, amount, betType, true);
+            }, 50);
+        }
+    };
+
+    const handleInvertColorChange = (isChecked, source) => {
+        invertCharColor = isChecked;
+        try {
+            localStorage.setItem('uma_baken_invert_color', invertCharColor);
+        } catch (err) {
+            console.error(err);
+        }
+
+        // Sync check states
+        if (source === 'main' && modalInvertCheckbox) {
+            modalInvertCheckbox.checked = isChecked;
+        } else if (source === 'modal' && invertCheckbox) {
+            invertCheckbox.checked = isChecked;
+        }
+
+        // If changed from modal and ticket is currently shown, regenerate it
+        if (source === 'modal' && currentGeneratingTicketParams) {
+            setTimeout(() => {
+                const { data, amount, betType } = currentGeneratingTicketParams;
+                generateTicket(data, amount, betType, true);
+            }, 50);
+        }
+    };
+
+    if (checkbox) {
+        checkbox.addEventListener('change', (e) => handleReflectColorChange(e.target.checked, 'main'));
+    }
+    if (modalCheckbox) {
+        modalCheckbox.addEventListener('change', (e) => handleReflectColorChange(e.target.checked, 'modal'));
     }
 
+    if (bitmapCheckbox) {
+        bitmapCheckbox.addEventListener('change', (e) => handleBitmapTextChange(e.target.checked, 'main'));
+    }
+    if (modalBitmapCheckbox) {
+        modalBitmapCheckbox.addEventListener('change', (e) => handleBitmapTextChange(e.target.checked, 'modal'));
+    }
 
+    if (invertCheckbox) {
+        invertCheckbox.addEventListener('change', (e) => handleInvertColorChange(e.target.checked, 'main'));
+    }
+    if (modalInvertCheckbox) {
+        modalInvertCheckbox.addEventListener('change', (e) => handleInvertColorChange(e.target.checked, 'modal'));
+    }
 });
 
 function hexToHsl(hex) {
@@ -114,7 +232,7 @@ function applyBakenThemeColor(data) {
     const bakenDOM = document.getElementById('bakenSlip');
     if (!bakenDOM) return;
 
-    const isEnabled = document.getElementById('reflectCharColorCheckbox')?.checked;
+    const isEnabled = reflectCharColor;
     if (!isEnabled) {
         bakenDOM.style.removeProperty('--baken-bg-color');
         bakenDOM.style.removeProperty('--baken-theme-color');
@@ -136,7 +254,9 @@ function applyBakenThemeColor(data) {
     const found = allUmaData.find(r => r.cast_name === castName || (r.uma_name && r.uma_name.replace('役', '').trim() === cleanUmaName));
 
     if (found && found.main_color) {
-        const colors = getThemeColors(found.main_color, found.sub_color);
+        const main = invertCharColor ? (found.sub_color || found.main_color) : found.main_color;
+        const sub = invertCharColor ? found.main_color : found.sub_color;
+        const colors = getThemeColors(main, sub);
         bakenDOM.style.setProperty('--baken-bg-color', colors.bg);
         bakenDOM.style.setProperty('--baken-theme-color', colors.theme);
         bakenDOM.style.setProperty('--baken-watermark-color', colors.watermark);
@@ -688,8 +808,19 @@ function formatBakenRaceName(name) {
 }
 
 async function generateTicket(data, amount, betType, isReissue = false) {
+    currentGeneratingTicketParams = { data, amount, betType };
+
+    const modalCheckbox = document.getElementById('modalReflectCharColorCheckbox');
+    if (modalCheckbox) modalCheckbox.checked = reflectCharColor;
+    const modalBitmapCheckbox = document.getElementById('modalBitmapTextCheckbox');
+    if (modalBitmapCheckbox) modalBitmapCheckbox.checked = advancedSettings.bitmapText;
+    const modalInvertCheckbox = document.getElementById('modalInvertColorCheckbox');
+    if (modalInvertCheckbox) modalInvertCheckbox.checked = invertCharColor;
+
+    updateInvertColorVisibility();
+
     shareModal.classList.add('show');
-    shareImageLoading.style.display = 'block';
+    shareImageLoading.style.display = 'flex';
     shareImagePreview.style.display = 'none';
 
     applyBakenThemeColor(data);
@@ -871,6 +1002,7 @@ async function generateTicket(data, amount, betType, isReissue = false) {
 
         if (!_0xV) {
             shareModal.classList.remove('show');
+            currentGeneratingTicketParams = null;
             showToast('エラー：不正な値が検出されました');
             return;
         }
@@ -1354,6 +1486,7 @@ function generateAndDownloadPDF(images) {
 
 document.getElementById('shareCloseBtn').addEventListener('click', () => {
     shareModal.classList.remove('show');
+    currentGeneratingTicketParams = null;
 });
 
 const updateCartQty = (newAmount) => {
@@ -1379,6 +1512,7 @@ document.getElementById('cartIssueBtn').addEventListener('click', () => {
 document.getElementById('openHistoryFromShare').addEventListener('click', (e) => {
     e.preventDefault();
     shareModal.classList.remove('show');
+    currentGeneratingTicketParams = null;
     renderHistoryList();
     historyModal.classList.add('show');
 });

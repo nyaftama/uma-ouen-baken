@@ -715,6 +715,21 @@ h1.main-title {
     text-align: center;
 }
 
+#shareImageLoading {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 760 / 420;
+    box-sizing: border-box;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    background-color: #fafafa;
+    color: #666;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
 .modal-actions {
     display: flex;
     gap: 10px;
@@ -1045,7 +1060,7 @@ h1.main-title {
     border: 2px solid #111;
     font-size: 2.5rem;
     font-weight: 900;
-    padding: 2px 15px;
+    padding: 0px 15px 4px 15px;
     border-radius: 4px;
     min-width: 44px;
     text-align: center;
@@ -1141,7 +1156,7 @@ h1.main-title {
     border: 3px solid #111;
     font-size: 2.2rem;
     font-weight: 900;
-    padding: 2px 10px;
+    padding: 0px 10px 4px 10px;
     border-radius: 4px;
     font-family: 'Noto Sans JP', sans-serif;
     display: inline-block;

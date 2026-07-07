@@ -715,12 +715,22 @@ h1.main-title {
     text-align: center;
 }
 
+.share-image-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 760 / 420;
+    margin-bottom: 15px;
+}
+
 #shareImageLoading {
     display: none;
     align-items: center;
     justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    aspect-ratio: 760 / 420;
+    height: 100%;
     box-sizing: border-box;
     border: 2px dashed #ccc;
     border-radius: 4px;
@@ -728,6 +738,7 @@ h1.main-title {
     color: #666;
     font-weight: bold;
     font-size: 0.95rem;
+    z-index: 1;
 }
 
 .modal-actions {

@@ -982,8 +982,8 @@ h1.main-title {
     z-index: 1;
     --wm-size: 130px;
     --wm-gap: 140px;
-    --wm-start-y: -84px;
-    --wm-start-x: 0px;
+    --wm-start-y: -88px;
+    --wm-start-x: -6px;
     --wm-step: calc(var(--wm-size) + var(--wm-gap));
     --wm-offset: calc(var(--wm-step) / 2);
 }

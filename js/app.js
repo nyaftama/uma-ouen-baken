@@ -1,9 +1,8 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.07b';
+const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.07c';
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];
-let searchKeywordsArray = [];
 
 let ticketAmounts = {};
 let ticketTypes = {};
@@ -435,17 +434,63 @@ function hiraganaToKatakana(str) {
     });
 }
 
+function katakanaToHiragana(str) {
+    return str.replace(/[\u30a1-\u30f6]/g, function (match) {
+        const chr = match.charCodeAt(0) - 0x60;
+        return String.fromCharCode(chr);
+    });
+}
+
 function getMatches(keyword) {
     if (!keyword) return [];
     const katakanaKeyword = hiraganaToKatakana(keyword);
-    return searchKeywordsArray.filter(k => {
-        const kLower = k.toLowerCase();
-        const isKatakana = /^[ァ-ヶー・ 　]+$/.test(k);
-        if (isKatakana) {
-            return kLower.includes(keyword) || kLower.includes(katakanaKeyword);
+    const hiraganaKeyword = katakanaToHiragana(keyword);
+
+    const matchesMap = new Map();
+
+    for (const row of allUmaData) {
+        const castName = (row.cast_name || '').trim();
+        const umaName = (row.uma_name || '').replace('役', '').trim();
+        const castKana = (row.cast_name_kana || '').trim();
+
+        // キャスト名でのマッチ判定
+        const castMatched = castName.toLowerCase().includes(keyword) ||
+            (castKana && (castKana.toLowerCase().includes(keyword) || castKana.toLowerCase().includes(hiraganaKeyword)));
+
+        if (castMatched && castName) {
+            const key = `cast_${castName}`;
+            if (!matchesMap.has(key)) {
+                matchesMap.set(key, {
+                    type: 'cast',
+                    value: castName,
+                    subValue: umaName
+                });
+            }
         }
-        return kLower.includes(keyword);
-    }).slice(0, 3);
+
+        // キャラ名でのマッチ判定
+        const umaLower = umaName.toLowerCase();
+        const isKatakana = /^[ァ-ヶー・ 　]+$/.test(umaName);
+        let umaMatched = false;
+        if (isKatakana) {
+            umaMatched = umaLower.includes(keyword) || umaLower.includes(katakanaKeyword);
+        } else {
+            umaMatched = umaLower.includes(keyword);
+        }
+
+        if (umaMatched && umaName) {
+            const key = `uma_${umaName}`;
+            if (!matchesMap.has(key)) {
+                matchesMap.set(key, {
+                    type: 'uma',
+                    value: umaName,
+                    subValue: castName
+                });
+            }
+        }
+    }
+
+    return Array.from(matchesMap.values()).slice(0, 3);
 }
 
 const searchInput = document.getElementById('searchInput');
@@ -456,13 +501,6 @@ Papa.parse(umaCsvPath, {
     download: true, header: true, skipEmptyLines: true,
     complete: function (results) {
         allUmaData = results.data;
-
-        const keywordsSet = new Set();
-        allUmaData.forEach(row => {
-            if (row.cast_name) keywordsSet.add(row.cast_name.trim());
-            if (row.uma_name) keywordsSet.add(row.uma_name.replace('役', '').trim());
-        });
-        searchKeywordsArray = Array.from(keywordsSet).filter(k => k);
 
         applyFilters();
         document.getElementById('loading').style.display = 'none';
@@ -476,6 +514,7 @@ Papa.parse(umaCsvPath, {
 function applyFilters() {
     const keyword = searchInput.value.toLowerCase().trim();
     const katakanaKeyword = hiraganaToKatakana(keyword);
+    const hiraganaKeyword = katakanaToHiragana(keyword);
 
     const activeFilters = {
         // dormitory: document.getElementById('dormitorySelect')?.value,
@@ -489,8 +528,13 @@ function applyFilters() {
         // ② キーワード検索判定
         if (keyword) {
             const cast = (row.cast_name || '').toLowerCase();
+            const castKana = (row.cast_name_kana || '').toLowerCase();
             const uma = (row.uma_name || '').toLowerCase();
-            return cast.includes(keyword) || uma.includes(keyword) || uma.includes(katakanaKeyword);
+            return cast.includes(keyword) ||
+                castKana.includes(keyword) ||
+                castKana.includes(hiraganaKeyword) ||
+                uma.includes(keyword) ||
+                uma.includes(katakanaKeyword);
         }
         return true;
     });
@@ -511,7 +555,7 @@ searchInput.addEventListener('keydown', function (e) {
         const keyword = searchInput.value.toLowerCase().trim();
         const matches = getMatches(keyword);
         if (matches.length === 1) {
-            selectSuggestion(matches[0]);
+            selectSuggestion(matches[0].value);
         } else {
             suggestionsBox.innerHTML = '';
         }
@@ -545,20 +589,18 @@ function showSuggestions(keyword) {
     const matches = getMatches(keyword);
     if (matches.length === 0) return;
 
-    const isSingleMatch = matches.length === 1;
-
     matches.forEach(match => {
         const div = document.createElement('div');
         div.className = 'suggestion-item';
         div.innerHTML = `
                     <div style="display: flex; align-items: center;">
                         <span class="suggestion-icon-svg"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg></span>
-                        ${match}
+                        ${match.value}
                     </div>
-                    ${isSingleMatch ? '<span class="suggestion-enter-confirm" style="font-size: 0.75rem; color: #888; white-space: nowrap; margin-left: 10px;">Enterで確定</span>' : ''}
+                    <span class="suggestion-sub-value" style="font-size: 0.8rem; color: #888; white-space: nowrap; margin-left: 10px;">${match.subValue}</span>
                 `;
         div.addEventListener('click', () => {
-            selectSuggestion(match);
+            selectSuggestion(match.value);
         });
         suggestionsBox.appendChild(div);
     });

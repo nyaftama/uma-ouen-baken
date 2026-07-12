@@ -1,5 +1,5 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.07d';
+const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.07e';
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];
@@ -1573,6 +1573,65 @@ function updateEventSettingsUI() {
         `${formattedDate} | ${eventSettings.racecourse} | ${eventSettings.raceNumber}R | ${eventSettings.grade} | ${eventSettings.raceName}`;
 }
 
+function formatPeriod(key) {
+    if (key === 'special') return 'スペシャル';
+    const match = key.match(/^y(0[1-3])_m(0[1-9]|1[0-2])_(early|late)$/);
+    if (!match) return key;
+
+    const yearMap = { '01': 'ジュニア級', '02': 'クラシック級', '03': 'シニア級' };
+    const periodMap = { 'early': '前半', 'late': '後半' };
+
+    const year = yearMap[match[1]];
+    const month = parseInt(match[2], 10) + '月';
+    const period = periodMap[match[3]];
+
+    return `${year}${month}${period}`;
+}
+
+function formatPeriods(periods) {
+    if (periods.length === 0) return '';
+    if (periods.length === 1) return formatPeriod(periods[0]);
+
+    const parsed = periods.map(p => {
+        if (p === 'special') return { type: 'special', label: 'スペシャル' };
+        const match = p.match(/^y(0[1-3])_m(0[1-9]|1[0-2])_(early|late)$/);
+        if (!match) return { type: 'unknown', label: p };
+        return {
+            type: 'standard',
+            year: match[1],
+            month: parseInt(match[2], 10),
+            period: match[3]
+        };
+    });
+
+    const groups = {};
+    const others = [];
+
+    parsed.forEach(item => {
+        if (item.type === 'standard') {
+            const periodKey = `${item.month}月${item.period === 'early' ? '前半' : '後半'}`;
+            if (!groups[periodKey]) {
+                groups[periodKey] = [];
+            }
+            groups[periodKey].push(item.year);
+        } else {
+            others.push(item.label);
+        }
+    });
+
+    const yearLabelMap = { '01': 'ジュニア', '02': 'クラシック', '03': 'シニア' };
+    const parts = [];
+
+    for (const [periodKey, years] of Object.entries(groups)) {
+        const yearLabels = years.map(y => yearLabelMap[y]).filter(Boolean);
+        const yearStr = yearLabels.join('/');
+        parts.push(`${yearStr}級${periodKey}`);
+    }
+
+    others.forEach(o => parts.push(o));
+    return parts.join(', ');
+}
+
 function setupRaceNameSuggestion(optionsList) {
     const inputEl = document.getElementById('setRaceName');
     const boxEl = document.getElementById('raceSuggestionsBox');
@@ -1589,7 +1648,7 @@ function setupRaceNameSuggestion(optionsList) {
             return;
         }
 
-        const matches = optionsList.filter(name => name.toLowerCase().includes(keyword)).slice(0, 5);
+        const matches = optionsList.filter(item => item.name.toLowerCase().includes(keyword)).slice(0, 5);
 
         if (matches.length === 0) {
             boxEl.style.display = 'none';
@@ -1600,16 +1659,45 @@ function setupRaceNameSuggestion(optionsList) {
         matches.forEach(match => {
             const div = document.createElement('div');
             div.className = 'suggestion-item';
-            div.textContent = match;
+
+            const periodStr = formatPeriods(match.periods);
+            div.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="suggestion-icon-svg"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg></span>
+                        <span>${match.name}</span>
+                    </div>
+                    <span class="suggestion-sub-value" style="font-size: 0.8rem; color: #888; white-space: nowrap; margin-left: 10px;">${periodStr}</span>
+                </div>
+            `;
 
             div.addEventListener('click', () => {
-                inputEl.value = match;
+                inputEl.value = match.name;
                 boxEl.innerHTML = '';
                 boxEl.style.display = 'none';
                 clearBtn.style.display = 'block';
             });
             boxEl.appendChild(div);
         });
+    });
+
+    inputEl.addEventListener('keydown', (e) => {
+        if (e.isComposing) return;
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const keyword = inputEl.value.toLowerCase().trim();
+            const matches = optionsList.filter(item => item.name.toLowerCase().includes(keyword));
+            if (matches.length === 1) {
+                inputEl.value = matches[0].name;
+                boxEl.innerHTML = '';
+                boxEl.style.display = 'none';
+                clearBtn.style.display = 'block';
+            } else {
+                boxEl.innerHTML = '';
+                boxEl.style.display = 'none';
+            }
+            inputEl.blur();
+        }
     });
 
     clearBtn.addEventListener('click', () => {
@@ -1676,33 +1764,74 @@ async function initEventSettings() {
             gradeSelect.appendChild(opt);
         });
 
-        setupRaceNameSuggestion(options.race_name);
+        const raceListWithPeriod = [];
+        const raceMap = {};
+        for (const [period, names] of Object.entries(options.race_name)) {
+            names.forEach(name => {
+                if (!raceMap[name]) {
+                    raceMap[name] = [];
+                }
+                raceMap[name].push(period);
+            });
+        }
+        for (const [name, periods] of Object.entries(raceMap)) {
+            raceListWithPeriod.push({ name, periods });
+        }
+        setupRaceNameSuggestion(raceListWithPeriod);
 
         const raceListModal = document.getElementById('raceListModal');
         const raceGridContainer = document.getElementById('raceGridContainer');
+        raceGridContainer.innerHTML = '';
 
-        options.race_name.forEach(name => {
-            const item = document.createElement('div');
-            item.className = 'race-grid-item';
-            item.textContent = name;
+        for (const [period, names] of Object.entries(options.race_name)) {
+            if (names.length === 0) continue;
 
-            item.addEventListener('click', () => {
-                const inputEl = document.getElementById('setRaceName');
-                const clearBtn = document.getElementById('clearRaceInputBtn');
-                const boxEl = document.getElementById('raceSuggestionsBox');
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'race-group';
+            groupDiv.style.marginBottom = '15px';
 
-                inputEl.value = name;
-                clearBtn.style.display = 'block';
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'settings-form-group';
+            headerDiv.style.marginBottom = '6px';
 
-                if (boxEl) {
-                    boxEl.innerHTML = '';
-                    boxEl.style.display = 'none';
-                }
+            const label = document.createElement('label');
+            label.textContent = formatPeriod(period);
+            headerDiv.appendChild(label);
+            groupDiv.appendChild(headerDiv);
 
-                raceListModal.classList.remove('show');
+            const gridDiv = document.createElement('div');
+            gridDiv.className = 'race-grid-container';
+            gridDiv.style.display = 'grid';
+            gridDiv.style.gridTemplateColumns = 'repeat(auto-fill, minmax(130px, 1fr))';
+            gridDiv.style.gap = '8px';
+            gridDiv.style.padding = '0';
+
+            names.forEach(name => {
+                const item = document.createElement('div');
+                item.className = 'race-grid-item';
+                item.textContent = name;
+
+                item.addEventListener('click', () => {
+                    const inputEl = document.getElementById('setRaceName');
+                    const clearBtn = document.getElementById('clearRaceInputBtn');
+                    const boxEl = document.getElementById('raceSuggestionsBox');
+
+                    inputEl.value = name;
+                    clearBtn.style.display = 'block';
+
+                    if (boxEl) {
+                        boxEl.innerHTML = '';
+                        boxEl.style.display = 'none';
+                    }
+
+                    raceListModal.classList.remove('show');
+                });
+                gridDiv.appendChild(item);
             });
-            raceGridContainer.appendChild(item);
-        });
+
+            groupDiv.appendChild(gridDiv);
+            raceGridContainer.appendChild(groupDiv);
+        }
 
         document.getElementById('openRaceListBtn').addEventListener('click', (e) => {
             e.preventDefault();
@@ -1748,8 +1877,9 @@ document.getElementById('saveSettingsBtn').addEventListener('click', async () =>
 
     const response = await fetch('./data/option_list.json?v=' + version);
     const options = await response.json();
+    const flatRaceNames = Object.values(options.race_name).flat();
 
-    if (!options.race_name.includes(inputRaceName)) {
+    if (!flatRaceNames.includes(inputRaceName)) {
         showToast('エラー：リストに存在しないレース名です');
         return;
     }

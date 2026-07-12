@@ -35,14 +35,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=1.07e">
+    <link rel="stylesheet" href="css/style.css?v=1.08">
 </head>
 
 <body>
 
     <div class="container">
         <div class="header-meta">
-            <span class="version-text">v<span id="version">1.07e</span></span>
+            <span class="version-text">v<span id="version">1.08</span></span>
             <a href="https://nyaftama.github.io/" target="_blank" rel="noopener noreferrer" class="credit-link">作った人:
                 <strong>@nyaftama</strong>
             </a>
@@ -314,7 +314,23 @@
         <div class="modal-content" style="text-align: left; max-width: 450px;">
             <h3 class="modal-title">開催情報設定</h3>
 
+            <div class="settings-form-group" style="position: relative; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label for="setRaceName" style="margin-bottom: 0;">レース名</label>
+                    <a href="#" id="openRaceListBtn"
+                        style="font-size: 0.85rem; color: var(--primary-color); font-weight: bold; text-decoration: underline; padding-left: 4px;">レース一覧</a>
+                </div>
 
+                <div class="search-input-wrapper">
+                    <input type="text" id="setRaceName" placeholder="レース名を検索..." autocomplete="off"
+                        style="padding-right: 30px;">
+                    <button id="clearRaceInputBtn" class="clear-input-btn" aria-label="クリア">✕</button>
+                </div>
+
+                <div id="raceSuggestionsBox" class="suggestions-box"
+                    style="left: 0; right: 0; width: 100%; display: none; z-index: 1000; position: absolute; top: 100%;">
+                </div>
+            </div>
 
             <div class="settings-grid">
                 <div class="settings-form-group">
@@ -332,24 +348,6 @@
                 <div class="settings-form-group">
                     <label for="setGrade">レースのグレード</label>
                     <select id="setGrade"></select>
-                </div>
-            </div>
-
-            <div class="settings-form-group" style="position: relative; margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                    <label for="setRaceName" style="margin-bottom: 0;">レース名</label>
-                    <a href="#" id="openRaceListBtn"
-                        style="font-size: 0.85rem; color: var(--primary-color); font-weight: bold; text-decoration: underline; padding-left: 4px;">レース一覧</a>
-                </div>
-
-                <div class="search-input-wrapper">
-                    <input type="text" id="setRaceName" placeholder="レース名を検索..." autocomplete="off"
-                        style="padding-right: 30px;">
-                    <button id="clearRaceInputBtn" class="clear-input-btn" aria-label="クリア">✕</button>
-                </div>
-
-                <div id="raceSuggestionsBox" class="suggestions-box"
-                    style="left: 0; right: 0; width: 100%; display: none; z-index: 1000; position: absolute; top: 100%;">
                 </div>
             </div>
 
@@ -389,7 +387,7 @@
         </div>
     </div>
 
-    <script src="js/app.js?v=1.07e" defer></script>
+    <script src="js/app.js?v=1.08" defer></script>
 
 </body>
 

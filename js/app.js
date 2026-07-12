@@ -1,8 +1,9 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.07e';
+const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.08';
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];
+let allRaceData = [];
 
 let ticketAmounts = {};
 let ticketTypes = {};
@@ -1632,6 +1633,24 @@ function formatPeriods(periods) {
     return parts.join(', ');
 }
 
+function mapCsvGradeToUiGrade(grade) {
+    if (!grade) return '';
+    if (grade === 'G1') return 'GI';
+    if (grade === 'G2') return 'GII';
+    if (grade === 'G3') return 'GIII';
+    return grade;
+}
+
+function getPeriodKey(row) {
+    if (row.is_special === 'true') {
+        return 'special';
+    }
+    const y = String(row.year).padStart(2, '0');
+    const m = String(row.month).padStart(2, '0');
+    const p = row.period === '前半' ? 'early' : 'late';
+    return `y${y}_m${m}_${p}`;
+}
+
 function setupRaceNameSuggestion(optionsList) {
     const inputEl = document.getElementById('setRaceName');
     const boxEl = document.getElementById('raceSuggestionsBox');
@@ -1648,7 +1667,10 @@ function setupRaceNameSuggestion(optionsList) {
             return;
         }
 
-        const matches = optionsList.filter(item => item.name.toLowerCase().includes(keyword)).slice(0, 5);
+        const matches = optionsList.filter(item =>
+            item.name.toLowerCase().includes(keyword) ||
+            (item.kana && item.kana.toLowerCase().includes(keyword))
+        ).slice(0, 5);
 
         if (matches.length === 0) {
             boxEl.style.display = 'none';
@@ -1661,10 +1683,12 @@ function setupRaceNameSuggestion(optionsList) {
             div.className = 'suggestion-item';
 
             const periodStr = formatPeriods(match.periods);
+            const mappedGrade = mapCsvGradeToUiGrade(match.grade);
+            const gradeClass = match.grade ? match.grade.toLowerCase().replace('-', '_') : '';
             div.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <span class="suggestion-icon-svg"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg></span>
+                        <span class="suggestion-grade-badge grade-${gradeClass}">${mappedGrade}</span>
                         <span>${match.name}</span>
                     </div>
                     <span class="suggestion-sub-value" style="font-size: 0.8rem; color: #888; white-space: nowrap; margin-left: 10px;">${periodStr}</span>
@@ -1676,6 +1700,12 @@ function setupRaceNameSuggestion(optionsList) {
                 boxEl.innerHTML = '';
                 boxEl.style.display = 'none';
                 clearBtn.style.display = 'block';
+                if (mappedGrade) {
+                    document.getElementById('setGrade').value = mappedGrade;
+                }
+                if (match.track) {
+                    document.getElementById('setRacecourse').value = match.track;
+                }
             });
             boxEl.appendChild(div);
         });
@@ -1686,12 +1716,22 @@ function setupRaceNameSuggestion(optionsList) {
         if (e.key === 'Enter') {
             e.preventDefault();
             const keyword = inputEl.value.toLowerCase().trim();
-            const matches = optionsList.filter(item => item.name.toLowerCase().includes(keyword));
+            const matches = optionsList.filter(item =>
+                item.name.toLowerCase().includes(keyword) ||
+                (item.kana && item.kana.toLowerCase().includes(keyword))
+            );
             if (matches.length === 1) {
                 inputEl.value = matches[0].name;
                 boxEl.innerHTML = '';
                 boxEl.style.display = 'none';
                 clearBtn.style.display = 'block';
+                const mappedGrade = mapCsvGradeToUiGrade(matches[0].grade);
+                if (mappedGrade) {
+                    document.getElementById('setGrade').value = mappedGrade;
+                }
+                if (matches[0].track) {
+                    document.getElementById('setRacecourse').value = matches[0].track;
+                }
             } else {
                 boxEl.innerHTML = '';
                 boxEl.style.display = 'none';
@@ -1727,8 +1767,13 @@ async function initEventSettings() {
     }
 
     try {
-        const response = await fetch('./data/option_list.json?v=' + version);
-        const options = await response.json();
+        const optResponse = await fetch('./data/option_list.json?v=' + version);
+        const options = await optResponse.json();
+
+        const csvResponse = await fetch('./data/race_list.csv?v=' + version);
+        const csvText = await csvResponse.text();
+        const csvData = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
+        allRaceData = csvData;
 
         function getNextSunday() {
             const date = new Date();
@@ -1764,18 +1809,45 @@ async function initEventSettings() {
             gradeSelect.appendChild(opt);
         });
 
+        const optionsRaceName = {};
+        const raceGradeMap = {};
+        const raceTrackMap = {};
+        const raceKanaMap = {};
+        csvData.forEach(row => {
+            const name = row.race_name;
+            if (!name) return;
+            const periodKey = getPeriodKey(row);
+            if (!optionsRaceName[periodKey]) {
+                optionsRaceName[periodKey] = [];
+            }
+            if (!optionsRaceName[periodKey].includes(name)) {
+                optionsRaceName[periodKey].push(name);
+            }
+            raceGradeMap[name] = row.race_grade;
+            raceTrackMap[name] = row.race_track;
+            raceKanaMap[name] = row.race_name_kana;
+        });
+
         const raceListWithPeriod = [];
         const raceMap = {};
-        for (const [period, names] of Object.entries(options.race_name)) {
+        for (const [period, names] of Object.entries(optionsRaceName)) {
             names.forEach(name => {
                 if (!raceMap[name]) {
                     raceMap[name] = [];
                 }
-                raceMap[name].push(period);
+                if (!raceMap[name].includes(period)) {
+                    raceMap[name].push(period);
+                }
             });
         }
         for (const [name, periods] of Object.entries(raceMap)) {
-            raceListWithPeriod.push({ name, periods });
+            raceListWithPeriod.push({
+                name,
+                periods,
+                grade: raceGradeMap[name] || '',
+                track: raceTrackMap[name] || '',
+                kana: raceKanaMap[name] || ''
+            });
         }
         setupRaceNameSuggestion(raceListWithPeriod);
 
@@ -1783,7 +1855,7 @@ async function initEventSettings() {
         const raceGridContainer = document.getElementById('raceGridContainer');
         raceGridContainer.innerHTML = '';
 
-        for (const [period, names] of Object.entries(options.race_name)) {
+        for (const [period, names] of Object.entries(optionsRaceName)) {
             if (names.length === 0) continue;
 
             const groupDiv = document.createElement('div');
@@ -1808,8 +1880,27 @@ async function initEventSettings() {
 
             names.forEach(name => {
                 const item = document.createElement('div');
-                item.className = 'race-grid-item';
-                item.textContent = name;
+                const rawGrade = raceGradeMap[name] || '';
+                const mappedGrade = mapCsvGradeToUiGrade(rawGrade);
+                const gradeClass = rawGrade.toLowerCase().replace('-', '_');
+                const track = raceTrackMap[name] || '';
+
+                item.className = `race-grid-item grade-${gradeClass}`;
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'race-item-name';
+                nameSpan.style.marginBottom = '2px';
+                nameSpan.textContent = name;
+
+                const gradeSpan = document.createElement('span');
+                gradeSpan.className = 'race-item-grade';
+                gradeSpan.style.fontSize = '0.65rem';
+                gradeSpan.style.opacity = '0.8';
+                gradeSpan.style.fontWeight = 'normal';
+                gradeSpan.textContent = mappedGrade + (track ? ` ${track}` : '');
+
+                item.appendChild(nameSpan);
+                item.appendChild(gradeSpan);
 
                 item.addEventListener('click', () => {
                     const inputEl = document.getElementById('setRaceName');
@@ -1822,6 +1913,13 @@ async function initEventSettings() {
                     if (boxEl) {
                         boxEl.innerHTML = '';
                         boxEl.style.display = 'none';
+                    }
+
+                    if (mappedGrade) {
+                        document.getElementById('setGrade').value = mappedGrade;
+                    }
+                    if (track) {
+                        document.getElementById('setRacecourse').value = track;
                     }
 
                     raceListModal.classList.remove('show');
@@ -1843,7 +1941,7 @@ async function initEventSettings() {
         });
 
     } catch (error) {
-        console.error('オプションリストの読み込みに失敗しました:', error);
+        console.error('オプションリストまたはレースリストの読み込みに失敗しました:', error);
     }
 
     document.getElementById('setEventDate').value = eventSettings.date;
@@ -1875,9 +1973,7 @@ document.getElementById('saveSettingsBtn').addEventListener('click', async () =>
         return;
     }
 
-    const response = await fetch('./data/option_list.json?v=' + version);
-    const options = await response.json();
-    const flatRaceNames = Object.values(options.race_name).flat();
+    const flatRaceNames = allRaceData.map(r => r.race_name).filter(Boolean);
 
     if (!flatRaceNames.includes(inputRaceName)) {
         showToast('エラー：リストに存在しないレース名です');

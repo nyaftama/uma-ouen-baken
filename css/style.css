@@ -1441,7 +1441,7 @@ body[data-display-mode="uma"] .uma-badge {
     text-align: center;
     padding: 8px 6px;
     background: #f8f9fa;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 0.8rem;
     font-weight: bold;
@@ -1452,66 +1452,9 @@ body[data-display-mode="uma"] .uma-badge {
 }
 
 .race-grid-item:hover {
-    background: #f1f8e9;
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-}
-
-.race-grid-item.grade-g1 {
-    background: #eef6ff;
-    border-color: #93c5fd;
-    color: #1e3a8a;
-}
-.race-grid-item.grade-g1:hover {
-    background: #dbeafe;
-    border-color: #2563eb;
-    color: #1d4ed8;
-}
-
-.race-grid-item.grade-g2 {
-    background: #fef2f2;
-    border-color: #fca5a5;
-    color: #7f1d1d;
-}
-.race-grid-item.grade-g2:hover {
-    background: #fee2e2;
-    border-color: #dc2626;
-    color: #b91c1c;
-}
-
-.race-grid-item.grade-g3 {
-    background: #f0fdf4;
-    border-color: #86efac;
-    color: #14532d;
-}
-.race-grid-item.grade-g3:hover {
-    background: #dcfce7;
-    border-color: #16a34a;
-    color: #15803d;
-}
-
-.race-grid-item.grade-op,
-.race-grid-item.grade-pre_op {
-    background: #ecfeff;
-    border-color: #67e8f9;
-    color: #164e63;
-}
-.race-grid-item.grade-op:hover,
-.race-grid-item.grade-pre_op:hover {
-    background: #cffafe;
-    border-color: #0891b2;
-    color: #0e7490;
-}
-
-.race-grid-item.grade-ex {
-    background: #fefce8;
-    border-color: #fde047;
-    color: #713f12;
-}
-.race-grid-item.grade-ex:hover {
-    background: #fef9c3;
-    border-color: #ca8a04;
-    color: #a16207;
+    background: #e0e0e0;
+    border-color: #ccc;
+    color: #333;
 }
 
 /* Suggestion box grade badge */
@@ -1528,29 +1471,34 @@ body[data-display-mode="uma"] .uma-badge {
     box-sizing: border-box;
     margin-right: 6px;
 }
+
 .suggestion-grade-badge.grade-g1 {
-    background-color: #eef6ff;
-    color: #1d4ed8;
-    border-color: #bfdbfe;
+    background-color: #1d4ed8;
+    color: #ffffff;
+    border-color: #1d4ed8;
 }
+
 .suggestion-grade-badge.grade-g2 {
-    background-color: #fef2f2;
-    color: #b91c1c;
-    border-color: #fecaca;
+    background-color: #b91c1c;
+    color: #ffffff;
+    border-color: #b91c1c;
 }
+
 .suggestion-grade-badge.grade-g3 {
-    background-color: #f0fdf4;
-    color: #15803d;
-    border-color: #bbf7d0;
+    background-color: #15803d;
+    color: #ffffff;
+    border-color: #15803d;
 }
+
 .suggestion-grade-badge.grade-op,
 .suggestion-grade-badge.grade-pre_op {
-    background-color: #ecfeff;
-    color: #0e7490;
-    border-color: #a5f3fc;
+    background-color: #6b7280;
+    color: #ffffff;
+    border-color: #6b7280;
 }
+
 .suggestion-grade-badge.grade-ex {
-    background-color: #fefce8;
-    color: #a16207;
-    border-color: #fef08a;
+    background-color: #a16207;
+    color: #ffffff;
+    border-color: #a16207;
 }

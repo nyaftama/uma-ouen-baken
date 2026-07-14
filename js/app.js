@@ -1,5 +1,5 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.08';
+const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.08a';
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];
@@ -886,7 +886,8 @@ async function generateTicket(data, amount, betType, isReissue = false) {
     document.getElementById('bkSlipVenue').textContent = venueDisp;
 
     document.getElementById('bkSlipRaceNumber').textContent = eventSettings.raceNumber;
-    document.getElementById('bkSlipRaceTitle').innerHTML = `${formatBakenRaceName(eventSettings.raceName)}<br>(${eventSettings.grade})`;
+    const gradeSuffix = (eventSettings.grade && eventSettings.grade !== '--') ? `<br>(${eventSettings.grade})` : '';
+    document.getElementById('bkSlipRaceTitle').innerHTML = `${formatBakenRaceName(eventSettings.raceName)}${gradeSuffix}`;
 
     const isMulti = Array.isArray(data);
     const firstData = isMulti ? data[0] : data;
@@ -1315,7 +1316,8 @@ document.getElementById('printSelectedBtn').addEventListener('click', async () =
                 }
                 document.getElementById('bkSlipVenue').textContent = venueDisp;
                 document.getElementById('bkSlipRaceNumber').textContent = currentEvent.raceNumber;
-                document.getElementById('bkSlipRaceTitle').innerHTML = `${formatBakenRaceName(currentEvent.raceName)}<br>(${currentEvent.grade})`;
+                const gradeSuffix = (currentEvent.grade && currentEvent.grade !== '--') ? `<br>(${currentEvent.grade})` : '';
+                document.getElementById('bkSlipRaceTitle').innerHTML = `${formatBakenRaceName(currentEvent.raceName)}${gradeSuffix}`;
 
                 let totalAmount = target.amount;
                 const betType = target.betType;
@@ -1685,10 +1687,12 @@ function setupRaceNameSuggestion(optionsList) {
             const periodStr = formatPeriods(match.periods);
             const mappedGrade = mapCsvGradeToUiGrade(match.grade);
             const gradeClass = match.grade ? match.grade.toLowerCase().replace('-', '_') : '';
+            const showBadge = mappedGrade && mappedGrade !== '--';
+            const badgeHtml = showBadge ? `<span class="suggestion-grade-badge grade-${gradeClass}">${mappedGrade}</span>` : '';
             div.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <span class="suggestion-grade-badge grade-${gradeClass}">${mappedGrade}</span>
+                        ${badgeHtml}
                         <span>${match.name}</span>
                     </div>
                     <span class="suggestion-sub-value" style="font-size: 0.8rem; color: #888; white-space: nowrap; margin-left: 10px;">${periodStr}</span>
@@ -1885,22 +1889,44 @@ async function initEventSettings() {
                 const gradeClass = rawGrade.toLowerCase().replace('-', '_');
                 const track = raceTrackMap[name] || '';
 
-                item.className = `race-grid-item grade-${gradeClass}`;
+                item.className = 'race-grid-item';
 
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'race-item-name';
                 nameSpan.style.marginBottom = '2px';
                 nameSpan.textContent = name;
-
-                const gradeSpan = document.createElement('span');
-                gradeSpan.className = 'race-item-grade';
-                gradeSpan.style.fontSize = '0.65rem';
-                gradeSpan.style.opacity = '0.8';
-                gradeSpan.style.fontWeight = 'normal';
-                gradeSpan.textContent = mappedGrade + (track ? ` ${track}` : '');
-
                 item.appendChild(nameSpan);
-                item.appendChild(gradeSpan);
+
+                const infoDiv = document.createElement('div');
+                infoDiv.style.display = 'flex';
+                infoDiv.style.alignItems = 'center';
+                infoDiv.style.justifyContent = 'center';
+                infoDiv.style.flexWrap = 'wrap';
+                infoDiv.style.gap = '4px';
+                infoDiv.style.marginTop = '4px';
+
+                if (mappedGrade && mappedGrade !== '--') {
+                    const badgeSpan = document.createElement('span');
+                    badgeSpan.className = `suggestion-grade-badge grade-${gradeClass}`;
+                    badgeSpan.textContent = mappedGrade;
+                    if (!track) {
+                        badgeSpan.style.marginRight = '0';
+                    }
+                    infoDiv.appendChild(badgeSpan);
+                }
+
+                if (track) {
+                    const trackSpan = document.createElement('span');
+                    trackSpan.className = 'race-item-track';
+                    trackSpan.style.fontSize = '0.75rem';
+                    trackSpan.style.color = '#666';
+                    trackSpan.textContent = track;
+                    infoDiv.appendChild(trackSpan);
+                }
+
+                if (infoDiv.children.length > 0) {
+                    item.appendChild(infoDiv);
+                }
 
                 item.addEventListener('click', () => {
                     const inputEl = document.getElementById('setRaceName');

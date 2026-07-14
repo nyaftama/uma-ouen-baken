@@ -1,7 +1,7 @@
 year,month,period,race_name,race_name_kana,year_dispname,race_grade,race_track,fleld_type,distance,distance_range,direction,is_special
 ,,,トゥインクルシリーズ,とぅいんくるしりーず,,EX,,,,,,true
 ,,,ドリームトロフィーリーグ,どりーむとろふぃーりーぐ,,EX,,,,,,true
-,,,メイクデビュー,めいくでびゅー,,Pre-OP,,,,,,true
+,,,メイクデビュー,めいくでびゅー,,--,,,,,,true
 1,7,後半,函館ジュニアステークス,はこだてじゅにあすてーくす,ジュニア,G3,函館,芝,1200m,短距離,右,false
 1,7,後半,中京ジュニアステークス,ちゅうきょうじゅにあすてーくす,ジュニア,OP,中京,芝,1600m,マイル,左,false
 1,8,前半,フェニックス賞,ふぇにっくすしょう,ジュニア,OP,小倉,芝,1200m,短距離,右,false

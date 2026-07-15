@@ -1,5 +1,5 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.08a';
+const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.08b';
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];
@@ -400,6 +400,11 @@ function setupLongPress(btn, action) {
         if (e.type === 'touchstart') e.preventDefault();
         if (btn.disabled || isPressing) return;
 
+        const activeInput = document.querySelector('.qty-display input');
+        if (activeInput) {
+            activeInput.blur();
+        }
+
         isPressing = true;
         checkRapidClick();
         action();
@@ -489,6 +494,30 @@ function getMatches(keyword) {
                 });
             }
         }
+
+        // タグでのマッチ判定
+        if (row.tags && row.tags.trim()) {
+            const tagsArray = row.tags.split(/\s+/).filter(t => t.trim() !== '');
+            tagsArray.forEach(tag => {
+                let displayTag = tag;
+                if (!displayTag.startsWith('#')) {
+                    displayTag = '#' + displayTag;
+                }
+                const cleanTag = displayTag.replace(/#/g, '').toLowerCase();
+                const cleanKeyword = keyword.replace(/#/g, '').toLowerCase();
+
+                if (cleanTag.includes(cleanKeyword)) {
+                    const key = `tag_${displayTag}`;
+                    if (!matchesMap.has(key)) {
+                        matchesMap.set(key, {
+                            type: 'tag',
+                            value: displayTag,
+                            subValue: 'タグ検索'
+                        });
+                    }
+                }
+            });
+        }
     }
 
     return Array.from(matchesMap.values()).slice(0, 3);
@@ -531,11 +560,18 @@ function applyFilters() {
             const cast = (row.cast_name || '').toLowerCase();
             const castKana = (row.cast_name_kana || '').toLowerCase();
             const uma = (row.uma_name || '').toLowerCase();
+            const tags = (row.tags || '').toLowerCase();
+
+            const cleanKeyword = keyword.replace(/#/g, '');
+            const cleanTags = tags.replace(/#/g, '');
+
             return cast.includes(keyword) ||
                 castKana.includes(keyword) ||
                 castKana.includes(hiraganaKeyword) ||
                 uma.includes(keyword) ||
-                uma.includes(katakanaKeyword);
+                uma.includes(katakanaKeyword) ||
+                tags.includes(keyword) ||
+                cleanTags.includes(cleanKeyword);
         }
         return true;
     });
@@ -688,6 +724,27 @@ function renderList(data) {
         const nameSpan = document.createElement('span');
         badgesWrapper.appendChild(badgeSpan);
 
+        if (row.tags && row.tags.trim()) {
+            const tagsArray = row.tags.split(/\s+/).filter(t => t.trim() !== '');
+            tagsArray.forEach(tag => {
+                let displayTag = tag;
+                if (!displayTag.startsWith('#')) {
+                    displayTag = '#' + displayTag;
+                }
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'tag-badge';
+                tagSpan.textContent = displayTag;
+                tagSpan.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    searchInput.value = displayTag;
+                    clearInputBtn.style.display = 'block';
+                    applyFilters();
+                    showSuggestions(displayTag);
+                });
+                badgesWrapper.appendChild(tagSpan);
+            });
+        }
+
         nameSpan.className = 'cast-name-text';
         nameSpan.textContent = row.cast_name;
         nameSpan.style.marginLeft = '8px';
@@ -697,6 +754,13 @@ function renderList(data) {
 
         infoTopDiv.appendChild(badgesWrapper);
         infoTopDiv.appendChild(castDiv);
+
+        if (row.note && row.note.trim()) {
+            const noteDiv = document.createElement('div');
+            noteDiv.className = 'uma-note';
+            noteDiv.textContent = row.note;
+            infoTopDiv.appendChild(noteDiv);
+        }
 
         const getTicketData = () => {
             return { ...row, uma_number: umaNumbers[key] };
@@ -737,6 +801,50 @@ function renderList(data) {
         qtySpan.className = 'qty-display'; qtySpan.textContent = ticketAmounts[key];
         const plusBtn = document.createElement('button');
         plusBtn.className = 'qty-btn'; plusBtn.textContent = '＋';
+
+        qtySpan.addEventListener('click', () => {
+            if (qtySpan.querySelector('input')) return;
+            const currentVal = ticketAmounts[key];
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.setAttribute('inputmode', 'numeric');
+            input.setAttribute('pattern', '[0-9]*');
+            input.value = currentVal;
+            input.style.width = '60px';
+            input.style.fontSize = 'inherit';
+            input.style.fontFamily = 'inherit';
+            input.style.fontWeight = 'inherit';
+            input.style.textAlign = 'center';
+            input.style.border = 'none';
+            input.style.background = 'transparent';
+            input.style.outline = 'none';
+            input.style.color = 'inherit';
+            input.style.padding = '0';
+            input.style.margin = '0';
+
+            qtySpan.textContent = '';
+            qtySpan.appendChild(input);
+            input.focus();
+            input.select();
+
+            const finishEdit = () => {
+                let val = parseInt(input.value, 10);
+                if (isNaN(val) || val < 100) {
+                    val = 100;
+                } else {
+                    val = Math.floor(val / 100) * 100;
+                }
+                qtySpan.textContent = val;
+                updateQty(val);
+            };
+
+            input.addEventListener('blur', finishEdit);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    input.blur();
+                }
+            });
+        });
 
         const qtySubRow = document.createElement('div');
         qtySubRow.className = 'qty-sub-row';
@@ -1543,6 +1651,53 @@ const updateCartQty = (newAmount) => {
     document.getElementById('cartMinusBtn').disabled = !isReady || cartAmount <= 100;
     document.getElementById('cartMinus1000Btn').disabled = !isReady || cartAmount <= 100;
 };
+
+const cartQtySpan = document.getElementById('cartQtySpan');
+if (cartQtySpan) {
+    cartQtySpan.addEventListener('click', () => {
+        if (cartQtySpan.querySelector('input')) return;
+        const currentVal = cartAmount;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.setAttribute('inputmode', 'numeric');
+        input.setAttribute('pattern', '[0-9]*');
+        input.value = currentVal;
+        input.style.width = '60px';
+        input.style.fontSize = 'inherit';
+        input.style.fontFamily = 'inherit';
+        input.style.fontWeight = 'inherit';
+        input.style.textAlign = 'center';
+        input.style.border = 'none';
+        input.style.background = 'transparent';
+        input.style.outline = 'none';
+        input.style.color = 'inherit';
+        input.style.padding = '0';
+        input.style.margin = '0';
+
+        cartQtySpan.textContent = '';
+        cartQtySpan.appendChild(input);
+        input.focus();
+        input.select();
+
+        const finishEdit = () => {
+            let val = parseInt(input.value, 10);
+            if (isNaN(val) || val < 100) {
+                val = 100;
+            } else {
+                val = Math.floor(val / 100) * 100;
+            }
+            cartQtySpan.textContent = val;
+            updateCartQty(val);
+        };
+
+        input.addEventListener('blur', finishEdit);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                input.blur();
+            }
+        });
+    });
+}
 
 setupLongPress(document.getElementById('cartMinusBtn'), () => updateCartQty(cartAmount - 100));
 setupLongPress(document.getElementById('cartPlusBtn'), () => updateCartQty(cartAmount + 100));

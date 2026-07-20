@@ -1,5 +1,5 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.08f';
+const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.08g';
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];
@@ -739,7 +739,8 @@ function renderList(data) {
                     searchInput.value = displayTag;
                     clearInputBtn.style.display = 'block';
                     applyFilters();
-                    showSuggestions(displayTag);
+                    suggestionsBox.innerHTML = '';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
                 badgesWrapper.appendChild(tagSpan);
             });

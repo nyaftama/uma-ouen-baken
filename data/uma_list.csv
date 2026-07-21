@@ -181,7 +181,7 @@ uma_name,cast_name,cast_name_kana,main_color,sub_color,is_primary,is_additional,
 おばあさま,榊原良子,,#00b5be,#dfc8e7,FALSE,TRUE,メジロ家の当主,
 SP隊長,呉羽藍依,,#20a95c,#ee5340,FALSE,TRUE,ファインモーションSP部隊の隊長,
 マネージャー,福沙奈恵,,#245099,#e63c5c,FALSE,TRUE,ゴールドシチーのマネージャー,
-ビューティー安心沢,井上喜久子,,,,FALSE,TRUE,ビューティードリームカップの主催者,
+ビューティー安心沢,井上喜久子,,#df4945,#c3cacd,,FALSE,TRUE,ビューティードリームカップの主催者,
 ベルノライト,根本京里,,#f3ce3c,#e03c32,FALSE,TRUE,ボイスコミック版,#シングレ
 ベルノライト,瀬戸桃子,,#f3ce3c,#e03c32,FALSE,TRUE,アニメ版,#シングレ
 北原穣,中村章吾,,#3a7ad2,#ece7e7,FALSE,TRUE,オグリキャップの担当トレーナー ボイスコミック版,#シングレ

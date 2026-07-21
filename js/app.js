@@ -1,5 +1,5 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.08g';
+const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.08h';
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];
@@ -249,13 +249,26 @@ function applyBakenThemeColor(data) {
         return;
     }
 
-    const castName = firstData.cast_name;
-    const cleanUmaName = (firstData.uma_name || '').replace('役', '').trim();
-    const found = allUmaData.find(r => r.cast_name === castName || (r.uma_name && r.uma_name.replace('役', '').trim() === cleanUmaName));
+    let mainColor = firstData.main_color;
+    let subColor = firstData.sub_color;
 
-    if (found && found.main_color) {
-        const main = invertCharColor ? (found.sub_color || found.main_color) : found.main_color;
-        const sub = invertCharColor ? found.main_color : found.sub_color;
+    if (!mainColor) {
+        const castName = firstData.cast_name;
+        const cleanUmaName = (firstData.uma_name || '').replace('役', '').trim();
+        const found = allUmaData.find(r => r.main_color && (
+            (r.cast_name && r.cast_name === castName && r.uma_name && r.uma_name.replace('役', '').trim() === cleanUmaName) ||
+            (r.cast_name && r.cast_name === castName) ||
+            (r.uma_name && r.uma_name.replace('役', '').trim() === cleanUmaName)
+        ));
+        if (found) {
+            mainColor = found.main_color;
+            subColor = found.sub_color;
+        }
+    }
+
+    if (mainColor) {
+        const main = invertCharColor ? (subColor || mainColor) : mainColor;
+        const sub = invertCharColor ? mainColor : subColor;
         const colors = getThemeColors(main, sub);
         bakenDOM.style.setProperty('--baken-bg-color', colors.bg);
         bakenDOM.style.setProperty('--baken-theme-color', colors.theme);
@@ -487,10 +500,16 @@ function getMatches(keyword) {
         if (umaMatched && umaName) {
             const key = `uma_${umaName}`;
             if (!matchesMap.has(key)) {
+                const matchingCasts = allUmaData
+                    .filter(r => (r.uma_name || '').replace('役', '').trim() === umaName && r.cast_name && r.cast_name.trim() !== '')
+                    .map(r => r.cast_name.trim());
+                const uniqueCasts = Array.from(new Set(matchingCasts));
+                const castDisplay = uniqueCasts.join('・');
+
                 matchesMap.set(key, {
                     type: 'uma',
                     value: umaName,
-                    subValue: castName
+                    subValue: castDisplay
                 });
             }
         }
@@ -660,7 +679,7 @@ function renderList(data) {
     }
 
     data.forEach((row, index) => {
-        const key = row.uma_name;
+        const key = row.cast_name ? `${row.uma_name}_${row.cast_name}` : row.uma_name;
 
         if (!ticketAmounts[key]) ticketAmounts[key] = 100;
         if (!ticketTypes[key]) ticketTypes[key] = 'ouen';

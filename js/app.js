@@ -1,5 +1,5 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.09a';
+const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.09b';
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];
@@ -446,6 +446,253 @@ function setupLongPress(btn, action) {
     btn.addEventListener('contextmenu', (e) => e.preventDefault());
 }
 
+const MAX_BAKEN_QTY = 99999900;
+
+function adjustQtyDisplayScale(el) {
+    if (!el) return;
+    if (el.classList.contains('editing')) {
+        el.style.transform = 'none';
+        return;
+    }
+    const text = el.textContent.trim();
+    const len = text.length;
+    if (len > 6) {
+        const scale = 0.9 * (6 / len);
+        el.style.transform = `scaleX(${scale.toFixed(4)})`;
+    } else {
+        el.style.transform = 'scaleX(0.9)';
+    }
+}
+
+function updateBkValScaling(totalAmount) {
+    const bkValEl = document.getElementById('bkVal');
+    const bkTotalValEl = document.getElementById('bkTotalVal');
+    if (!bkValEl || !bkTotalValEl) return;
+
+    if (totalAmount && totalAmount.toString().length >= 9) {
+        bkValEl.classList.add('scale-8-9');
+        bkValEl.style.display = 'inline-block';
+        bkValEl.style.transform = 'scaleX(0.8888)';
+        bkValEl.style.transformOrigin = 'center';
+        bkValEl.style.letterSpacing = '0px';
+
+        bkTotalValEl.classList.add('scale-8-9');
+        bkTotalValEl.style.display = 'inline-block';
+        bkTotalValEl.style.transform = 'scaleX(0.8888)';
+        bkTotalValEl.style.transformOrigin = 'center';
+        bkTotalValEl.style.letterSpacing = '0px';
+    } else {
+        bkValEl.classList.remove('scale-8-9');
+        bkValEl.style.display = '';
+        bkValEl.style.transform = '';
+        bkValEl.style.transformOrigin = '';
+        bkValEl.style.letterSpacing = '';
+
+        bkTotalValEl.classList.remove('scale-8-9');
+        bkTotalValEl.style.display = '';
+        bkTotalValEl.style.transform = '';
+        bkTotalValEl.style.transformOrigin = '';
+        bkTotalValEl.style.letterSpacing = '';
+    }
+}
+
+let warningTooltipTimeout = null;
+
+function showQtyTooltip(targetEl, msg) {
+    let tooltip = document.getElementById('qtyTooltip');
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'qtyTooltip';
+        tooltip.className = 'qty-tooltip';
+        document.body.appendChild(tooltip);
+    }
+    tooltip.textContent = msg || '入力値 × 100 に換算されます';
+    tooltip.classList.remove('warning');
+    const rect = targetEl.getBoundingClientRect();
+    tooltip.style.left = `${rect.left + rect.width / 2}px`;
+    tooltip.style.top = `${rect.top}px`;
+    tooltip.offsetHeight;
+    tooltip.classList.add('show');
+}
+
+function showQtyWarningTooltip(targetEl, msg) {
+    let tooltip = document.getElementById('qtyTooltip');
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'qtyTooltip';
+        tooltip.className = 'qty-tooltip';
+        document.body.appendChild(tooltip);
+    }
+    tooltip.textContent = msg || '8桁を超える金額は設定できません';
+    tooltip.classList.add('warning');
+    const rect = targetEl.getBoundingClientRect();
+    tooltip.style.left = `${rect.left + rect.width / 2}px`;
+    tooltip.style.top = `${rect.top}px`;
+    tooltip.offsetHeight;
+    tooltip.classList.add('show');
+
+    clearTimeout(warningTooltipTimeout);
+    warningTooltipTimeout = setTimeout(() => {
+        hideQtyTooltip();
+    }, 2500);
+}
+
+function hideQtyTooltip() {
+    clearTimeout(warningTooltipTimeout);
+    const tooltip = document.getElementById('qtyTooltip');
+    if (tooltip) {
+        tooltip.classList.remove('show');
+        tooltip.classList.remove('warning');
+    }
+}
+
+const handleQtyTooltipReposition = () => {
+    const activeInput = document.querySelector('.qty-display input');
+    if (activeInput) {
+        const qtyDisplay = activeInput.closest('.qty-display');
+        if (qtyDisplay) {
+            const tooltip = document.getElementById('qtyTooltip');
+            if (tooltip && tooltip.classList.contains('show')) {
+                const rect = qtyDisplay.getBoundingClientRect();
+                tooltip.style.left = `${rect.left + rect.width / 2}px`;
+                tooltip.style.top = `${rect.top}px`;
+            }
+        }
+    }
+};
+
+window.addEventListener('scroll', handleQtyTooltipReposition, { passive: true });
+window.addEventListener('resize', handleQtyTooltipReposition, { passive: true });
+
+function setupQtyDisplayEdit(qtySpan, getCurrentVal, onUpdateVal) {
+    qtySpan.addEventListener('click', () => {
+        if (qtySpan.querySelector('input')) return;
+        const currentVal = getCurrentVal();
+        const displayVal = Math.max(1, Math.floor(currentVal / 100));
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.setAttribute('inputmode', 'numeric');
+        input.setAttribute('pattern', '[0-9]*');
+        input.value = displayVal;
+        input.style.width = '100%';
+        input.style.fontSize = 'inherit';
+        input.style.fontFamily = 'inherit';
+        input.style.fontWeight = 'inherit';
+        input.style.textAlign = 'center';
+        input.style.border = 'none';
+        input.style.background = 'transparent';
+        input.style.outline = 'none';
+        input.style.color = 'inherit';
+        input.style.padding = '0';
+        input.style.margin = '0';
+        input.style.boxSizing = 'border-box';
+
+        const wrapper = qtySpan.closest('.amount-control-wrapper');
+        let mainBtns = [];
+        let qtySubRow = null;
+        let confirmBtn = null;
+
+        if (wrapper) {
+            mainBtns = wrapper.querySelectorAll('.qty-main-row .qty-btn');
+            mainBtns.forEach(btn => btn.style.display = 'none');
+            qtySubRow = wrapper.querySelector('.qty-sub-row');
+            if (qtySubRow) {
+                Array.from(qtySubRow.children).forEach(child => child.style.display = 'none');
+                confirmBtn = document.createElement('button');
+                confirmBtn.className = 'qty-btn-small';
+                confirmBtn.style.width = '100%';
+                confirmBtn.textContent = '確定';
+                confirmBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    input.blur();
+                });
+                qtySubRow.appendChild(confirmBtn);
+            }
+        }
+
+        qtySpan.classList.add('editing');
+        qtySpan.textContent = '';
+        qtySpan.style.transform = 'none';
+
+        const editContainer = document.createElement('div');
+        editContainer.className = 'qty-edit-container';
+        editContainer.style.display = 'inline-flex';
+        editContainer.style.alignItems = 'center';
+        editContainer.style.justifyContent = 'center';
+        editContainer.style.width = '100%';
+
+        input.style.width = 'auto';
+        input.style.minWidth = '24px';
+        input.style.maxWidth = '90px';
+        input.style.textAlign = 'right';
+
+        const suffixSpan = document.createElement('span');
+        suffixSpan.className = 'qty-zero-suffix';
+        suffixSpan.textContent = '00';
+        suffixSpan.style.color = '#333';
+        suffixSpan.style.fontWeight = 'inherit';
+        suffixSpan.style.fontSize = 'inherit';
+        suffixSpan.style.marginLeft = '2px';
+        suffixSpan.style.flexShrink = '0';
+
+        editContainer.appendChild(input);
+        editContainer.appendChild(suffixSpan);
+        qtySpan.appendChild(editContainer);
+
+        input.focus();
+        input.select();
+
+        input.addEventListener('input', () => {
+            let numStr = input.value.replace(/[^0-9]/g, '');
+            if (numStr.length > 6) {
+                numStr = numStr.slice(0, 6);
+                input.value = numStr;
+                showQtyWarningTooltip(qtySpan, '8桁を超える金額は設定できません');
+            } else {
+                input.value = numStr;
+            }
+        });
+
+        let isFinished = false;
+        const finishEdit = () => {
+            if (isFinished) return;
+            isFinished = true;
+            hideQtyTooltip();
+
+            qtySpan.classList.remove('editing');
+
+            if (wrapper) {
+                mainBtns.forEach(btn => btn.style.display = '');
+                if (qtySubRow) {
+                    if (confirmBtn && confirmBtn.parentNode === qtySubRow) {
+                        qtySubRow.removeChild(confirmBtn);
+                    }
+                    Array.from(qtySubRow.children).forEach(child => child.style.display = '');
+                }
+            }
+
+            let raw = parseInt(input.value, 10);
+            let units = (isNaN(raw) || raw < 1) ? 1 : raw;
+            let val = units * 100;
+            if (val > MAX_BAKEN_QTY) {
+                val = MAX_BAKEN_QTY;
+                showQtyWarningTooltip(qtySpan, '8桁を超える金額は設定できません');
+            }
+            qtySpan.textContent = val;
+            adjustQtyDisplayScale(qtySpan);
+            onUpdateVal(val);
+        };
+
+        input.addEventListener('blur', finishEdit);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === 'Escape') {
+                input.blur();
+            }
+        });
+    });
+}
+
 function hiraganaToKatakana(str) {
     return str.replace(/[\u3041-\u3096]/g, function (match) {
         const chr = match.charCodeAt(0) + 0x60;
@@ -733,7 +980,7 @@ function renderList(data) {
             const newNum = e.target.value;
             umaNumbers[key] = newNum;
             cartItems.forEach(item => {
-                if (item.uma_name === key) {
+                if (item.cast_name === row.cast_name) {
                     item.uma_number = newNum;
                 }
             });
@@ -819,52 +1066,11 @@ function renderList(data) {
         minusBtn.className = 'qty-btn'; minusBtn.textContent = '−';
         const qtySpan = document.createElement('span');
         qtySpan.className = 'qty-display'; qtySpan.textContent = ticketAmounts[key];
+        adjustQtyDisplayScale(qtySpan);
         const plusBtn = document.createElement('button');
         plusBtn.className = 'qty-btn'; plusBtn.textContent = '＋';
 
-        qtySpan.addEventListener('click', () => {
-            if (qtySpan.querySelector('input')) return;
-            const currentVal = ticketAmounts[key];
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.setAttribute('inputmode', 'numeric');
-            input.setAttribute('pattern', '[0-9]*');
-            input.value = currentVal;
-            input.style.width = '60px';
-            input.style.fontSize = 'inherit';
-            input.style.fontFamily = 'inherit';
-            input.style.fontWeight = 'inherit';
-            input.style.textAlign = 'center';
-            input.style.border = 'none';
-            input.style.background = 'transparent';
-            input.style.outline = 'none';
-            input.style.color = 'inherit';
-            input.style.padding = '0';
-            input.style.margin = '0';
-
-            qtySpan.textContent = '';
-            qtySpan.appendChild(input);
-            input.focus();
-            input.select();
-
-            const finishEdit = () => {
-                let val = parseInt(input.value, 10);
-                if (isNaN(val) || val < 100) {
-                    val = 100;
-                } else {
-                    val = Math.floor(val / 100) * 100;
-                }
-                qtySpan.textContent = val;
-                updateQty(val);
-            };
-
-            input.addEventListener('blur', finishEdit);
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    input.blur();
-                }
-            });
-        });
+        setupQtyDisplayEdit(qtySpan, () => ticketAmounts[key], (newVal) => updateQty(newVal));
 
         const qtySubRow = document.createElement('div');
         qtySubRow.className = 'qty-sub-row';
@@ -882,13 +1088,22 @@ function renderList(data) {
 
         const updateQty = (newAmount) => {
             if (newAmount < 100) newAmount = 100;
+            if (newAmount > MAX_BAKEN_QTY) {
+                newAmount = MAX_BAKEN_QTY;
+                showQtyWarningTooltip(qtySpan, '8桁を超える金額は設定できません');
+            }
             ticketAmounts[key] = newAmount;
             qtySpan.textContent = newAmount;
+            adjustQtyDisplayScale(qtySpan);
             minusBtn.disabled = newAmount <= 100;
             minus1000Btn.disabled = newAmount <= 100;
+            plusBtn.disabled = newAmount >= MAX_BAKEN_QTY;
+            plus1000Btn.disabled = newAmount >= MAX_BAKEN_QTY;
         };
         minusBtn.disabled = ticketAmounts[key] <= 100;
         minus1000Btn.disabled = ticketAmounts[key] <= 100;
+        plusBtn.disabled = ticketAmounts[key] >= MAX_BAKEN_QTY;
+        plus1000Btn.disabled = ticketAmounts[key] >= MAX_BAKEN_QTY;
 
         setupLongPress(minusBtn, () => updateQty(ticketAmounts[key] - 100));
         setupLongPress(plusBtn, () => updateQty(ticketAmounts[key] + 100));
@@ -1049,6 +1264,8 @@ async function generateTicket(data, amount, betType, isReissue = false) {
     };
 
     document.getElementById('bkVal').textContent = amount;
+    document.getElementById('bkTotalVal').textContent = totalAmount;
+    updateBkValScaling(totalAmount);
 
     const amountRow = document.querySelector('.bk-amount-row');
     const totalRow = document.querySelector('.bk-total-row');
@@ -1072,7 +1289,6 @@ async function generateTicket(data, amount, betType, isReissue = false) {
     }
 
     document.getElementById('bkStarsSub').textContent = getStars(amount, false);
-    document.getElementById('bkTotalVal').textContent = totalAmount;
     document.getElementById('bkStarsTotal').textContent = getStars(totalAmount, true);
 
     if (isMulti) {
@@ -1468,6 +1684,8 @@ document.getElementById('printSelectedBtn').addEventListener('click', async () =
                 }
 
                 document.getElementById('bkVal').textContent = target.amount;
+                document.getElementById('bkTotalVal').textContent = totalAmount;
+                updateBkValScaling(totalAmount);
 
                 const amountRow = document.querySelector('.bk-amount-row');
                 const totalRow = document.querySelector('.bk-total-row');
@@ -1498,7 +1716,6 @@ document.getElementById('printSelectedBtn').addEventListener('click', async () =
                 };
 
                 document.getElementById('bkStarsSub').textContent = getStars(target.amount, false);
-                document.getElementById('bkTotalVal').textContent = totalAmount;
                 document.getElementById('bkStarsTotal').textContent = getStars(totalAmount, true);
 
                 if (isMulti) {
@@ -1664,59 +1881,28 @@ document.getElementById('shareCloseBtn').addEventListener('click', () => {
 
 const updateCartQty = (newAmount) => {
     if (newAmount < 100) newAmount = 100;
+    if (newAmount > MAX_BAKEN_QTY) {
+        newAmount = MAX_BAKEN_QTY;
+        const cartQtySpan = document.getElementById('cartQtySpan');
+        if (cartQtySpan) showQtyWarningTooltip(cartQtySpan, '8桁を超える金額は設定できません');
+    }
     cartAmount = newAmount;
-    document.getElementById('cartQtySpan').textContent = cartAmount;
+    const cartQtySpan = document.getElementById('cartQtySpan');
+    if (cartQtySpan) {
+        cartQtySpan.textContent = cartAmount;
+        adjustQtyDisplayScale(cartQtySpan);
+    }
 
     const isReady = cartItems.length >= 2;
     document.getElementById('cartMinusBtn').disabled = !isReady || cartAmount <= 100;
     document.getElementById('cartMinus1000Btn').disabled = !isReady || cartAmount <= 100;
+    document.getElementById('cartPlusBtn').disabled = !isReady || cartAmount >= MAX_BAKEN_QTY;
+    document.getElementById('cartPlus1000Btn').disabled = !isReady || cartAmount >= MAX_BAKEN_QTY;
 };
 
 const cartQtySpan = document.getElementById('cartQtySpan');
 if (cartQtySpan) {
-    cartQtySpan.addEventListener('click', () => {
-        if (cartQtySpan.querySelector('input')) return;
-        const currentVal = cartAmount;
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.setAttribute('inputmode', 'numeric');
-        input.setAttribute('pattern', '[0-9]*');
-        input.value = currentVal;
-        input.style.width = '60px';
-        input.style.fontSize = 'inherit';
-        input.style.fontFamily = 'inherit';
-        input.style.fontWeight = 'inherit';
-        input.style.textAlign = 'center';
-        input.style.border = 'none';
-        input.style.background = 'transparent';
-        input.style.outline = 'none';
-        input.style.color = 'inherit';
-        input.style.padding = '0';
-        input.style.margin = '0';
-
-        cartQtySpan.textContent = '';
-        cartQtySpan.appendChild(input);
-        input.focus();
-        input.select();
-
-        const finishEdit = () => {
-            let val = parseInt(input.value, 10);
-            if (isNaN(val) || val < 100) {
-                val = 100;
-            } else {
-                val = Math.floor(val / 100) * 100;
-            }
-            cartQtySpan.textContent = val;
-            updateCartQty(val);
-        };
-
-        input.addEventListener('blur', finishEdit);
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                input.blur();
-            }
-        });
-    });
+    setupQtyDisplayEdit(cartQtySpan, () => cartAmount, (newVal) => updateCartQty(newVal));
 }
 
 setupLongPress(document.getElementById('cartMinusBtn'), () => updateCartQty(cartAmount - 100));

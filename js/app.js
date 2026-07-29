@@ -1,5 +1,5 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.09b';
+const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.09c';
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];

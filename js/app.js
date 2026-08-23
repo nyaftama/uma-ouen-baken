@@ -3122,18 +3122,13 @@ initEventSettings();
 async function captureBakenSlip(bakenDOM) {
     if (document.fonts) {
         try {
-            // コンテンツブロッカー等でブロックされている場合でも最大200msでフォールバック
-            await Promise.race([
-                document.fonts.ready,
-                new Promise(resolve => setTimeout(resolve, 200))
-            ]);
+            await document.fonts.ready;
         } catch (e) { }
     }
 
     const baseOptions = {
         useCORS: true,
         logging: false,
-        foreignObjectRendering: false,
         width: 760,
         height: 420,
         windowWidth: 760,
@@ -3141,15 +3136,6 @@ async function captureBakenSlip(bakenDOM) {
         scrollX: 0,
         scrollY: 0,
         onclone: (clonedDoc) => {
-            // コンテンツブロッカー環境でもhtml2canvasが外部通信でブロックされないよう、外部link/scriptをすべて除去
-            const externalResources = clonedDoc.querySelectorAll('link[rel="stylesheet"], script');
-            externalResources.forEach(el => {
-                const src = el.src || el.href || '';
-                if (src.includes('fonts.googleapis.com') || src.includes('fonts.gstatic.com') || src.includes('googletagmanager.com')) {
-                    el.remove();
-                }
-            });
-
             const container = clonedDoc.querySelector('.container');
             if (container) container.style.display = 'none';
             const modals = clonedDoc.querySelectorAll('.modal-overlay');

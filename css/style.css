@@ -149,7 +149,7 @@ body {
     padding: 4px 8px;
     border-radius: 4px;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
     transition: all 0.2s;
 }
 
@@ -209,7 +209,7 @@ body {
     padding: 12px;
     padding-right: 40px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
     border: 2px solid #ddd;
     border-radius: 8px;
     box-sizing: border-box;
@@ -261,7 +261,7 @@ body {
     border-bottom: 1px solid #eee;
     cursor: pointer;
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -603,7 +603,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
     font-family: inherit;
     background-color: #fff;
     color: #333;
@@ -853,7 +853,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     padding: 0;
     border-radius: 6px;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 700;
     display: flex;
     align-items: stretch;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -876,7 +876,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
 }
 
 .cart-item-name {
-    font-weight: 600;
+    font-weight: 700;
     color: #333;
     white-space: nowrap;
     overflow: hidden;
@@ -2039,7 +2039,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     border-radius: 4px;
     font-family: inherit;
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
     min-width: 0;
 }
 
@@ -2157,7 +2157,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     border-radius: 6px;
     font-family: inherit;
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #333;
     min-width: 0;
     cursor: text;
@@ -2322,7 +2322,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     background: #ffffff;
     border-radius: 6px;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #333;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -2376,7 +2376,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
     font-family: inherit;
     color: #333;
     cursor: pointer;
@@ -2402,7 +2402,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-weight: 600;
+    font-weight: 700;
     flex: 1;
 }
 
@@ -2472,7 +2472,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     border: none;
     background: transparent;
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 700;
     font-family: inherit;
     color: #333;
     cursor: pointer;
@@ -2490,7 +2490,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
 .dropdown-item.active {
     background: #e8f5e9;
     color: var(--primary-color);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .dropdown-item:disabled,
@@ -2548,7 +2548,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
 .uma-number-dropdown .dropdown-item {
     justify-content: center;
     padding: 6px 8px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.95rem;
 }
 
@@ -2561,7 +2561,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     width: 100%;
     padding: 6px 10px;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .bet-type-dropdown .dropdown-menu {
@@ -2573,7 +2573,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
 
 .bet-type-dropdown .dropdown-item {
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 700;
     padding: 7px 12px;
 }
 
@@ -2585,7 +2585,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
 
 .dropdown-item-action {
     color: var(--primary-color);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.8rem;
 }
 

@@ -1822,7 +1822,12 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
     const isMulti = Array.isArray(data);
     const firstData = isMulti ? data[0] : data;
 
+    const tStart = performance.now();
+    console.log('[DEBUG] 発券処理開始:', new Date().toISOString());
+
     const totalAmount = populateBakenSlip(data, amount, betType, eventSettings);
+    const tPopulate = performance.now();
+    console.log(`[DEBUG] populateBakenSlip 完了: ${(tPopulate - tStart).toFixed(1)}ms`);
 
     const rightCol = document.querySelector('.bk-right-col');
     if (rightCol) {
@@ -1864,8 +1869,20 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
             return;
         }
 
+        const tCaptureStart = performance.now();
+        console.log('[DEBUG] captureBakenSlip 開始...');
         const canvas = await captureBakenSlip(bakenDOM);
+        const tCaptureEnd = performance.now();
+        console.log(`[DEBUG] captureBakenSlip 完了: ${(tCaptureEnd - tCaptureStart).toFixed(1)}ms`);
+
+        const tDataUrlStart = performance.now();
         const imgDataUrl = canvas.toDataURL('image/png');
+        const tDataUrlEnd = performance.now();
+        console.log(`[DEBUG] toDataURL 完了: ${(tDataUrlEnd - tDataUrlStart).toFixed(1)}ms`);
+
+        const totalTime = (tDataUrlEnd - tStart).toFixed(1);
+        console.log(`[DEBUG] ★ 全体所要時間: ${totalTime}ms`);
+        showToast(`生成完了 (${totalTime}ms)`);
 
         shareImagePreview.src = imgDataUrl;
         shareImageLoading.style.display = 'none';

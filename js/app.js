@@ -182,6 +182,80 @@ document.addEventListener('DOMContentLoaded', () => {
         modalInvertCheckbox.addEventListener('change', (e) => handleInvertColorChange(e.target.checked, 'modal'));
     }
 
+    const modalModeSwitchBtn = document.getElementById('modalModeSwitchBtn');
+    const modalModeSwitchLabel = document.getElementById('modalModeSwitchLabel');
+    const toggleModalMode = (e) => {
+        if (e) e.stopPropagation();
+        const currentMode = getDisplayMode();
+        const nextMode = (currentMode === 'uma') ? 'cast' : 'uma';
+        setDisplayMode(nextMode);
+    };
+    if (modalModeSwitchBtn) {
+        modalModeSwitchBtn.addEventListener('click', toggleModalMode);
+    }
+    if (modalModeSwitchLabel) {
+        modalModeSwitchLabel.addEventListener('click', toggleModalMode);
+    }
+
+    const shareCopyBtn = document.getElementById('shareCopyBtn');
+    if (shareCopyBtn) {
+        shareCopyBtn.addEventListener('click', async () => {
+            if (!shareImagePreview.src || shareImagePreview.src === '' || shareImageLoading.style.display === 'flex') {
+                showToast('画像を生成中です');
+                return;
+            }
+            try {
+                const res = await fetch(shareImagePreview.src);
+                const blob = await res.blob();
+                if (navigator.clipboard && navigator.clipboard.write) {
+                    const item = new ClipboardItem({ [blob.type]: blob });
+                    await navigator.clipboard.write([item]);
+                    showToast('画像をクリップボードにコピーしました');
+                } else {
+                    throw new Error('Clipboard API not supported');
+                }
+            } catch (err) {
+                console.error('クリップボードコピー失敗:', err);
+                showToast('画像のコピーに失敗しました（画像を長押しして保存してください）');
+            }
+        });
+    }
+
+    const shareDownloadBtn = document.getElementById('shareDownloadBtn');
+    if (shareDownloadBtn) {
+        shareDownloadBtn.addEventListener('click', () => {
+            if (!shareImagePreview.src || shareImagePreview.src === '' || shareImageLoading.style.display === 'flex') {
+                showToast('画像を生成中です');
+                return;
+            }
+            let targetName = 'ticket';
+            if (currentGeneratingTicketParams && currentGeneratingTicketParams.data) {
+                const d = currentGeneratingTicketParams.data;
+                if (Array.isArray(d)) {
+                    targetName = d.map(r => (r.uma_name || r.cast_name || '').replace('役', '').trim()).filter(Boolean).join('_');
+                } else if (d) {
+                    targetName = (d.uma_name || d.cast_name || 'ticket').replace('役', '').trim();
+                }
+            }
+            const downloadFileName = `推しバ券_${targetName}.png`;
+            const link = document.createElement('a');
+            link.download = downloadFileName;
+            link.href = shareImagePreview.src;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('画像をダウンロードしました');
+        });
+    }
+
+    if (shareImagePreview) {
+        shareImagePreview.addEventListener('contextmenu', () => {
+            if (window.getSelection) {
+                window.getSelection().removeAllRanges();
+            }
+        });
+    }
+
     const toggleTopBtn = document.getElementById('toggleTopAreaBtn');
     if (toggleTopBtn) {
         toggleTopBtn.addEventListener('click', () => {
@@ -231,8 +305,10 @@ function getThemeColors(mainHex, subHex) {
     const bgLightness = 90;
     const borderLightness = Math.min(30, Math.max(10, hslMain.l - 20));
     const watermarkLightness = 93;
+    const brightColor = `hsl(${hslMain.h}, ${hslMain.s}%, ${bgLightness}%)`;
     return {
-        bg: `hsl(${hslMain.h}, ${hslMain.s}%, ${bgLightness}%)`,
+        bg: brightColor,
+        cardBg: `linear-gradient(135deg, ${brightColor} 0%, transparent 100%)`,
         theme: `hsl(${hslMain.h}, ${hslMain.s}%, ${borderLightness}%)`,
         watermark: `hsl(${hslSub.h}, ${hslSub.s}%, ${watermarkLightness}%)`
     };
@@ -329,6 +405,7 @@ function updateTopAreaView() {
 let currentCartBetType = 'umaren';
 let isCartBetTypeUserModified = false;
 let cartBetTypeDropdownObj = null;
+let isCartExpanded = false;
 
 function initCartBetTypeDropdown() {
     const container = document.getElementById('cartBetTypeContainer');
@@ -422,6 +499,35 @@ function updateCartUI() {
 
     const isReady = cartItems.length >= 2;
     const count = cartItems.length;
+
+    const cartCountBadge = document.getElementById('cartCountBadge');
+    if (cartCountBadge) {
+        cartCountBadge.textContent = ` (${count}/8)`;
+    }
+
+    // スマホ用 展開/折りたたみボタンの制御（4件以上の時のみ表示）
+    const expandBtn = document.getElementById('cartExpandBtn');
+    const cartItemsEl = document.getElementById('cartItems');
+    if (expandBtn && cartItemsEl) {
+        if (count >= 4) {
+            expandBtn.style.display = 'flex';
+            const iconExpand = expandBtn.querySelector('.cart-expand-icon.expand');
+            const iconCollapse = expandBtn.querySelector('.cart-expand-icon.collapse');
+            if (isCartExpanded) {
+                cartItemsEl.classList.add('is-expanded');
+                if (iconExpand) iconExpand.style.display = 'none';
+                if (iconCollapse) iconCollapse.style.display = 'block';
+            } else {
+                cartItemsEl.classList.remove('is-expanded');
+                if (iconExpand) iconExpand.style.display = 'block';
+                if (iconCollapse) iconCollapse.style.display = 'none';
+            }
+        } else {
+            expandBtn.style.display = 'none';
+            isCartExpanded = false;
+            cartItemsEl.classList.remove('is-expanded');
+        }
+    }
 
     if (cartBetTypeDropdownObj) {
         if (count <= 1) {
@@ -769,6 +875,11 @@ window.addEventListener('resize', handleQtyTooltipReposition, { passive: true })
 function setupQtyDisplayEdit(qtySpan, getCurrentVal, onUpdateVal) {
     qtySpan.addEventListener('click', () => {
         if (qtySpan.querySelector('input')) return;
+
+        // 編集開始前のスクロール位置を保持（スマートフォン対応）
+        const prevScrollX = window.scrollX || window.pageXOffset || 0;
+        const prevScrollY = window.scrollY || window.pageYOffset || 0;
+
         const currentVal = getCurrentVal();
         const displayVal = Math.max(1, Math.floor(currentVal / 100));
         const input = document.createElement('input');
@@ -884,6 +995,15 @@ function setupQtyDisplayEdit(qtySpan, getCurrentVal, onUpdateVal) {
             qtySpan.textContent = val;
             adjustQtyDisplayScale(qtySpan);
             onUpdateVal(val);
+
+            // ソフトウェアキーボードが閉じた後に元のスクロール位置へ復元
+            const restoreScroll = () => {
+                window.scrollTo(prevScrollX, prevScrollY);
+            };
+            restoreScroll();
+            setTimeout(restoreScroll, 50);
+            setTimeout(restoreScroll, 150);
+            setTimeout(restoreScroll, 300);
         };
 
         input.addEventListener('blur', finishEdit);
@@ -1111,6 +1231,10 @@ function setDisplayMode(mode) {
     document.body.setAttribute('data-display-mode', mode);
     updateCartUI();
     if (typeof renderHistoryList === 'function') renderHistoryList();
+    if (currentGeneratingTicketParams) {
+        const { data, amount, betType } = currentGeneratingTicketParams;
+        generateTicket(data, amount, betType, true);
+    }
     const modeName = (mode === 'cast') ? 'キャスト名優先' : 'キャラ名優先';
     showToast(`${modeName}モードに切り替えました`);
 }
@@ -1296,18 +1420,42 @@ function renderList(data) {
         card.className = 'item-card';
         card.dataset.castName = row.cast_name;
         const themeColors = getThemeColors(mainColor, subColor);
-        card.style.setProperty('--card-active-bg', themeColors.bg);
+        card.style.setProperty('--card-active-bg', themeColors.cardBg);
         card.style.setProperty('--card-active-border', mainColor);
-
-        // 左側8pxのツートン枠線背景
-        card.style.backgroundImage = `linear-gradient(135deg, ${mainColor} 75%, ${subColor} 25%)`;
-        card.style.backgroundSize = `8px 100%`;
-        card.style.backgroundRepeat = `no-repeat`;
-        card.style.backgroundPosition = `left center`;
+        card.style.setProperty('--card-stripe', `linear-gradient(135deg, ${mainColor} 75%, ${subColor} 25%)`);
 
         if (cartItems.some(item => item.cast_name === row.cast_name)) {
             card.classList.add('checked-row');
         }
+
+        const checkBtn = document.createElement('button');
+        checkBtn.type = 'button';
+        checkBtn.className = 'card-checked-badge';
+        checkBtn.setAttribute('aria-label', '連勝候補から削除');
+        checkBtn.setAttribute('title', '連勝候補から削除');
+        checkBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+            </svg>
+        `;
+        checkBtn.style.backgroundColor = mainColor;
+        checkBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const idx = cartItems.findIndex(item => item.cast_name === row.cast_name);
+            if (idx !== -1) {
+                cartItems.splice(idx, 1);
+                if (cartItems.length === 0) {
+                    currentTopView = 'event';
+                    isCartBetTypeUserModified = false;
+                    currentCartBetType = 'umaren';
+                    if (cartBetTypeDropdownObj && typeof cartBetTypeDropdownObj.setValue === 'function') {
+                        cartBetTypeDropdownObj.setValue('umaren');
+                    }
+                }
+                updateCartUI();
+            }
+        });
+        card.appendChild(checkBtn);
 
         const leftDiv = document.createElement('div');
         leftDiv.className = 'card-left';
@@ -1347,11 +1495,23 @@ function renderList(data) {
         modeSwitchBtn.setAttribute('aria-label', 'キャラ名/キャスト名切り替え');
         modeSwitchBtn.setAttribute('title', 'キャラ名/キャスト名切り替え');
         modeSwitchBtn.innerHTML = `
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="mode-icon-user" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+            </svg>
+            <svg class="mode-icon-switch" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                 <polyline points="3 3 3 8 8 8" />
                 <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
                 <polyline points="21 21 21 16 16 16" />
+            </svg>
+            <svg class="mode-icon-carrot" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(45deg);">
+                <path d="M7 9c-1 3 0 7 5 13 5-6 6-10 5-13-1-2-3-2.5-5-2.5S8 7 7 9z" />
+                <path d="M12 6.5C12 3 10 2 9 2" />
+                <path d="M12 6.5C12 3 14 2 15 2" />
+                <path d="M12 6.5V2" />
+                <path d="M9.5 12h3" />
+                <path d="M11 16h2.5" />
             </svg>
         `;
         modeSwitchBtn.addEventListener('click', (e) => {
@@ -1803,6 +1963,8 @@ function populateBakenSlip(data, amount, betType, eventInfo = eventSettings) {
     return totalAmount;
 }
 
+let hasShownShareModalOnce = false;
+
 async function openTicketModal(data, amount, betType, isReissue = false) {
     currentGeneratingTicketParams = { data, amount, betType, isReissue };
 
@@ -1816,6 +1978,12 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
     updateInvertColorVisibility();
 
     // 1. 発券ボタン押下直後に即座にモーダルを表示し、ローディング状態にする
+    const shareLoadingHint = document.getElementById('shareLoadingHint');
+    if (shareLoadingHint) {
+        shareLoadingHint.style.display = hasShownShareModalOnce ? 'none' : 'block';
+    }
+    hasShownShareModalOnce = true;
+
     shareImagePreview.src = '';
     shareImagePreview.style.display = 'none';
     shareImageLoading.style.display = 'flex';
@@ -1893,7 +2061,12 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
             }
         }
 
-        const tweetText = `推しバ券を発券しました！\n\n${castNamesText}、がんばれ！\n\n#推しバ券メーカー\nhttps://nyaftama.github.io/uma-ouen-baken/`;
+        let tweetText = "";
+        if (isMulti && data.length >= 4) {
+            tweetText = `推しバ券を発券しました！\n\n#推しバ券メーカー\nhttps://nyaftama.github.io/uma-ouen-baken/`;
+        } else {
+            tweetText = `推しバ券を発券しました！\n\n${castNamesText}、がんばれ！\n\n#推しバ券メーカー\nhttps://nyaftama.github.io/uma-ouen-baken/`;
+        }
         document.getElementById('shareTwitterBtn').href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
 
         if (!isReissue) {
@@ -2243,6 +2416,14 @@ if (cartQtySpan) {
 
 setupLongPress(document.getElementById('cartMinusBtn'), () => updateCartQty(cartAmount - 100));
 setupLongPress(document.getElementById('cartPlusBtn'), () => updateCartQty(cartAmount + 100));
+
+const cartExpandBtn = document.getElementById('cartExpandBtn');
+if (cartExpandBtn) {
+    cartExpandBtn.addEventListener('click', () => {
+        isCartExpanded = !isCartExpanded;
+        updateCartUI();
+    });
+}
 
 document.getElementById('cartIssueBtn').addEventListener('click', () => {
     const count = cartItems.length;
@@ -3134,6 +3315,12 @@ async function captureBakenSlip(bakenDOM) {
         windowHeight: 420,
         scrollX: 0,
         scrollY: 0,
+        ignoreElements: (element) => {
+            if (element.classList && (element.classList.contains('container') || element.classList.contains('modal-overlay'))) {
+                return true;
+            }
+            return false;
+        },
         onclone: (clonedDoc) => {
             const container = clonedDoc.querySelector('.container');
             if (container) container.style.display = 'none';
@@ -3155,7 +3342,7 @@ async function captureBakenSlip(bakenDOM) {
         bakenDOM.classList.add('capture-bg-only');
         const bgCanvas = await html2canvas(bakenDOM, {
             ...baseOptions,
-            scale: 3
+            scale: 2
         });
         bakenDOM.classList.remove('capture-bg-only');
 
@@ -3205,8 +3392,29 @@ async function captureBakenSlip(bakenDOM) {
     } else {
         return await html2canvas(bakenDOM, {
             ...baseOptions,
-            scale: 3,
+            scale: 2,
             backgroundColor: '#ffffff'
         });
     }
+}
+
+// モーダル開閉時の背面スクロール制御
+const modalObserver = new MutationObserver(() => {
+    const hasOpenModal = document.querySelector('.modal-overlay.show') !== null;
+    if (hasOpenModal) {
+        document.body.classList.add('modal-open');
+    } else {
+        document.body.classList.remove('modal-open');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modalObserver.observe(modal, { attributes: true, attributeFilter: ['class'] });
+    });
+});
+if (document.readyState !== 'loading') {
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modalObserver.observe(modal, { attributes: true, attributeFilter: ['class'] });
+    });
 }

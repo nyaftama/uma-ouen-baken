@@ -17,6 +17,8 @@
     --shadow-hover: 0 8px 24px rgba(46, 125, 50, 0.12);
     --transition: all 0.2s ease;
     --danger-color: #d32f2f;
+    --card-active-bg: linear-gradient(135deg, #e8f5e9 0%, transparent 100%);
+    --card-active-border: #a5d6a7;
 }
 
 body {
@@ -28,6 +30,10 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     margin: 0;
+}
+
+body.modal-open {
+    overflow: hidden !important;
 }
 
 .container {
@@ -325,23 +331,29 @@ body {
     display: grid;
     grid-template-columns: 1fr;
     gap: 12px;
-    padding: 0 10px;
+    padding: 0 14px;
 }
 
 @media (min-width: 601px) {
     .item-list {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
+        padding: 0 14px;
     }
 }
 
 .item-card {
+    position: relative;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
     gap: 8px;
     background-color: #fff;
+    background-image: var(--card-stripe);
+    background-size: 8px 100%;
+    background-repeat: no-repeat;
+    background-position: left center;
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     padding: 12px 14px 12px 20px;
@@ -349,8 +361,46 @@ body {
 }
 
 .item-card.checked-row {
-    background-color: var(--card-active-bg, #f1f8e9) !important;
+    background-color: #ffffff !important;
+    background-image: var(--card-stripe), var(--card-active-bg) !important;
+    background-size: 8px 100%, 100% 100% !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-position: left center, center center !important;
     border-color: var(--card-active-border, #a5d6a7) !important;
+}
+
+.card-checked-badge {
+    display: none;
+    position: absolute;
+    top: 68px;
+    left: 4px;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    color: #ffffff;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    z-index: 10;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    touch-action: manipulation;
+}
+
+.card-checked-badge:hover {
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+.card-checked-badge:active {
+    transform: translate(-50%, -50%) scale(0.92);
+}
+
+.item-card.checked-row .card-checked-badge {
+    display: flex;
 }
 
 .card-left {
@@ -384,17 +434,18 @@ body {
 }
 
 .mode-switch-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+    width: auto;
+    height: 24px;
+    border-radius: 12px;
     border: 1px solid #ccc;
     background-color: #f8f9fa;
     color: #555;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 3px;
+    padding: 0 7px;
     cursor: pointer;
-    padding: 0;
     transition: all 0.15s ease;
     touch-action: manipulation;
 }
@@ -406,7 +457,14 @@ body {
 }
 
 .mode-switch-btn:active {
-    transform: scale(0.92);
+    transform: scale(0.94);
+}
+
+.mode-icon-user,
+.mode-icon-switch,
+.mode-icon-carrot {
+    display: inline-block;
+    flex-shrink: 0;
 }
 
 /* メイン名 (2行目: 1rem, bold) */
@@ -747,7 +805,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 15px;
+    gap: 8px;
     width: 100%;
 }
 
@@ -782,6 +840,12 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     color: #555;
     margin-bottom: 5px;
     line-height: 1.4;
+}
+
+.cart-count-badge {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #666;
 }
 
 .cart-help-note {
@@ -823,26 +887,69 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     max-height: 112px;
     overflow-y: auto;
     padding-right: 4px;
-    scrollbar-width: thin;
-    scrollbar-color: #bbb transparent;
 }
 
 .cart-items::-webkit-scrollbar {
-    width: 5px;
+    width: 6px;
+    height: 6px;
+    display: block;
 }
 
-.cart-items::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 3px;
+.cart-items::-webkit-scrollbar-track,
+.cart-items::-webkit-scrollbar-track-piece {
+    background-color: var(--border-color) !important;
+    border-radius: 4px;
 }
 
 .cart-items::-webkit-scrollbar-thumb {
-    background: #bbb;
-    border-radius: 3px;
+    background-color: var(--primary-color) !important;
+    border-radius: 4px;
 }
 
 .cart-items::-webkit-scrollbar-thumb:hover {
-    background: #999;
+    background-color: var(--primary-hover, #1b5e20) !important;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+    .cart-items {
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-color) var(--border-color);
+    }
+}
+
+.cart-items.is-expanded {
+    max-height: none !important;
+    overflow-y: visible !important;
+}
+
+.cart-expand-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 22px;
+    margin: 2px 0 0 0;
+    background: #f0f5f0;
+    border: 1px solid #d0ded0;
+    border-radius: 4px;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.15s ease;
+}
+
+.cart-expand-btn:hover {
+    background: #e2ede2;
+}
+
+.cart-expand-btn:active {
+    transform: scale(0.98);
+}
+
+@media screen and (min-width: 769px) {
+    .cart-expand-btn {
+        display: none !important;
+    }
 }
 
 .cart-item {
@@ -1066,6 +1173,8 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     z-index: 2000;
     padding: 10px;
     box-sizing: border-box;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-overlay.show {
@@ -1082,6 +1191,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     max-width: 500px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     text-align: center;
+    overscroll-behavior: contain;
 }
 
 .modal-description {
@@ -1185,11 +1295,47 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     margin-top: 4px;
 }
 
+.modal-mode-switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    user-select: none;
+}
+
+.modal-mode-switch-label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #444;
+    cursor: pointer;
+}
+
 .share-image-container {
     position: relative;
     width: 100%;
     aspect-ratio: 760 / 420;
     margin-bottom: 15px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.share-image-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    display: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    object-fit: contain;
+    z-index: 2;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: default;
+    pointer-events: auto;
 }
 
 #shareImageLoading {
@@ -1253,6 +1399,7 @@ body[data-display-mode="cast"] .card-name-uma-sub {
         opacity: 0;
         transform: translateY(4px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1260,10 +1407,12 @@ body[data-display-mode="cast"] .card-name-uma-sub {
 }
 
 .modal-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
     margin-top: 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .modal-title {
@@ -1282,16 +1431,17 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    flex: 1;
-    padding: 12px 20px;
+    width: 100%;
+    padding: 11px 14px;
     border: none;
     border-radius: 6px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: bold;
     cursor: pointer;
     text-decoration: none;
     box-sizing: border-box;
     transition: background-color 0.2s, transform 0.1s, opacity 0.2s;
+    white-space: nowrap;
 }
 
 .modal-btn:active {
@@ -1305,6 +1455,25 @@ body[data-display-mode="cast"] .card-name-uma-sub {
 
 .modal-btn.primary:hover {
     background: #1b5e20;
+}
+
+.modal-btn.copy {
+    color: #333;
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+}
+
+.modal-btn.copy:hover {
+    background-color: #e0e0e0;
+}
+
+.modal-btn.download {
+    background: var(--primary-color);
+    color: white;
+}
+
+.modal-btn.download:hover {
+    background: var(--primary-hover, #1b5e20);
 }
 
 .modal-btn.cancel {
@@ -2146,6 +2315,13 @@ body[data-display-mode="cast"] .card-name-uma-sub {
         flex: 0 0 150px;
         gap: 8px;
     }
+
+    #raceNumberDropdown .dropdown-menu,
+    #raceNumberDropdownMenu,
+    #gradeDropdown .dropdown-menu,
+    #gradeDropdownMenu {
+        max-height: 150px;
+    }
 }
 
 /* 詳細設定のキャプチャ用スタイル */
@@ -2478,6 +2654,37 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     display: none;
     flex-direction: column;
     box-sizing: border-box;
+    overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    display: block;
+}
+
+.dropdown-menu::-webkit-scrollbar-track,
+.dropdown-menu::-webkit-scrollbar-track-piece {
+    background-color: var(--border-color) !important;
+    border-radius: 4px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color) !important;
+    border-radius: 4px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-hover, #1b5e20) !important;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+    .dropdown-menu {
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-color) var(--border-color);
+    }
 }
 
 .custom-dropdown.open .dropdown-menu {

@@ -19,7 +19,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <title>ウマ娘 推しバ券メーカー ALLSTAR edition</title>
+    <title>ウマ娘 推しバ券メーカー ALLSTAR edition | Umamusume Oshi-baken Maker: ALLSTAR EDITION</title>
     <meta name="description" content="ウマ娘プリティーダービーの非公式応援ツールです。あなただけのオリジナル「推しバ券」を発券してみましょう。">
 
     <meta property="og:title" content="ウマ娘 推しバ券メーカー ALL-STAR edition">
@@ -33,121 +33,119 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Noto+Serif+JP:wght@700;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Noto+Serif+JP:wght@200..900&display=swap"
         rel="stylesheet">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <link rel="stylesheet" href="css/style.css?v=1.09d">
+    <link rel="stylesheet" href="css/style.css?v=1.10">
 </head>
 
 <body>
 
     <div class="container">
         <div class="header-meta">
-            <span class="version-text">v<span id="version">1.09d</span></span>
-            <a href="https://nyaftama.github.io/" target="_blank" rel="noopener noreferrer" class="credit-link">作った人:
-                <strong>@nyaftama</strong>
+            <div class="version-group">
+                <span class="version-badge">v<span id="version">1.10</span></span>
+                <a href="https://github.com/nyaftama/uma-ouen-baken#%E6%9B%B4%E6%96%B0%E5%B1%A5%E6%AD%B4"
+                    target="_blank" rel="noopener noreferrer" class="changelog-link">更新履歴</a>
+            </div>
+            <a href="https://nyaftama.github.io/" target="_blank" rel="noopener noreferrer" class="credit-link">
+                作った人: <strong>@nyaftama</strong>
             </a>
         </div>
 
         <h1 class="main-title">
-            推しバ券メーカー <br>
+            ウマ娘 推しバ券メーカー<br>
             <span class="sub-title">ALLSTAR edition</span>
         </h1>
-        <div class="eng-title">UMAMUSUME OSHI-BAKEN MAKER: ALLSTAR Edition</div>
-        <div
-            style="padding: 0 10px; margin-bottom: 10px; display: flex; flex-wrap: wrap; row-gap: 5px; column-gap: 15px; align-items: center;">
-            <a href="#" id="historyBtn" class="credit-link"
-                style="font-size: 0.85rem; color: var(--primary-color); font-weight: bold; text-decoration: underline;">
-                発券履歴・印刷用PDF
+        <div class="eng-title">OSHI-BAKEN MAKER: ALLSTAR EDITION</div>
+
+        <div class="tool-links">
+            <a href="#" id="historyBtn" class="tool-link">
+                <span>発券履歴・印刷用PDF</span>
             </a>
-            <a href="https://nyaftama.github.io/uma7th-ouen-baken/" class="credit-link"
-                style="font-size: 0.85rem; color: var(--primary-color); font-weight: bold; text-decoration: underline;">
-                7th in TOKYO edition
+            <a href="https://nyaftama.github.io/uma-salmon-summoner/" target="_blank" rel="noopener noreferrer"
+                class="tool-link">
+                <span>なんでもSHAKEROCKメーカー</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+            </a>
+            <a href="https://nyaftama.github.io/uma7th-ouen-baken/" target="_blank" rel="noopener noreferrer"
+                class="tool-link">
+                <span>7th in TOKYO edition</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+            </a>
+            <a href="https://nyaftama.github.io/" target="_blank" rel="noopener noreferrer" class="tool-link-subtle">
+                <span>すべて見る</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
             </a>
         </div>
 
         <div id="attributeFiltersArea" style="display: none; margin: 0 10px 15px 10px;">
         </div>
 
-        <div class="day-toggle">
-            <label class="day-label">
-                <input type="radio" name="displayMode" value="cast" checked> キャスト名優先
-            </label>
-            <label class="day-label">
-                <input type="radio" name="displayMode" value="uma"> キャラ名優先
-            </label>
-        </div>
+        <div id="topInfoSwitcher" class="top-info-switcher">
+            <button id="toggleTopAreaBtn" class="top-area-toggle-btn" type="button" aria-label="表示切り替え"
+                title="開催情報 / 連勝候補リスト を切り替え" style="display: none;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <polyline points="3 3 3 8 8 8" />
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                    <polyline points="21 21 21 16 16 16" />
+                </svg>
+            </button>
 
-        <div
-            style="margin: 0 10px 15px 10px; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; user-select: none;">
-            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px;">
-                <div style="display: inline-flex; align-items: center; gap: 6px;">
-                    <label class="history-checkbox-wrapper" style="width: 22px; height: 22px;">
-                        <input type="checkbox" id="reflectCharColorCheckbox" class="history-checkbox">
-                        <div class="custom-checkbox"></div>
-                    </label>
-                    <label for="reflectCharColorCheckbox"
-                        style="font-weight: bold; cursor: pointer; font-size: 0.8rem; color: #333;">イメージカラーを反映</label>
-                </div>
-                <div id="invertColorSubItem"
-                    style="display: inline-flex; align-items: center; gap: 6px; margin-left: 28px; transition: opacity 0.15s ease;">
-                    <label class="history-checkbox-wrapper" style="width: 18px; height: 18px;">
-                        <input type="checkbox" id="invertColorCheckbox" class="history-checkbox">
-                        <div class="custom-checkbox" style="border-radius: 3px;"></div>
-                    </label>
-                    <label for="invertColorCheckbox"
-                        style="font-weight: bold; cursor: pointer; font-size: 0.75rem; color: #555;">メイン/サブを反転</label>
-                </div>
-            </div>
-            <div style="display: inline-flex; align-items: center; gap: 6px;">
-                <label class="history-checkbox-wrapper" style="width: 22px; height: 22px;">
-                    <input type="checkbox" id="bitmapTextCheckbox" class="history-checkbox">
-                    <div class="custom-checkbox"></div>
-                </label>
-                <label for="bitmapTextCheckbox"
-                    style="font-weight: bold; cursor: pointer; font-size: 0.8rem; color: #333;">文字をビットマップ化</label>
-            </div>
-        </div>
-
-        <div class="event-settings-area">
-            <div class="settings-left">
-                <div class="settings-header">開催情報設定</div>
-                <div id="currentEventInfo" class="settings-info-text">ーーー</div>
-            </div>
-            <div class="settings-right">
-                <button id="openSettingsBtn" class="settings-btn">変更</button>
-            </div>
-        </div>
-
-        <div id="cartArea" class="cart-area">
-            <div class="cart-left">
-                <div class="cart-header">
-                    ウマ連・3連複 候補リスト
-                    <div class="cart-status-row">
-                        <span id="cartCount">0/3</span>
-                        <span id="cartBetType"></span>
+            <div class="top-info-card">
+                <div id="eventSettingsArea" class="event-settings-area">
+                    <div class="settings-left">
+                        <div class="settings-header">開催情報設定</div>
+                        <div id="currentEventInfo" class="settings-info-text">ーーー</div>
+                    </div>
+                    <div class="settings-right">
+                        <button id="openSettingsBtn" class="settings-btn">変更</button>
                     </div>
                 </div>
-                <div id="cartItems" class="cart-items"></div>
-            </div>
 
-            <div id="cartRight" class="cart-right" style="display: none;">
-                <div class="amount-control-wrapper">
-                    <div class="qty-main-row" style="justify-content: center;">
-                        <button id="cartMinusBtn" class="qty-btn">-</button>
-                        <span id="cartQtySpan" class="qty-display">100</span>
-                        <button id="cartPlusBtn" class="qty-btn">+</button>
+                <div id="cartArea" class="cart-area" style="display: none;">
+                    <div class="cart-main">
+                        <div class="cart-left">
+                            <div class="cart-header">連勝候補リスト</div>
+                            <div id="cartItems" class="cart-items"></div>
+                        </div>
+
+                        <div id="cartRight" class="cart-right" style="display: none;">
+                            <div class="amount-control-wrapper">
+                                <div id="cartBetTypeContainer"></div>
+                                <div class="qty-main-row" style="justify-content: center;">
+                                    <button id="cartMinusBtn" class="qty-btn">−</button>
+                                    <span id="cartQtySpan" class="qty-display">100</span>
+                                    <button id="cartPlusBtn" class="qty-btn">＋</button>
+                                </div>
+                            </div>
+                            <button id="cartIssueBtn" class="issue-btn" style="margin: 0; width: 100%;">発券</button>
+                        </div>
                     </div>
-                    <div class="qty-sub-row" style="justify-content: center;">
-                        <button id="cartMinus1000Btn" class="qty-btn-small">-1000</button>
-                        <button id="cartPlus1000Btn" class="qty-btn-small">+1000</button>
-                    </div>
+
+                    <div class="cart-bottom" id="cartBottom"></div>
                 </div>
-                <button id="cartIssueBtn" class="issue-btn" style="margin: 0; width: 100%;">発券</button>
             </div>
         </div>
 
@@ -168,7 +166,7 @@
     <div id="shareModal" class="modal-overlay">
         <div class="modal-content">
             <h3 class="modal-title">推しバ券が発券されました！</h3>
-            <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">
+            <p class="modal-description">
                 画像を長押し（または右クリック）で保存できます。<br>
                 画像のテキスト認識が可能な端末（iPhoneやPixelなど）では、文字以外の部分を長押ししてください。<br>
                 <span style="color: var(--primary-color); font-weight: bold;">Xでシェアする際には、保存した画像を手動で添付してください。</span>
@@ -180,34 +178,30 @@
                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 4px; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1); object-fit: contain; z-index: 2;" />
             </div>
 
-            <div
-                style="margin: 15px 0 5px 0; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; user-select: none;">
-                <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px;">
-                    <div style="display: inline-flex; align-items: center; gap: 6px;">
-                        <label class="history-checkbox-wrapper" style="width: 22px; height: 22px;">
-                            <input type="checkbox" id="modalReflectCharColorCheckbox" class="history-checkbox">
+            <div class="modal-options-bar">
+                <div class="color-options-group">
+                    <div class="checkbox-item">
+                        <label class="checkbox-wrapper" style="width: 22px; height: 22px;">
+                            <input type="checkbox" id="modalReflectCharColorCheckbox" class="setting-checkbox">
                             <div class="custom-checkbox"></div>
                         </label>
-                        <label for="modalReflectCharColorCheckbox"
-                            style="font-weight: bold; cursor: pointer; font-size: 0.8rem; color: #333;">イメージカラーを反映</label>
+                        <label for="modalReflectCharColorCheckbox" class="checkbox-label-text">イメージカラーを反映</label>
                     </div>
-                    <div id="modalInvertColorSubItem"
-                        style="display: inline-flex; align-items: center; gap: 6px; margin-left: 28px; transition: opacity 0.15s ease;">
-                        <label class="history-checkbox-wrapper" style="width: 18px; height: 18px;">
-                            <input type="checkbox" id="modalInvertColorCheckbox" class="history-checkbox">
+                    <div id="modalInvertColorSubItem" class="checkbox-item"
+                        style="margin-left: 28px; transition: opacity 0.15s ease;">
+                        <label class="checkbox-wrapper" style="width: 18px; height: 18px;">
+                            <input type="checkbox" id="modalInvertColorCheckbox" class="setting-checkbox">
                             <div class="custom-checkbox" style="border-radius: 3px;"></div>
                         </label>
-                        <label for="modalInvertColorCheckbox"
-                            style="font-weight: bold; cursor: pointer; font-size: 0.75rem; color: #555;">メイン/サブを反転</label>
+                        <label for="modalInvertColorCheckbox" class="checkbox-label-text sub-label">メイン/サブを反転</label>
                     </div>
                 </div>
-                <div style="display: inline-flex; align-items: center; gap: 6px;">
-                    <label class="history-checkbox-wrapper" style="width: 22px; height: 22px;">
-                        <input type="checkbox" id="modalBitmapTextCheckbox" class="history-checkbox">
+                <div class="checkbox-item">
+                    <label class="checkbox-wrapper" style="width: 22px; height: 22px;">
+                        <input type="checkbox" id="modalBitmapTextCheckbox" class="setting-checkbox">
                         <div class="custom-checkbox"></div>
                     </label>
-                    <label for="modalBitmapTextCheckbox"
-                        style="font-weight: bold; cursor: pointer; font-size: 0.8rem; color: #333;">文字をビットマップ化</label>
+                    <label for="modalBitmapTextCheckbox" class="checkbox-label-text">文字をビットマップ化</label>
                 </div>
             </div>
 
@@ -217,10 +211,8 @@
                     Xでシェア
                 </a>
             </div>
-            <div style="margin-top: 15px; text-align: center;">
-                <a href="#" id="openHistoryFromShare"
-                    style="font-size: 0.9rem; color: var(--primary-color); text-decoration: underline; font-weight: bold;">▶
-                    発券履歴・印刷用PDF画面を開く</a>
+            <div class="modal-footer-nav">
+                <a href="#" id="openHistoryFromShare" class="modal-nav-link">▶ 発券履歴・印刷用PDF画面を開く</a>
             </div>
         </div>
     </div>
@@ -248,7 +240,7 @@
                 </div>
 
                 <div class="bk-left-bottom">
-                    <div class="bk-ura-tokyo">推しバ券メーカー</div>
+                    <div class="bk-footer-title">推しバ券メーカー</div>
                     <div class="bk-issue-date bk-tall"><span id="bkIssueDateVal">3月22日</span></div>
                 </div>
             </div>
@@ -272,14 +264,15 @@
                         <div id="bkName" class="bk-uma-name bk-tall">トウカイテイオー</div>
                     </div>
 
-                    <div class="bk-amount-row bk-tall">
-                        各<span class="bk-stars" id="bkStarsSub">☆☆☆</span><span id="bkVal" class="bk-val">100</span>
-                        ジュエル
-                    </div>
+                    <div class="bk-bottom-amounts">
+                        <div id="bkCombinationsRow" class="bk-combinations-row bk-tall" style="display: none;"><span
+                                class="bk-label">組合せ数</span><span id="bkCombinationsVal" class="bk-val">6</span></div>
 
-                    <div class="bk-total-row bk-tall">
-                        合計<span class="bk-stars" id="bkStarsTotal">★★★</span><span id="bkTotalVal"
-                            class="bk-val">200</span> ジュエル
+                        <div class="bk-amount-row bk-tall"><span class="bk-label">各</span><span class="bk-stars"
+                                id="bkStarsSub">☆☆☆</span><span id="bkVal" class="bk-val">100</span>ジュエル</div>
+
+                        <div class="bk-total-row bk-tall"><span class="bk-label">合計</span><span class="bk-stars"
+                                id="bkStarsTotal">★★★</span><span id="bkTotalVal" class="bk-val">200</span>ジュエル</div>
                     </div>
                 </div>
             </div>
@@ -291,19 +284,15 @@
         <div class="modal-content"
             style="max-width: 600px; width: 90%; height: 80vh; display: flex; flex-direction: column;">
             <h3 class="modal-title">発券履歴・印刷用PDF</h3>
-            <p style="font-size: 0.8rem; color: #666; text-align: left;">
+            <p class="modal-description" style="text-align: left;">
                 最近発券したバ券（最大8枚）が保存されています。チェックを入れてPDF保存ボタンを押すと、A4サイズの印刷用PDF（原寸大）をダウンロードできます。</p>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <a href="#" id="deleteAllHistoryBtn"
-                    style="color: #d32f2f; font-weight: bold; text-decoration: underline; font-size: 0.9rem;">すべて削除...</a>
-                <a href="#" id="selectAllHistoryBtn"
-                    style="color: var(--primary-color); text-decoration: underline; font-size: 0.9rem; font-weight: bold;">すべて選択
-                    / 解除</a>
+            <div class="history-header-actions">
+                <a href="#" id="deleteAllHistoryBtn" class="history-action-link danger">すべて削除...</a>
+                <a href="#" id="selectAllHistoryBtn" class="history-action-link">すべて選択 / 解除</a>
             </div>
 
-            <div id="historyList"
-                style="flex: 1; overflow-y: auto; text-align: left; margin-top: 5px; border: 1px solid #eee; padding: 10px; border-radius: 8px;">
+            <div id="historyList">
             </div>
 
             <div class="modal-actions">
@@ -320,10 +309,9 @@
             <h3 class="modal-title">開催情報設定</h3>
 
             <div class="settings-form-group" style="position: relative; margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <div class="settings-label-row">
                     <label for="setRaceName" style="margin-bottom: 0;">レース名</label>
-                    <a href="#" id="openRaceListBtn"
-                        style="font-size: 0.85rem; color: var(--primary-color); font-weight: bold; text-decoration: underline; padding-left: 4px;">レース一覧</a>
+                    <a href="#" id="openRaceListBtn" class="settings-header-link">レース一覧</a>
                 </div>
 
                 <div class="search-input-wrapper">
@@ -340,19 +328,64 @@
             <div class="settings-grid">
                 <div class="settings-form-group">
                     <label for="setEventDate">開催日</label>
-                    <input type="date" id="setEventDate">
+                    <div class="date-input-wrapper">
+                        <input type="text" id="setEventDate" placeholder="YYYYMMDD" maxlength="10" autocomplete="off">
+                        <button type="button" id="openDatePickerBtn" class="date-picker-icon-btn" aria-label="カレンダーから選択"
+                            title="カレンダーから選択">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="settings-form-group">
-                    <label for="setRacecourse">開催レース場</label>
-                    <select id="setRacecourse"></select>
+                    <label>開催レース場</label>
+                    <input type="hidden" id="setRacecourse" value="">
+                    <div class="custom-dropdown" id="racecourseDropdown">
+                        <button type="button" class="dropdown-trigger" id="racecourseDropdownTrigger"
+                            aria-haspopup="listbox" aria-expanded="false">
+                            <span class="dropdown-selected-text" id="racecourseSelectedText">ーーー</span>
+                            <svg class="dropdown-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="racecourseDropdownMenu" role="listbox"></div>
+                    </div>
                 </div>
                 <div class="settings-form-group">
-                    <label for="setRaceNumber">レース番号</label>
-                    <select id="setRaceNumber"></select>
+                    <label>レース番号</label>
+                    <input type="hidden" id="setRaceNumber" value="">
+                    <div class="custom-dropdown" id="raceNumberDropdown">
+                        <button type="button" class="dropdown-trigger" id="raceNumberDropdownTrigger"
+                            aria-haspopup="listbox" aria-expanded="false">
+                            <span class="dropdown-selected-text" id="raceNumberSelectedText">11R</span>
+                            <svg class="dropdown-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="raceNumberDropdownMenu" role="listbox"></div>
+                    </div>
                 </div>
                 <div class="settings-form-group">
-                    <label for="setGrade">レースのグレード</label>
-                    <select id="setGrade"></select>
+                    <label>レースのグレード</label>
+                    <input type="hidden" id="setGrade" value="">
+                    <div class="custom-dropdown" id="gradeDropdown">
+                        <button type="button" class="dropdown-trigger" id="gradeDropdownTrigger" aria-haspopup="listbox"
+                            aria-expanded="false">
+                            <span class="dropdown-selected-text" id="gradeSelectedText">GI</span>
+                            <svg class="dropdown-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="gradeDropdownMenu" role="listbox"></div>
+                    </div>
                 </div>
             </div>
 
@@ -378,12 +411,78 @@
         </div>
     </div>
 
+    <div id="datePickerModal" class="modal-overlay" style="z-index: 2150;">
+        <div class="modal-content date-picker-modal-content" style="max-width: 360px; width: 90%;">
+            <h3 class="modal-title">開催日の選択</h3>
+
+            <div class="date-picker-header">
+                <button type="button" id="prevMonthBtn" class="month-nav-btn" aria-label="前月" title="前月">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                </button>
+
+                <div class="date-picker-dropdowns">
+                    <div class="custom-dropdown" id="datePickerYearDropdown">
+                        <button type="button" class="dropdown-trigger" id="datePickerYearTrigger"
+                            aria-haspopup="listbox" aria-expanded="false">
+                            <span class="dropdown-selected-text" id="datePickerYearSelectedText">2024年</span>
+                            <svg class="dropdown-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="datePickerYearDropdownMenu" role="listbox"></div>
+                    </div>
+
+                    <div class="custom-dropdown" id="datePickerMonthDropdown">
+                        <button type="button" class="dropdown-trigger" id="datePickerMonthTrigger"
+                            aria-haspopup="listbox" aria-expanded="false">
+                            <span class="dropdown-selected-text" id="datePickerMonthSelectedText">10月</span>
+                            <svg class="dropdown-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="datePickerMonthDropdownMenu" role="listbox"></div>
+                    </div>
+                </div>
+
+                <button type="button" id="nextMonthBtn" class="month-nav-btn" aria-label="次月" title="次月">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="calendar-container">
+                <div class="calendar-weekdays">
+                    <span class="weekday sun">日</span>
+                    <span class="weekday">月</span>
+                    <span class="weekday">火</span>
+                    <span class="weekday">水</span>
+                    <span class="weekday">木</span>
+                    <span class="weekday">金</span>
+                    <span class="weekday sat">土</span>
+                </div>
+                <div id="calendarDaysGrid" class="calendar-days-grid"></div>
+            </div>
+
+            <div class="modal-actions" style="margin-top: 15px;">
+                <button id="cancelDatePickerBtn" class="modal-btn cancel">キャンセル</button>
+                <button id="confirmDatePickerBtn" class="modal-btn primary">確定</button>
+            </div>
+        </div>
+    </div>
+
     <div id="deleteConfirmModal" class="modal-overlay" style="z-index: 2200;">
         <div class="modal-content" style="max-width: 400px;">
             <h3 class="modal-title">履歴の削除</h3>
-            <p style="font-size: 0.95rem; color: #333; margin-bottom: 20px; text-align: center;">
+            <p class="delete-confirm-message">
                 すべての発券履歴を削除しますか？<br>
-                <span style="color: #d32f2f; font-weight: bold; font-size: 0.85rem;">※この操作は取り消せません</span>
+                <span class="delete-confirm-warning">※この操作は取り消せません</span>
             </p>
             <div class="modal-actions">
                 <button id="cancelDeleteBtn" class="modal-btn cancel">キャンセル</button>

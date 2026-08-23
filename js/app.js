@@ -1,5 +1,5 @@
 
-const version = document.getElementById('version') ? document.getElementById('version').textContent : '1.09d';
+const version = document.getElementById('version')?.textContent?.trim() || Date.now().toString();
 const umaCsvPath = './data/uma_list.csv?v=' + version;
 
 let allUmaData = [];
@@ -181,6 +181,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modalInvertCheckbox) {
         modalInvertCheckbox.addEventListener('change', (e) => handleInvertColorChange(e.target.checked, 'modal'));
     }
+
+    const toggleTopBtn = document.getElementById('toggleTopAreaBtn');
+    if (toggleTopBtn) {
+        toggleTopBtn.addEventListener('click', () => {
+            currentTopView = (currentTopView === 'event') ? 'cart' : 'event';
+            updateTopAreaView();
+        });
+    }
+
+    updateTopAreaView();
 });
 
 function hexToHsl(hex) {
@@ -280,65 +290,182 @@ function applyBakenThemeColor(data) {
     }
 }
 
-function updateCartUI() {
+let currentTopView = 'event'; // 'event' or 'cart'
+
+function updateTopAreaView() {
+    const switcher = document.getElementById('topInfoSwitcher');
+    const eventArea = document.getElementById('eventSettingsArea');
     const cartArea = document.getElementById('cartArea');
-    const itemsDiv = document.getElementById('cartItems');
-    const cartRight = document.getElementById('cartRight');
-    const countSpan = document.getElementById('cartCount');
-    const betTypeSpan = document.getElementById('cartBetType');
+    const toggleBtn = document.getElementById('toggleTopAreaBtn');
 
-    const cartMinusBtn = document.getElementById('cartMinusBtn');
-    const cartPlusBtn = document.getElementById('cartPlusBtn');
-    const cartMinus1000Btn = document.getElementById('cartMinus1000Btn');
-    const cartPlus1000Btn = document.getElementById('cartPlus1000Btn');
-    const cartIssueBtn = document.getElementById('cartIssueBtn');
+    if (!eventArea || !cartArea) return;
 
-    if (cartItems.length > 0) {
-        cartArea.style.display = 'flex';
-        cartRight.style.display = 'flex';
-    } else {
-        cartArea.style.display = 'none';
+    const hasItems = cartItems.length > 0;
+
+    if (switcher) {
+        switcher.classList.toggle('has-multi-pages', hasItems);
     }
 
-    itemsDiv.innerHTML = '';
-    countSpan.textContent = `${cartItems.length}/3`;
+    if (toggleBtn) {
+        toggleBtn.style.display = hasItems ? 'flex' : 'none';
+    }
 
-    const mode = document.querySelector('input[name="displayMode"]:checked').value;
+    if (currentTopView === 'cart' && hasItems) {
+        eventArea.style.display = 'none';
+        cartArea.style.display = 'flex';
+        if (toggleBtn) {
+            toggleBtn.title = '開催情報設定を表示';
+        }
+    } else {
+        currentTopView = 'event';
+        eventArea.style.display = 'flex';
+        cartArea.style.display = 'none';
+        if (toggleBtn) {
+            toggleBtn.title = '連勝候補リストを表示';
+        }
+    }
+}
+
+let currentCartBetType = 'umaren';
+let isCartBetTypeUserModified = false;
+let cartBetTypeDropdownObj = null;
+
+function initCartBetTypeDropdown() {
+    const container = document.getElementById('cartBetTypeContainer');
+    if (!container || cartBetTypeDropdownObj) return;
+
+    const cartBetTypeOptions = [
+        { value: 'umaren', label: 'ウマ連' },
+        { value: 'sanrenpuku', label: '3連複' },
+        { value: 'umaren_box', label: 'ウマ連ボックス' },
+        { value: 'sanrenpuku_box', label: '3連複ボックス' }
+    ];
+
+    cartBetTypeDropdownObj = createCustomDropdown({
+        options: cartBetTypeOptions,
+        initialValue: currentCartBetType,
+        className: 'bet-type-dropdown cart-bet-type-dropdown',
+        triggerClass: 'bet-type-trigger',
+        onSelect: (selectedVal) => {
+            currentCartBetType = selectedVal;
+            isCartBetTypeUserModified = true;
+            updateCartHelpNotes();
+        }
+    });
+
+    container.innerHTML = '';
+    container.appendChild(cartBetTypeDropdownObj.element);
+}
+
+function renderCartItems() {
+    const itemsDiv = document.getElementById('cartItems');
+    if (!itemsDiv) return;
+
+    itemsDiv.innerHTML = '';
+    const mode = getDisplayMode();
+
     cartItems.forEach((item, index) => {
         const el = document.createElement('div');
         el.className = 'cart-item';
+        el.dataset.index = index;
 
         const cleanName = (item.uma_name || '').replace('役', '').trim();
         const displayName = (mode === 'cast') ? item.cast_name : cleanName;
+        const mainColor = item.main_color || '#333333';
+        const subColor = item.sub_color || '#cccccc';
+        const badgeStyle = `background: linear-gradient(135deg, ${mainColor} 75%, ${subColor} 25%);`;
 
-        el.innerHTML = `<span>${item.uma_number}. ${displayName}</span> <span class="cart-item-remove" data-index="${index}">×</span>`;
+        el.innerHTML = `<span class="cart-item-num" style="${badgeStyle}">${item.uma_number}</span><span class="cart-item-name">${displayName}</span><span class="cart-item-remove" data-index="${index}">×</span>`;
+
+        const removeBtn = el.querySelector('.cart-item-remove');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cartItems.splice(index, 1);
+                if (cartItems.length === 0) {
+                    currentTopView = 'event';
+                    isCartBetTypeUserModified = false;
+                    currentCartBetType = 'umaren';
+                    if (cartBetTypeDropdownObj && typeof cartBetTypeDropdownObj.setValue === 'function') {
+                        cartBetTypeDropdownObj.setValue('umaren');
+                    }
+                }
+                updateCartUI();
+            });
+        }
+
         itemsDiv.appendChild(el);
     });
+}
 
-    document.querySelectorAll('.cart-item-remove').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const idx = e.target.getAttribute('data-index');
-            cartItems.splice(idx, 1);
-            updateCartUI();
-        });
-    });
+function updateCartUI() {
+    initCartBetTypeDropdown();
 
-    const isReady = cartItems.length >= 2;
+    const cartRight = document.getElementById('cartRight');
+    const cartMinusBtn = document.getElementById('cartMinusBtn');
+    const cartPlusBtn = document.getElementById('cartPlusBtn');
+    const cartIssueBtn = document.getElementById('cartIssueBtn');
 
-    if (cartItems.length === 2) {
-        betTypeSpan.textContent = 'ウマ連';
-    } else if (cartItems.length === 3) {
-        betTypeSpan.textContent = '3連複';
+    if (cartItems.length > 0) {
+        cartRight.style.display = 'flex';
     } else {
-        betTypeSpan.textContent = '';
+        cartRight.style.display = 'none';
+        isCartBetTypeUserModified = false;
+        currentCartBetType = 'umaren';
+        if (cartBetTypeDropdownObj && typeof cartBetTypeDropdownObj.setValue === 'function') {
+            cartBetTypeDropdownObj.setValue('umaren');
+        }
     }
 
-    cartPlusBtn.disabled = !isReady;
-    cartPlus1000Btn.disabled = !isReady;
-    cartIssueBtn.disabled = !isReady;
+    updateTopAreaView();
+    renderCartItems();
 
+    const isReady = cartItems.length >= 2;
+    const count = cartItems.length;
+
+    if (cartBetTypeDropdownObj) {
+        if (count <= 1) {
+            cartBetTypeDropdownObj.setDisabled(true);
+            cartBetTypeDropdownObj.setDisabledOptions(['umaren', 'sanrenpuku', 'umaren_box', 'sanrenpuku_box']);
+            if (!isCartBetTypeUserModified) {
+                currentCartBetType = 'umaren';
+                cartBetTypeDropdownObj.setValue('umaren');
+            }
+        } else if (count === 2) {
+            cartBetTypeDropdownObj.setDisabled(false);
+            cartBetTypeDropdownObj.setDisabledOptions(['sanrenpuku', 'umaren_box', 'sanrenpuku_box']);
+            if (!isCartBetTypeUserModified || currentCartBetType !== 'umaren') {
+                currentCartBetType = 'umaren';
+                cartBetTypeDropdownObj.setValue('umaren');
+            }
+        } else if (count === 3) {
+            cartBetTypeDropdownObj.setDisabled(false);
+            cartBetTypeDropdownObj.setDisabledOptions(['umaren', 'sanrenpuku_box']);
+            if (!isCartBetTypeUserModified) {
+                currentCartBetType = 'sanrenpuku';
+                cartBetTypeDropdownObj.setValue('sanrenpuku');
+            } else if (currentCartBetType === 'umaren' || currentCartBetType === 'sanrenpuku_box') {
+                currentCartBetType = 'sanrenpuku';
+                cartBetTypeDropdownObj.setValue('sanrenpuku');
+            }
+        } else {
+            cartBetTypeDropdownObj.setDisabled(false);
+            cartBetTypeDropdownObj.setDisabledOptions(['umaren', 'sanrenpuku']);
+            if (!isCartBetTypeUserModified) {
+                currentCartBetType = 'sanrenpuku_box';
+                cartBetTypeDropdownObj.setValue('sanrenpuku_box');
+            } else if (currentCartBetType === 'umaren' || currentCartBetType === 'sanrenpuku') {
+                currentCartBetType = 'sanrenpuku_box';
+                cartBetTypeDropdownObj.setValue('sanrenpuku_box');
+            }
+        }
+    }
+
+    updateCartHelpNotes();
+
+    cartPlusBtn.disabled = !isReady;
+    cartIssueBtn.disabled = !isReady;
     cartMinusBtn.disabled = !isReady || cartAmount <= 100;
-    cartMinus1000Btn.disabled = !isReady || cartAmount <= 100;
 
     document.querySelectorAll('.item-card').forEach(card => {
         const castName = card.dataset.castName;
@@ -350,9 +477,84 @@ function updateCartUI() {
     });
 }
 
+function makeCartNumbersSequential() {
+    if (cartItems.length === 0) return;
+
+    const startNum = parseInt(cartItems[0].uma_number, 10) || 1;
+
+    cartItems.forEach((item, idx) => {
+        const newNum = String(startNum + idx);
+        item.uma_number = newNum;
+
+        const key = item.cast_name ? `${item.uma_name}_${item.cast_name}` : item.uma_name;
+        umaNumbers[key] = newNum;
+    });
+
+    document.querySelectorAll('.item-card').forEach(card => {
+        const castName = card.dataset.castName;
+        const matchedItem = cartItems.find(item => item.cast_name === castName);
+        if (matchedItem) {
+            const dropdown = card.querySelector('.uma-number-dropdown');
+            if (dropdown && typeof dropdown.setCustomValue === 'function') {
+                dropdown.setCustomValue(matchedItem.uma_number);
+            }
+        }
+    });
+
+    updateCartUI();
+    showToast('ウマ番を連番に設定しました');
+}
+
+function updateCartHelpNotes() {
+    const bottomDiv = document.getElementById('cartBottom');
+    if (!bottomDiv) return;
+    bottomDiv.innerHTML = '';
+
+    if (cartItems.length === 0) return;
+
+    const isBox = (currentCartBetType === 'umaren_box' || currentCartBetType === 'sanrenpuku_box');
+
+    // 1. 重複ウマ番チェック
+    const numbers = cartItems.map(item => String(item.uma_number));
+    const hasDuplicateNumbers = numbers.some((num, idx) => numbers.indexOf(num) !== idx);
+
+    if (hasDuplicateNumbers) {
+        const dupNote = document.createElement('p');
+        dupNote.className = 'cart-help-note warning';
+        dupNote.innerHTML = `
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+            </svg>
+            <span>同じウマ番が存在します（<a href="#" id="cartSequentialBtn" class="cart-help-action">連番にする</a>）</span>
+        `;
+
+        const seqBtn = dupNote.querySelector('#cartSequentialBtn');
+        if (seqBtn) {
+            seqBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                makeCartNumbersSequential();
+            });
+        }
+        bottomDiv.appendChild(dupNote);
+    }
+
+    // 2. ボックス時のサブ名称非表示ノート
+    if (isBox) {
+        const boxNote = document.createElement('p');
+        boxNote.className = 'cart-help-note';
+        boxNote.innerHTML = `
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+            </svg>
+            <span>ボックスではサブ名称が表示されません。</span>
+        `;
+        bottomDiv.appendChild(boxNote);
+    }
+}
+
 function addToCart(rowData) {
-    if (cartItems.length >= 3) {
-        showToast('追加できるのは3人までです');
+    if (cartItems.length >= 8) {
+        showToast('追加できるのは8人までです');
         return;
     }
 
@@ -369,10 +571,10 @@ function addToCart(rowData) {
     }
 
     cartItems.push(rowData);
+    currentTopView = 'cart';
     updateCartUI();
 
     document.getElementById('cartQtySpan').textContent = cartAmount;
-    showToast(`${rowData.cast_name} を追加しました`);
 }
 
 let toastTimeout;
@@ -800,7 +1002,7 @@ Papa.parse(umaCsvPath, {
 
         applyFilters();
         document.getElementById('loading').style.display = 'none';
-        document.getElementById('itemList').style.display = 'flex';
+        document.getElementById('itemList').style.display = 'grid';
     },
     error: function (err) {
         document.getElementById('loading').innerText = 'データの読み込みに失敗しました';
@@ -812,16 +1014,7 @@ function applyFilters() {
     const katakanaKeyword = hiraganaToKatakana(keyword);
     const hiraganaKeyword = katakanaToHiragana(keyword);
 
-    const activeFilters = {
-        // dormitory: document.getElementById('dormitorySelect')?.value,
-        // grade: document.getElementById('gradeSelect')?.value
-    };
-
     const filteredData = allUmaData.filter(row => {
-        // ① 属性フィルター判定
-        // if (activeFilters.dormitory && row.dormitory !== activeFilters.dormitory) return false;
-
-        // ② キーワード検索判定
         if (keyword) {
             const cast = (row.cast_name || '').toLowerCase();
             const castKana = (row.cast_name_kana || '').toLowerCase();
@@ -909,19 +1102,183 @@ function showSuggestions(keyword) {
     });
 }
 
+function getDisplayMode() {
+    return document.body.getAttribute('data-display-mode') || 'cast';
+}
+
 function setDisplayMode(mode) {
-    const radio = document.querySelector(`input[name="displayMode"][value="${mode}"]`);
-    if (radio && !radio.checked) {
-        radio.checked = true;
-        radio.dispatchEvent(new Event('change'));
+    if (getDisplayMode() === mode) return;
+    document.body.setAttribute('data-display-mode', mode);
+    updateCartUI();
+    if (typeof renderHistoryList === 'function') renderHistoryList();
+    const modeName = (mode === 'cast') ? 'キャスト名優先' : 'キャラ名優先';
+    showToast(`${modeName}モードに切り替えました`);
+}
+
+function scrollActiveItemToCenter(menu) {
+    if (!menu) return;
+    const activeItem = menu.querySelector('.dropdown-item.active');
+    if (activeItem) {
+        requestAnimationFrame(() => {
+            const targetScrollTop = activeItem.offsetTop - (menu.clientHeight / 2) + (activeItem.clientHeight / 2);
+            menu.scrollTop = targetScrollTop;
+        });
     }
+}
+
+function createCustomDropdown({ options, initialValue, onSelect, className = '', triggerClass = '' }) {
+    const dropdown = document.createElement('div');
+    dropdown.className = `custom-dropdown ${className}`.trim();
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = `dropdown-trigger ${triggerClass}`.trim();
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+
+    const textSpan = document.createElement('span');
+    textSpan.className = 'dropdown-selected-text';
+
+    const currentOpt = options.find(o => o.value === initialValue) || options[0];
+    textSpan.textContent = currentOpt ? currentOpt.label : initialValue;
+
+    const chevronSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    chevronSvg.setAttribute('class', 'dropdown-chevron');
+    chevronSvg.setAttribute('viewBox', '0 0 24 24');
+    chevronSvg.setAttribute('width', className.includes('uma-number') ? '12' : '16');
+    chevronSvg.setAttribute('height', className.includes('uma-number') ? '12' : '16');
+    chevronSvg.setAttribute('fill', 'none');
+    chevronSvg.setAttribute('stroke', 'currentColor');
+    chevronSvg.setAttribute('stroke-width', className.includes('uma-number') ? '3' : '2');
+    chevronSvg.setAttribute('stroke-linecap', 'round');
+    chevronSvg.setAttribute('stroke-linejoin', 'round');
+    chevronSvg.innerHTML = '<path d="M6 9l6 6 6-6"/>';
+
+    trigger.appendChild(textSpan);
+    trigger.appendChild(chevronSvg);
+    dropdown.appendChild(trigger);
+
+    const menu = document.createElement('div');
+    menu.className = 'dropdown-menu';
+    menu.setAttribute('role', 'listbox');
+
+    options.forEach(opt => {
+        if (opt.divider) {
+            const divider = document.createElement('div');
+            divider.className = 'dropdown-divider';
+            menu.appendChild(divider);
+            return;
+        }
+
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'dropdown-item';
+        if (opt.isAction) item.classList.add('dropdown-item-action');
+        item.dataset.value = opt.value;
+        item.textContent = opt.label;
+        if (opt.value === initialValue) item.classList.add('active');
+
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const val = opt.value;
+            if (!opt.isAction) {
+                textSpan.textContent = opt.label;
+                menu.querySelectorAll('.dropdown-item').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.value === val);
+                });
+            }
+            dropdown.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+            if (onSelect) onSelect(val, item, dropdown, textSpan);
+        });
+
+        menu.appendChild(item);
+    });
+
+    dropdown.appendChild(menu);
+
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = dropdown.classList.contains('open');
+        document.querySelectorAll('.custom-dropdown.open').forEach(d => {
+            if (d !== dropdown) {
+                d.classList.remove('open');
+                d.querySelector('.dropdown-trigger')?.setAttribute('aria-expanded', 'false');
+            }
+        });
+        dropdown.classList.toggle('open', !isOpen);
+        trigger.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+        if (!isOpen) {
+            scrollActiveItemToCenter(menu);
+        }
+    });
+
+    const setValFn = (val, label) => {
+        const opt = options.find(o => o.value === val);
+        textSpan.textContent = label || (opt ? opt.label : val);
+        menu.querySelectorAll('.dropdown-item').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.value === val);
+        });
+    };
+    dropdown.setCustomValue = setValFn;
+
+    return {
+        element: dropdown,
+        setValue: setValFn,
+        getValue: () => {
+            const activeItem = menu.querySelector('.dropdown-item.active');
+            return activeItem ? activeItem.dataset.value : initialValue;
+        },
+        setDisabled: (disabled) => {
+            trigger.disabled = !!disabled;
+            dropdown.classList.toggle('disabled', !!disabled);
+            if (disabled) {
+                dropdown.classList.remove('open');
+                trigger.setAttribute('aria-expanded', 'false');
+            }
+        },
+        setDisabledOptions: (disabledValues = []) => {
+            menu.querySelectorAll('.dropdown-item').forEach(btn => {
+                const val = btn.dataset.value;
+                const isDisabled = disabledValues.includes(val);
+                btn.disabled = isDisabled;
+                btn.classList.toggle('disabled', isDisabled);
+            });
+        }
+    };
+}
+
+function changeAllTicketTypes(targetType) {
+    Object.keys(ticketTypes).forEach(k => {
+        ticketTypes[k] = targetType;
+    });
+
+    allUmaData.forEach(row => {
+        const k = row.cast_name ? `${row.uma_name}_${row.cast_name}` : row.uma_name;
+        ticketTypes[k] = targetType;
+    });
+
+    const label = (targetType === 'ouen') ? '応援バ券 (単+複)' : '単勝';
+    document.querySelectorAll('.bet-type-dropdown').forEach(dropdown => {
+        const textSpan = dropdown.querySelector('.dropdown-selected-text');
+        if (textSpan) textSpan.textContent = label;
+        dropdown.querySelectorAll('.dropdown-menu .dropdown-item').forEach(item => {
+            if (item.dataset.value === targetType) {
+                item.classList.add('active');
+            } else if (item.dataset.value === 'ouen' || item.dataset.value === 'tansho') {
+                item.classList.remove('active');
+            }
+        });
+    });
+
+    showToast(targetType === 'ouen' ? 'すべての券種を「応援バ券 (単+複)」に変更しました' : 'すべての券種を「単勝」に変更しました');
 }
 
 function renderList(data) {
     const listContainer = document.getElementById('itemList');
     listContainer.innerHTML = '';
     if (data.length === 0) {
-        listContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#666;">該当するキャラクターがいません</div>`;
+        listContainer.innerHTML = `<div class="empty-list-message">該当するキャラクターがいません</div>`;
         return;
     }
 
@@ -935,11 +1292,19 @@ function renderList(data) {
         const cleanUmaName = (row.uma_name || '').replace('役', '').trim();
         const mainColor = row.main_color || '#333333';
         const subColor = row.sub_color || '#cccccc';
-        const badgeStyle = `background: linear-gradient(135deg, ${mainColor} 75%, ${subColor} 25%);`;
-
         const card = document.createElement('div');
         card.className = 'item-card';
         card.dataset.castName = row.cast_name;
+        const themeColors = getThemeColors(mainColor, subColor);
+        card.style.setProperty('--card-active-bg', themeColors.bg);
+        card.style.setProperty('--card-active-border', mainColor);
+
+        // 左側8pxのツートン枠線背景
+        card.style.backgroundImage = `linear-gradient(135deg, ${mainColor} 75%, ${subColor} 25%)`;
+        card.style.backgroundSize = `8px 100%`;
+        card.style.backgroundRepeat = `no-repeat`;
+        card.style.backgroundPosition = `left center`;
+
         if (cartItems.some(item => item.cast_name === row.cast_name)) {
             card.classList.add('checked-row');
         }
@@ -950,83 +1315,127 @@ function renderList(data) {
         const infoTopDiv = document.createElement('div');
         infoTopDiv.className = 'card-info-top';
 
-        const badgesWrapper = document.createElement('div');
-        badgesWrapper.className = 'badges-wrapper';
+        // 1行目: 馬番ドロップダウン & 切り替えボタン
+        const actionsRow = document.createElement('div');
+        actionsRow.className = 'card-info-actions';
 
-        const badgeSpan = document.createElement('span');
-        badgeSpan.className = 'uma-badge';
-        badgeSpan.style.cssText = badgeStyle;
-        badgeSpan.textContent = cleanUmaName;
-        badgeSpan.addEventListener('click', () => setDisplayMode('uma'));
+        const numOptions = [];
+        for (let i = 1; i <= 32; i++) {
+            numOptions.push({ value: String(i), label: String(i) });
+        }
 
-        const castDiv = document.createElement('div');
-        castDiv.className = 'cast-name';
-        castDiv.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'SELECT') {
-                setDisplayMode('cast');
+        const numberDropdownObj = createCustomDropdown({
+            options: numOptions,
+            initialValue: String(umaNumbers[key]),
+            className: 'uma-number-dropdown',
+            triggerClass: 'uma-number-trigger',
+            onSelect: (newNum) => {
+                umaNumbers[key] = newNum;
+                cartItems.forEach(item => {
+                    if (item.cast_name === row.cast_name) {
+                        item.uma_number = newNum;
+                    }
+                });
+                updateCartUI();
             }
         });
+        actionsRow.appendChild(numberDropdownObj.element);
 
-        const numberSelect = document.createElement('select');
-        numberSelect.className = 'uma-number-select';
-        for (let i = 1; i <= 32; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i;
-            if (i === parseInt(umaNumbers[key])) option.selected = true;
-            numberSelect.appendChild(option);
-        }
-        numberSelect.addEventListener('change', (e) => {
-            const newNum = e.target.value;
-            umaNumbers[key] = newNum;
-            cartItems.forEach(item => {
-                if (item.cast_name === row.cast_name) {
-                    item.uma_number = newNum;
-                }
-            });
-            updateCartUI();
+        const modeSwitchBtn = document.createElement('button');
+        modeSwitchBtn.type = 'button';
+        modeSwitchBtn.className = 'mode-switch-btn';
+        modeSwitchBtn.setAttribute('aria-label', 'キャラ名/キャスト名切り替え');
+        modeSwitchBtn.setAttribute('title', 'キャラ名/キャスト名切り替え');
+        modeSwitchBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <polyline points="3 3 3 8 8 8" />
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                <polyline points="21 21 21 16 16 16" />
+            </svg>
+        `;
+        modeSwitchBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const currentMode = document.body.getAttribute('data-display-mode') || 'uma';
+            const nextMode = (currentMode === 'uma') ? 'cast' : 'uma';
+            setDisplayMode(nextMode);
         });
+        actionsRow.appendChild(modeSwitchBtn);
 
-        const nameSpan = document.createElement('span');
-        badgesWrapper.appendChild(badgeSpan);
+        // 2行目: メイン名（キャラ名 または キャスト名）
+        const mainNameDiv = document.createElement('div');
+        mainNameDiv.className = 'card-info-main-name';
 
-        if (row.tags && row.tags.trim()) {
-            const tagsArray = row.tags.split(/\s+/).filter(t => t.trim() !== '');
-            tagsArray.forEach(tag => {
-                let displayTag = tag;
-                if (!displayTag.startsWith('#')) {
-                    displayTag = '#' + displayTag;
-                }
-                const tagSpan = document.createElement('span');
-                tagSpan.className = 'tag-badge';
-                tagSpan.textContent = displayTag;
-                tagSpan.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    searchInput.value = displayTag;
-                    clearInputBtn.style.display = 'block';
-                    applyFilters();
-                    suggestionsBox.innerHTML = '';
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+        const umaMainSpan = document.createElement('span');
+        umaMainSpan.className = 'card-name-uma-main';
+        umaMainSpan.textContent = cleanUmaName;
+
+        const castMainSpan = document.createElement('span');
+        castMainSpan.className = 'card-name-cast-main';
+        castMainSpan.textContent = row.cast_name;
+
+        mainNameDiv.appendChild(umaMainSpan);
+        mainNameDiv.appendChild(castMainSpan);
+
+        // 3行目: サブ名（CV: キャスト名 または キャラ名役）
+        const subNameDiv = document.createElement('div');
+        subNameDiv.className = 'card-info-sub-name';
+
+        const castSubSpan = document.createElement('span');
+        castSubSpan.className = 'card-name-cast-sub';
+        castSubSpan.textContent = `CV: ${row.cast_name}`;
+
+        const umaSubSpan = document.createElement('span');
+        umaSubSpan.className = 'card-name-uma-sub';
+        umaSubSpan.textContent = `${cleanUmaName}役`;
+
+        subNameDiv.appendChild(castSubSpan);
+        subNameDiv.appendChild(umaSubSpan);
+
+        infoTopDiv.appendChild(actionsRow);
+        infoTopDiv.appendChild(mainNameDiv);
+        infoTopDiv.appendChild(subNameDiv);
+
+        const hasTags = row.tags && row.tags.trim();
+        const hasNote = row.note && row.note.trim();
+
+        if (hasTags || hasNote) {
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'uma-meta-group';
+
+            if (hasNote) {
+                const noteDiv = document.createElement('div');
+                noteDiv.className = 'uma-note';
+                noteDiv.textContent = row.note;
+                metaDiv.appendChild(noteDiv);
+            }
+
+            if (hasTags) {
+                const tagsWrapper = document.createElement('div');
+                tagsWrapper.className = 'tags-wrapper';
+                const tagsArray = row.tags.split(/\s+/).filter(t => t.trim() !== '');
+                tagsArray.forEach(tag => {
+                    let displayTag = tag;
+                    if (!displayTag.startsWith('#')) {
+                        displayTag = '#' + displayTag;
+                    }
+                    const tagSpan = document.createElement('span');
+                    tagSpan.className = 'tag-badge';
+                    tagSpan.textContent = displayTag;
+                    tagSpan.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        searchInput.value = displayTag;
+                        clearInputBtn.style.display = 'block';
+                        applyFilters();
+                        suggestionsBox.innerHTML = '';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+                    tagsWrapper.appendChild(tagSpan);
                 });
-                badgesWrapper.appendChild(tagSpan);
-            });
-        }
+                metaDiv.appendChild(tagsWrapper);
+            }
 
-        nameSpan.className = 'cast-name-text';
-        nameSpan.textContent = row.cast_name;
-        nameSpan.style.marginLeft = '8px';
-
-        castDiv.appendChild(numberSelect);
-        castDiv.appendChild(nameSpan);
-
-        infoTopDiv.appendChild(badgesWrapper);
-        infoTopDiv.appendChild(castDiv);
-
-        if (row.note && row.note.trim()) {
-            const noteDiv = document.createElement('div');
-            noteDiv.className = 'uma-note';
-            noteDiv.textContent = row.note;
-            infoTopDiv.appendChild(noteDiv);
+            infoTopDiv.appendChild(metaDiv);
         }
 
         const getTicketData = () => {
@@ -1035,7 +1444,7 @@ function renderList(data) {
 
         const addCartLink = document.createElement('div');
         addCartLink.className = 'add-cart-link';
-        addCartLink.innerHTML = `＋ ウマ連・3連複に追加`;
+        addCartLink.innerHTML = `＋ 連勝候補に追加`;
         addCartLink.style.alignSelf = 'flex-start';
         addCartLink.style.width = 'fit-content';
         addCartLink.style.display = 'inline-block';
@@ -1072,20 +1481,6 @@ function renderList(data) {
 
         setupQtyDisplayEdit(qtySpan, () => ticketAmounts[key], (newVal) => updateQty(newVal));
 
-        const qtySubRow = document.createElement('div');
-        qtySubRow.className = 'qty-sub-row';
-
-        const minus1000Btn = document.createElement('button');
-        minus1000Btn.className = 'qty-btn-small';
-        minus1000Btn.textContent = '-1000';
-
-        const plus1000Btn = document.createElement('button');
-        plus1000Btn.className = 'qty-btn-small';
-        plus1000Btn.textContent = '+1000';
-
-        qtySubRow.appendChild(minus1000Btn);
-        qtySubRow.appendChild(plus1000Btn);
-
         const updateQty = (newAmount) => {
             if (newAmount < 100) newAmount = 100;
             if (newAmount > MAX_BAKEN_QTY) {
@@ -1096,38 +1491,44 @@ function renderList(data) {
             qtySpan.textContent = newAmount;
             adjustQtyDisplayScale(qtySpan);
             minusBtn.disabled = newAmount <= 100;
-            minus1000Btn.disabled = newAmount <= 100;
             plusBtn.disabled = newAmount >= MAX_BAKEN_QTY;
-            plus1000Btn.disabled = newAmount >= MAX_BAKEN_QTY;
         };
         minusBtn.disabled = ticketAmounts[key] <= 100;
-        minus1000Btn.disabled = ticketAmounts[key] <= 100;
         plusBtn.disabled = ticketAmounts[key] >= MAX_BAKEN_QTY;
-        plus1000Btn.disabled = ticketAmounts[key] >= MAX_BAKEN_QTY;
 
         setupLongPress(minusBtn, () => updateQty(ticketAmounts[key] - 100));
         setupLongPress(plusBtn, () => updateQty(ticketAmounts[key] + 100));
-        setupLongPress(minus1000Btn, () => updateQty(ticketAmounts[key] - 1000));
-        setupLongPress(plus1000Btn, () => updateQty(ticketAmounts[key] + 1000));
 
         qtyMainRow.appendChild(minusBtn);
         qtyMainRow.appendChild(qtySpan);
         qtyMainRow.appendChild(plusBtn);
 
-        const betTypeSelect = document.createElement('select');
-        betTypeSelect.className = 'bet-type-select';
-        betTypeSelect.innerHTML = `
-                    <option value="ouen">応援バ券 (単＋複)</option>
-                    <option value="tansho">単勝</option>
-                `;
-        betTypeSelect.value = ticketTypes[key];
-        betTypeSelect.addEventListener('change', (e) => {
-            ticketTypes[key] = e.target.value;
+        const betTypeOptions = [
+            { value: 'ouen', label: '応援バ券 (単+複)' },
+            { value: 'tansho', label: '単勝' },
+            { divider: true },
+            { value: 'all_ouen', label: 'すべて応援バ券に変更...', isAction: true },
+            { value: 'all_tansho', label: 'すべて単勝に変更...', isAction: true }
+        ];
+
+        const betTypeDropdownObj = createCustomDropdown({
+            options: betTypeOptions,
+            initialValue: ticketTypes[key],
+            className: 'bet-type-dropdown',
+            triggerClass: 'bet-type-trigger',
+            onSelect: (selectedVal) => {
+                if (selectedVal === 'all_ouen') {
+                    changeAllTicketTypes('ouen');
+                } else if (selectedVal === 'all_tansho') {
+                    changeAllTicketTypes('tansho');
+                } else {
+                    ticketTypes[key] = selectedVal;
+                }
+            }
         });
 
-        amountControl.appendChild(betTypeSelect);
+        amountControl.appendChild(betTypeDropdownObj.element);
         amountControl.appendChild(qtyMainRow);
-        amountControl.appendChild(qtySubRow);
 
         const issueBtn = document.createElement('button');
         issueBtn.className = 'issue-btn';
@@ -1193,8 +1594,217 @@ function formatBakenRaceName(name) {
     return name;
 }
 
-async function generateTicket(data, amount, betType, isReissue = false) {
-    currentGeneratingTicketParams = { data, amount, betType };
+const generateTicket = openTicketModal;
+
+function getBoxCombinationsCount(count, betType) {
+    if (betType === 'umaren_box') {
+        return (count * (count - 1)) / 2;
+    } else if (betType === 'sanrenpuku_box') {
+        return (count * (count - 1) * (count - 2)) / 6;
+    }
+    return 1;
+}
+
+function populateBakenSlip(data, amount, betType, eventInfo = eventSettings) {
+    const isMulti = Array.isArray(data);
+    const isBox = (betType === 'umaren_box' || betType === 'sanrenpuku_box');
+    const firstData = isMulti ? data[0] : data;
+    const cleanUmaName = (firstData.uma_name || '').replace('役', '').trim();
+    const mode = getDisplayMode();
+
+    applyBakenThemeColor(data);
+
+    const bakenDOM = document.getElementById('bakenSlip');
+    if (bakenDOM) {
+        bakenDOM.classList.toggle('is-box-slip', isBox);
+    }
+
+    const now = new Date();
+    const issueMonth = now.getMonth() + 1;
+    const issueDay = now.getDate();
+    document.getElementById('bkIssueDateVal').textContent = `${issueMonth}月${issueDay}日`;
+
+    document.getElementById('bkSlipDate').textContent = formatBakenDate(eventInfo.date);
+
+    let venueDisp = eventInfo.racecourse;
+    if (venueDisp.length === 2) {
+        venueDisp = '\u00A0' + venueDisp[0] + '\u00A0\u00A0\u00A0' + venueDisp[1];
+    }
+    document.getElementById('bkSlipVenue').textContent = venueDisp;
+    document.getElementById('bkSlipRaceNumber').textContent = eventInfo.raceNumber;
+    const gradeSuffix = (eventInfo.grade && eventInfo.grade !== '--') ? `<br>(${eventInfo.grade})` : '';
+    document.getElementById('bkSlipRaceTitle').innerHTML = `${formatBakenRaceName(eventInfo.raceName)}${gradeSuffix}`;
+
+    let totalAmount = amount;
+    const comboRow = document.getElementById('bkCombinationsRow');
+    const comboVal = document.getElementById('bkCombinationsVal');
+
+    const getStars = (val, isTotal) => {
+        const char = isTotal ? '★' : '☆';
+        const targetLength = isTotal ? 7 : 6;
+        const starCount = Math.max(0, targetLength - val.toString().length);
+        return char.repeat(starCount);
+    };
+
+    if (isBox) {
+        const comboCount = getBoxCombinationsCount(data.length, betType);
+        totalAmount = amount * comboCount;
+
+        if (betType === 'umaren_box') {
+            bkBetTypeBox.innerHTML = `<div class="bk-small-en">QUINELLA</div><div class="bk-vert-text" style="margin: 15px 0;">ウマ連</div>`;
+        } else {
+            bkBetTypeBox.innerHTML = `<div class="bk-small-en">TRIO</div><div class="bk-vert-text" style="margin: 15px 0;">３連複</div>`;
+        }
+
+        bkMessage.style.display = 'block';
+        bkMessage.classList.add('is-box-header');
+        bkMessage.innerHTML = `ボックス <span class="bk-small-box-en">BOX</span>`;
+
+        if (comboRow) {
+            comboRow.style.display = 'block';
+            if (comboVal) comboVal.textContent = comboCount;
+        }
+    } else {
+        bkMessage.classList.remove('is-box-header');
+        if (comboRow) comboRow.style.display = 'none';
+
+        if (betType === 'umaren') {
+            bkBetTypeBox.innerHTML = `<div class="bk-small-en">QUINELLA</div><div class="bk-vert-text" style="margin: 15px 0;">ウマ連</div>`;
+            bkMessage.style.display = 'none';
+        } else if (betType === 'sanrenpuku') {
+            bkBetTypeBox.innerHTML = `<div class="bk-small-en">TRIO</div><div class="bk-vert-text" style="margin: 15px 0;">３連複</div>`;
+            bkMessage.style.display = 'none';
+        } else if (betType === 'tansho') {
+            bkBetTypeBox.innerHTML = `<div class="bk-small-en">WIN</div><div class="bk-vert-text" style="margin: 15px 0;">単<br>勝</div>`;
+            bkMessage.style.display = 'block';
+            bkMessage.textContent = '激推し';
+            totalAmount = amount;
+        } else {
+            bkBetTypeBox.innerHTML = `<div class="bk-small-en">WIN</div><div class="bk-vert-text">単<br>勝</div><div class="bk-plus">＋</div><div class="bk-vert-text">複<br>勝</div><div class="bk-small-en">PLACE<br>SHOW</div>`;
+            bkMessage.style.display = 'block';
+            bkMessage.textContent = 'がんばれ！';
+            totalAmount = amount * 2;
+        }
+    }
+
+    document.getElementById('bkVal').textContent = amount;
+    document.getElementById('bkTotalVal').textContent = totalAmount;
+    updateBkValScaling(totalAmount);
+
+    document.getElementById('bkStarsSub').textContent = getStars(amount, false);
+    document.getElementById('bkStarsTotal').textContent = getStars(totalAmount, true);
+
+    if (isBox) {
+        const isTwoCol = data.length >= 5;
+        const colClass = isTwoCol ? 'is-col-2' : 'is-col-1';
+        let boxHtml = `<div class="multi-names-container is-box ${colClass}">`;
+
+        data.forEach(row => {
+            const cleanName = (row.uma_name || '').replace('役', '').trim();
+            const dispMain = (mode === 'cast') ? row.cast_name : cleanName;
+            const scaleMain = getScaleVar(dispMain, 6, 1);
+
+            boxHtml += `
+                <div class="multi-name-block">
+                    <div class="multi-cast-row">
+                        <div class="multi-horse-number">${row.uma_number}</div>
+                        <div class="multi-cast-name" style="--text-scale: ${scaleMain};">${dispMain}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        if (isTwoCol && data.length < 8) {
+            const emptyCount = 8 - data.length;
+            for (let i = 0; i < emptyCount; i++) {
+                boxHtml += `
+                    <div class="multi-name-block is-empty-slot">
+                        <div class="multi-cast-row">
+                            <div class="multi-horse-number">☆</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        boxHtml += `</div>`;
+        bkNameArea.innerHTML = boxHtml;
+
+        const dummyCast = document.createElement('div');
+        dummyCast.id = 'bkCast'; dummyCast.textContent = firstData.cast_name;
+        const dummyName = document.createElement('div');
+        dummyName.id = 'bkName'; dummyName.textContent = firstData.uma_name;
+        dummyCast.style.display = 'none'; dummyName.style.display = 'none';
+        bkNameArea.appendChild(dummyCast);
+        bkNameArea.appendChild(dummyName);
+
+    } else if (isMulti) {
+        const countClass = (data.length === 2) ? 'is-umaren' : 'is-sanrenpuku';
+        let multiHtml = `<div class="multi-names-container ${countClass}">`;
+        data.forEach(row => {
+            const cleanName = (row.uma_name || '').replace('役', '').trim();
+            let dispMain, dispSub;
+            if (mode === 'cast') {
+                dispMain = row.cast_name;
+                dispSub = `${cleanName}役`;
+            } else {
+                dispMain = cleanName;
+                dispSub = `CV: ${row.cast_name}`;
+            }
+
+            const isUmaren = (data.length === 2);
+            const baseScale = isUmaren ? 0.91 : 1;
+            const scaleMain = getScaleVar(dispMain, 6, baseScale);
+            const scaleSub = getScaleVar(dispSub, 10, 1);
+
+            multiHtml += `
+                <div class="multi-name-block">
+                    <div class="multi-cast-row">
+                        <div class="multi-horse-number">${row.uma_number}</div>
+                        <div class="multi-cast-name" style="--text-scale: ${scaleMain};">${dispMain}</div>
+                    </div>
+                    <div class="multi-uma-name" style="--text-scale: ${scaleSub};">${dispSub}</div>
+                </div>
+            `;
+        });
+        multiHtml += `</div>`;
+        bkNameArea.innerHTML = multiHtml;
+
+        const dummyCast = document.createElement('div');
+        dummyCast.id = 'bkCast'; dummyCast.textContent = firstData.cast_name;
+        const dummyName = document.createElement('div');
+        dummyName.id = 'bkName'; dummyName.textContent = firstData.uma_name;
+        dummyCast.style.display = 'none'; dummyName.style.display = 'none';
+        bkNameArea.appendChild(dummyCast);
+        bkNameArea.appendChild(dummyName);
+
+    } else {
+        let dispMain, dispSub;
+        if (mode === 'cast') {
+            dispMain = firstData.cast_name;
+            dispSub = `${cleanUmaName}役`;
+        } else {
+            dispMain = cleanUmaName;
+            dispSub = `CV: ${firstData.cast_name}`;
+        }
+
+        const scaleMain = getScaleVar(dispMain, 6, 0.91);
+        const scaleSub = getScaleVar(dispSub, 10, 1);
+
+        bkNameArea.innerHTML = `
+            <div class="bk-cast-row">
+                <div id="bkNumber" class="bk-horse-number bk-tall">${firstData.uma_number}</div>
+                <div id="bkCast" class="bk-cast-name bk-tall" style="--text-scale: ${scaleMain};">${dispMain}</div>
+            </div>
+            <div id="bkName" class="bk-uma-name bk-tall" style="--text-scale: ${scaleSub};">${dispSub}</div>
+        `;
+    }
+
+    return totalAmount;
+}
+
+async function openTicketModal(data, amount, betType, isReissue = false) {
+    currentGeneratingTicketParams = { data, amount, betType, isReissue };
 
     const modalCheckbox = document.getElementById('modalReflectCharColorCheckbox');
     if (modalCheckbox) modalCheckbox.checked = reflectCharColor;
@@ -1209,151 +1819,10 @@ async function generateTicket(data, amount, betType, isReissue = false) {
     shareImageLoading.style.display = 'flex';
     shareImagePreview.style.display = 'none';
 
-    applyBakenThemeColor(data);
-
-    const now = new Date();
-    const issueMonth = now.getMonth() + 1;
-    const issueDay = now.getDate();
-    document.getElementById('bkIssueDateVal').textContent = `${issueMonth}月${issueDay}日`;
-
-    const d = eventSettings.date.split('-');
-    const eventYear = d[0];
-    const eventMonth = parseInt(d[1], 10);
-    const eventDay = parseInt(d[2], 10);
-    document.getElementById('bkSlipDate').textContent = `${eventYear}年${eventMonth}月${eventDay}日`;
-
-    let venueDisp = eventSettings.racecourse;
-    if (venueDisp.length === 2) {
-        venueDisp = '\u00A0' + venueDisp[0] + '\u00A0\u00A0\u00A0' + venueDisp[1];
-    }
-    document.getElementById('bkSlipVenue').textContent = venueDisp;
-
-    document.getElementById('bkSlipRaceNumber').textContent = eventSettings.raceNumber;
-    const gradeSuffix = (eventSettings.grade && eventSettings.grade !== '--') ? `<br>(${eventSettings.grade})` : '';
-    document.getElementById('bkSlipRaceTitle').innerHTML = `${formatBakenRaceName(eventSettings.raceName)}${gradeSuffix}`;
-
     const isMulti = Array.isArray(data);
     const firstData = isMulti ? data[0] : data;
-    const cleanUmaName = (firstData.uma_name || '').replace('役', '').trim();
 
-    let totalAmount = amount;
-
-    if (betType === 'umaren') {
-        bkBetTypeBox.innerHTML = `<div class="bk-small-en">QUINELLA</div><div class="bk-vert-text" style="margin: 15px 0;">ウマ連</div>`;
-        bkMessage.style.display = 'none';
-    } else if (betType === 'sanrenpuku') {
-        bkBetTypeBox.innerHTML = `<div class="bk-small-en">TRIO</div><div class="bk-vert-text" style="margin: 15px 0;">３連複</div>`;
-        bkMessage.style.display = 'none';
-    } else if (betType === 'tansho') {
-        bkBetTypeBox.innerHTML = `<div class="bk-small-en">WIN</div><div class="bk-vert-text" style="margin: 15px 0;">単<br>勝</div>`;
-        bkMessage.style.display = 'block';
-        bkMessage.textContent = '激推し';
-        totalAmount = amount;
-    } else {
-        bkBetTypeBox.innerHTML = `<div class="bk-small-en">WIN</div><div class="bk-vert-text">単<br>勝</div><div class="bk-plus">＋</div><div class="bk-vert-text">複<br>勝</div><div class="bk-small-en">PLACE<br>SHOW</div>`;
-        bkMessage.style.display = 'block';
-        bkMessage.textContent = 'がんばれ！';
-        totalAmount = amount * 2;
-    }
-
-    const getStars = (val, isTotal) => {
-        const char = isTotal ? '★' : '☆';
-        const targetLength = isTotal ? 7 : 6;
-        const starCount = Math.max(0, targetLength - val.toString().length);
-        return char.repeat(starCount);
-    };
-
-    document.getElementById('bkVal').textContent = amount;
-    document.getElementById('bkTotalVal').textContent = totalAmount;
-    updateBkValScaling(totalAmount);
-
-    const amountRow = document.querySelector('.bk-amount-row');
-    const totalRow = document.querySelector('.bk-total-row');
-
-    if (isMulti) {
-        if (amountRow) {
-            amountRow.style.transform = 'scale(0.85)';
-            amountRow.style.transformOrigin = 'right bottom';
-            amountRow.style.marginBottom = '-10px';
-        }
-        if (totalRow) {
-            totalRow.style.transform = 'scale(0.85)';
-            totalRow.style.transformOrigin = 'right bottom';
-        }
-    } else {
-        if (amountRow) {
-            amountRow.style.transform = 'none';
-            amountRow.style.marginBottom = '5px';
-        }
-        if (totalRow) totalRow.style.transform = 'none';
-    }
-
-    document.getElementById('bkStarsSub').textContent = getStars(amount, false);
-    document.getElementById('bkStarsTotal').textContent = getStars(totalAmount, true);
-
-    if (isMulti) {
-        let multiHtml = `<div class="multi-names-container">`;
-        data.forEach(row => {
-            const cleanName = (row.uma_name || '').replace('役', '').trim();
-            const mode = document.querySelector('input[name="displayMode"]:checked').value;
-
-            let dispMain, dispSub;
-            if (mode === 'cast') {
-                dispMain = row.cast_name;
-                dispSub = `${cleanName}役`;
-            } else {
-                dispMain = cleanName;
-                dispSub = `CV: ${row.cast_name}`;
-            }
-
-            const scaleMain = getScaleVar(dispMain, 6, 1);
-            const scaleSub = getScaleVar(dispSub, 10, 1);
-
-            multiHtml += `
-                        <div class="multi-name-block">
-                            <div class="multi-cast-row">
-                                <div class="multi-horse-number">${row.uma_number}</div>
-                                <div class="multi-cast-name" style="--text-scale: ${scaleMain};">${dispMain}</div>
-                            </div>
-                            <div class="multi-uma-name" style="--text-scale: ${scaleSub};">${dispSub}</div>
-                        </div>
-                    `;
-        });
-        multiHtml += `</div>`;
-        bkNameArea.innerHTML = multiHtml;
-
-        const dummyCast = document.createElement('div');
-        dummyCast.id = 'bkCast'; dummyCast.textContent = firstData.cast_name;
-        const dummyName = document.createElement('div');
-        dummyName.id = 'bkName'; dummyName.textContent = firstData.uma_name;
-        dummyCast.style.display = 'none'; dummyName.style.display = 'none';
-        bkNameArea.appendChild(dummyCast);
-        bkNameArea.appendChild(dummyName);
-
-    } else {
-        const cleanUmaName = (firstData.uma_name || '').replace('役', '').trim();
-        const mode = document.querySelector('input[name="displayMode"]:checked').value;
-
-        let dispMain, dispSub;
-        if (mode === 'cast') {
-            dispMain = firstData.cast_name;
-            dispSub = `${cleanUmaName}役`;
-        } else {
-            dispMain = cleanUmaName;
-            dispSub = `CV: ${firstData.cast_name}`;
-        }
-
-        const scaleMain = getScaleVar(dispMain, 6, 0.91);
-        const scaleSub = getScaleVar(dispSub, 10, 1);
-
-        bkNameArea.innerHTML = `
-                    <div class="bk-cast-row">
-                        <div id="bkNumber" class="bk-horse-number bk-tall">${firstData.uma_number}</div>
-                        <div id="bkCast" class="bk-cast-name bk-tall" style="--text-scale: ${scaleMain};">${dispMain}</div>
-                    </div>
-                    <div id="bkName" class="bk-uma-name bk-tall" style="--text-scale: ${scaleSub};">${dispSub}</div>
-                `;
-    }
+    const totalAmount = populateBakenSlip(data, amount, betType, eventSettings);
 
     const rightCol = document.querySelector('.bk-right-col');
     if (rightCol) {
@@ -1403,7 +1872,7 @@ async function generateTicket(data, amount, betType, isReissue = false) {
         shareImagePreview.style.display = 'block';
 
         let castNamesText = "";
-        const tweetMode = document.querySelector('input[name="displayMode"]:checked').value;
+        const tweetMode = getDisplayMode();
 
         if (isMulti) {
             if (tweetMode === 'cast') {
@@ -1486,11 +1955,11 @@ function renderHistoryList() {
     historyList.innerHTML = '';
 
     if (history.length === 0) {
-        historyList.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">履歴がありません</div>';
+        historyList.innerHTML = '<div class="empty-list-message">履歴がありません</div>';
         return;
     }
 
-    const mode = document.querySelector('input[name="displayMode"]:checked').value;
+    const mode = getDisplayMode();
 
     history.forEach(entry => {
         let nameStr = '';
@@ -1515,6 +1984,8 @@ function renderHistoryList() {
         else if (entry.betType === 'ouen') typeStr = '応援(単＋複)';
         else if (entry.betType === 'umaren') typeStr = 'ウマ連';
         else if (entry.betType === 'sanrenpuku') typeStr = '3連複';
+        else if (entry.betType === 'umaren_box') typeStr = 'ウマ連BOX';
+        else if (entry.betType === 'sanrenpuku_box') typeStr = '3連複BOX';
 
         let eventInfoStr = 'ーーー';
         if (entry.eventInfo) {
@@ -1538,8 +2009,8 @@ function renderHistoryList() {
                         <div class="history-title" style="margin-top: 4px;">${typeStr}：${nameStr}</div>
                     </div>
                     
-                    <label class="history-checkbox-wrapper">
-                        <input type="checkbox" class="history-checkbox" value="${entry.id}">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" class="history-item-checkbox" value="${entry.id}">
                         <div class="custom-checkbox"></div>
                     </label>
                 `;
@@ -1581,7 +2052,7 @@ let isAllSelected = false;
 document.getElementById('selectAllHistoryBtn').addEventListener('click', (e) => {
     e.preventDefault();
     isAllSelected = !isAllSelected;
-    document.querySelectorAll('.history-checkbox').forEach(cb => cb.checked = isAllSelected);
+    document.querySelectorAll('#historyList .history-item-checkbox').forEach(cb => cb.checked = isAllSelected);
 });
 
 document.getElementById('deleteAllHistoryBtn').addEventListener('click', (e) => {
@@ -1608,7 +2079,7 @@ document.getElementById('executeDeleteBtn').addEventListener('click', () => {
 });
 
 document.getElementById('printSelectedBtn').addEventListener('click', async () => {
-    const selectedIds = Array.from(document.querySelectorAll('.history-checkbox:checked')).map(cb => cb.value);
+    const selectedIds = Array.from(document.querySelectorAll('#historyList .history-item-checkbox:checked')).map(cb => cb.value);
     if (selectedIds.length === 0) {
         showToast('印刷用PDFに含めるバ券を選択してください');
         return;
@@ -1635,148 +2106,10 @@ document.getElementById('printSelectedBtn').addEventListener('click', async () =
     try {
         for (const target of printTargets) {
             const currentEvent = target.eventInfo || eventSettings;
-            const tweetMode = document.querySelector('input[name="displayMode"]:checked').value;
+            const betType = target.betType;
 
             for (const comboData of target.combinations) {
-                applyBakenThemeColor(comboData);
-
-                const isMulti = Array.isArray(comboData);
-                const firstData = isMulti ? comboData[0] : comboData;
-
-                const now = new Date();
-                const issueMonth = now.getMonth() + 1;
-                const issueDay = now.getDate();
-                document.getElementById('bkIssueDateVal').textContent = `${issueMonth}月${issueDay}日`;
-
-                const d = currentEvent.date.split('-');
-                const eventYear = d[0];
-                const eventMonth = parseInt(d[1], 10);
-                const eventDay = parseInt(d[2], 10);
-                document.getElementById('bkSlipDate').textContent = `${eventYear}年${eventMonth}月${eventDay}日`;
-
-                let venueDisp = currentEvent.racecourse;
-                if (venueDisp.length === 2) {
-                    venueDisp = venueDisp[0] + ' ' + venueDisp[1];
-                }
-                document.getElementById('bkSlipVenue').textContent = venueDisp;
-                document.getElementById('bkSlipRaceNumber').textContent = currentEvent.raceNumber;
-                const gradeSuffix = (currentEvent.grade && currentEvent.grade !== '--') ? `<br>(${currentEvent.grade})` : '';
-                document.getElementById('bkSlipRaceTitle').innerHTML = `${formatBakenRaceName(currentEvent.raceName)}${gradeSuffix}`;
-
-                let totalAmount = target.amount;
-                const betType = target.betType;
-                if (betType === 'umaren') {
-                    bkBetTypeBox.innerHTML = `<div class="bk-small-en">QUINELLA</div><div class="bk-vert-text" style="margin: 15px 0;">ウマ連</div>`;
-                    bkMessage.style.display = 'none';
-                } else if (betType === 'sanrenpuku') {
-                    bkBetTypeBox.innerHTML = `<div class="bk-small-en">TRIO</div><div class="bk-vert-text" style="margin: 15px 0;">３連複</div>`;
-                    bkMessage.style.display = 'none';
-                } else if (betType === 'tansho') {
-                    bkBetTypeBox.innerHTML = `<div class="bk-small-en">WIN</div><div class="bk-vert-text" style="margin: 15px 0;">単<br>勝</div>`;
-                    bkMessage.style.display = 'block';
-                    bkMessage.textContent = '激推し';
-                    totalAmount = target.amount;
-                } else {
-                    bkBetTypeBox.innerHTML = `<div class="bk-small-en">WIN</div><div class="bk-vert-text">単<br>勝</div><div class="bk-plus">＋</div><div class="bk-vert-text">複<br>勝</div><div class="bk-small-en">PLACE<br>SHOW</div>`;
-                    bkMessage.style.display = 'block';
-                    bkMessage.textContent = 'がんばれ！';
-                    totalAmount = target.amount * 2;
-                }
-
-                document.getElementById('bkVal').textContent = target.amount;
-                document.getElementById('bkTotalVal').textContent = totalAmount;
-                updateBkValScaling(totalAmount);
-
-                const amountRow = document.querySelector('.bk-amount-row');
-                const totalRow = document.querySelector('.bk-total-row');
-
-                if (isMulti) {
-                    if (amountRow) {
-                        amountRow.style.transform = 'scale(0.85)';
-                        amountRow.style.transformOrigin = 'right bottom';
-                        amountRow.style.marginBottom = '-10px';
-                    }
-                    if (totalRow) {
-                        totalRow.style.transform = 'scale(0.85)';
-                        totalRow.style.transformOrigin = 'right bottom';
-                    }
-                } else {
-                    if (amountRow) {
-                        amountRow.style.transform = 'none';
-                        amountRow.style.marginBottom = '5px';
-                    }
-                    if (totalRow) totalRow.style.transform = 'none';
-                }
-
-                const getStars = (val, isTotal) => {
-                    const char = isTotal ? '★' : '☆';
-                    const targetLength = isTotal ? 7 : 6;
-                    const starCount = Math.max(0, targetLength - val.toString().length);
-                    return char.repeat(starCount);
-                };
-
-                document.getElementById('bkStarsSub').textContent = getStars(target.amount, false);
-                document.getElementById('bkStarsTotal').textContent = getStars(totalAmount, true);
-
-                if (isMulti) {
-                    let multiHtml = `<div class="multi-names-container">`;
-                    comboData.forEach(row => {
-                        const cleanName = (row.uma_name || '').replace('役', '').trim();
-                        let dispMain, dispSub;
-                        if (tweetMode === 'cast') {
-                            dispMain = row.cast_name;
-                            dispSub = `${cleanName}役`;
-                        } else {
-                            dispMain = cleanName;
-                            dispSub = `CV: ${row.cast_name}`;
-                        }
-
-                        const scaleMain = getScaleVar(dispMain, 6, 1);
-                        const scaleSub = getScaleVar(dispSub, 10, 1);
-
-                        multiHtml += `
-                                    <div class="multi-name-block">
-                                        <div class="multi-cast-row">
-                                            <div class="multi-horse-number">${row.uma_number}</div>
-                                            <div class="multi-cast-name" style="--text-scale: ${scaleMain};">${dispMain}</div>
-                                        </div>
-                                        <div class="multi-uma-name" style="--text-scale: ${scaleSub};">${dispSub}</div>
-                                    </div>
-                                `;
-                    });
-                    multiHtml += `</div>`;
-                    bkNameArea.innerHTML = multiHtml;
-
-                    const dummyCast = document.createElement('div');
-                    dummyCast.id = 'bkCast'; dummyCast.textContent = firstData.cast_name;
-                    const dummyName = document.createElement('div');
-                    dummyName.id = 'bkName'; dummyName.textContent = firstData.uma_name;
-                    dummyCast.style.display = 'none'; dummyName.style.display = 'none';
-                    bkNameArea.appendChild(dummyCast);
-                    bkNameArea.appendChild(dummyName);
-
-                } else {
-                    const cleanUmaName = (firstData.uma_name || '').replace('役', '').trim();
-                    let dispMain, dispSub;
-                    if (tweetMode === 'cast') {
-                        dispMain = firstData.cast_name;
-                        dispSub = `${cleanUmaName}役`;
-                    } else {
-                        dispMain = cleanUmaName;
-                        dispSub = `CV: ${firstData.cast_name}`;
-                    }
-
-                    const scaleMain = getScaleVar(dispMain, 6, 0.91);
-                    const scaleSub = getScaleVar(dispSub, 10, 1);
-
-                    bkNameArea.innerHTML = `
-                                <div class="bk-cast-row">
-                                    <div id="bkNumber" class="bk-horse-number bk-tall">${firstData.uma_number}</div>
-                                    <div id="bkCast" class="bk-cast-name bk-tall" style="--text-scale: ${scaleMain};">${dispMain}</div>
-                                </div>
-                                <div id="bkName" class="bk-uma-name bk-tall" style="--text-scale: ${scaleSub};">${dispSub}</div>
-                            `;
-                }
+                populateBakenSlip(comboData, target.amount, betType, currentEvent);
 
                 const rightCol = document.querySelector('.bk-right-col');
                 if (rightCol) {
@@ -1895,9 +2228,7 @@ const updateCartQty = (newAmount) => {
 
     const isReady = cartItems.length >= 2;
     document.getElementById('cartMinusBtn').disabled = !isReady || cartAmount <= 100;
-    document.getElementById('cartMinus1000Btn').disabled = !isReady || cartAmount <= 100;
     document.getElementById('cartPlusBtn').disabled = !isReady || cartAmount >= MAX_BAKEN_QTY;
-    document.getElementById('cartPlus1000Btn').disabled = !isReady || cartAmount >= MAX_BAKEN_QTY;
 };
 
 const cartQtySpan = document.getElementById('cartQtySpan');
@@ -1907,12 +2238,38 @@ if (cartQtySpan) {
 
 setupLongPress(document.getElementById('cartMinusBtn'), () => updateCartQty(cartAmount - 100));
 setupLongPress(document.getElementById('cartPlusBtn'), () => updateCartQty(cartAmount + 100));
-setupLongPress(document.getElementById('cartMinus1000Btn'), () => updateCartQty(cartAmount - 1000));
-setupLongPress(document.getElementById('cartPlus1000Btn'), () => updateCartQty(cartAmount + 1000));
 
 document.getElementById('cartIssueBtn').addEventListener('click', () => {
-    const betType = cartItems.length === 2 ? 'umaren' : 'sanrenpuku';
-    generateTicket(cartItems, cartAmount, betType);
+    const count = cartItems.length;
+    if (count < 2) return;
+
+    let actualBetType = currentCartBetType;
+
+    if (count === 2) {
+        if (actualBetType !== 'umaren') {
+            actualBetType = 'umaren';
+            currentCartBetType = 'umaren';
+            isCartBetTypeUserModified = false;
+            if (cartBetTypeDropdownObj) {
+                cartBetTypeDropdownObj.setValue('umaren');
+            }
+            showToast('券種をウマ連に変更しました');
+        }
+    } else if (count === 3) {
+        if (actualBetType !== 'umaren_box' && actualBetType !== 'sanrenpuku') {
+            actualBetType = 'sanrenpuku';
+            currentCartBetType = 'sanrenpuku';
+            if (cartBetTypeDropdownObj) cartBetTypeDropdownObj.setValue('sanrenpuku');
+        }
+    } else {
+        if (actualBetType !== 'umaren_box' && actualBetType !== 'sanrenpuku_box') {
+            actualBetType = 'sanrenpuku_box';
+            currentCartBetType = 'sanrenpuku_box';
+            if (cartBetTypeDropdownObj) cartBetTypeDropdownObj.setValue('sanrenpuku_box');
+        }
+    }
+
+    generateTicket(cartItems, cartAmount, actualBetType);
 });
 
 document.getElementById('openHistoryFromShare').addEventListener('click', (e) => {
@@ -1923,8 +2280,74 @@ document.getElementById('openHistoryFromShare').addEventListener('click', (e) =>
     historyModal.classList.add('show');
 });
 
+function parseAndFormatDate(input) {
+    if (!input) return '';
+    let str = String(input).trim();
+
+    // 全角数字を半角に変換
+    str = str.replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+
+    // yyyy年MM月dd日 または yyyy年M月d日
+    let m = str.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日?$/);
+    if (m) {
+        const y = m[1];
+        const month = m[2].padStart(2, '0');
+        const d = m[3].padStart(2, '0');
+        return `${y}/${month}/${d}`;
+    }
+
+    // yyyyMMdd (8桁)
+    m = str.match(/^(\d{4})(\d{2})(\d{2})$/);
+    if (m) {
+        const y = m[1];
+        const month = m[2];
+        const d = m[3];
+        return `${y}/${month}/${d}`;
+    }
+
+    // yyyy/MM/dd, yyyy-MM-dd, yyyy.MM.dd
+    m = str.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+    if (m) {
+        const y = m[1];
+        const month = m[2].padStart(2, '0');
+        const d = m[3].padStart(2, '0');
+        return `${y}/${month}/${d}`;
+    }
+
+    return str;
+}
+
+function formatBakenDate(input) {
+    if (!input) return '';
+    const formatted = parseAndFormatDate(input);
+    if (!formatted) return String(input);
+    const parts = formatted.split('/');
+    if (parts.length === 3) {
+        const y = parts[0];
+        const m = parseInt(parts[1], 10);
+        const d = parseInt(parts[2], 10);
+        if (!isNaN(m) && !isNaN(d)) {
+            return `${y}年${m}月${d}日`;
+        }
+    }
+    return String(input);
+}
+
+function isValidFormattedDate(str) {
+    const m = str.match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
+    if (!m) return false;
+    const y = parseInt(m[1], 10);
+    const month = parseInt(m[2], 10);
+    const d = parseInt(m[3], 10);
+    if (y < 1900 || y > 2100) return false;
+    if (month < 1 || month > 12) return false;
+    if (d < 1 || d > 31) return false;
+    const dateObj = new Date(y, month - 1, d);
+    return dateObj.getFullYear() === y && (dateObj.getMonth() + 1) === month && dateObj.getDate() === d;
+}
+
 let eventSettings = {
-    date: '2021-02-24',
+    date: '2021/02/24',
     racecourse: '東京',
     raceNumber: '11',
     grade: 'GI',
@@ -2121,15 +2544,319 @@ function setupRaceNameSuggestion(optionsList) {
     });
 }
 
-async function initEventSettings() {
-    const raceNumSelect = document.getElementById('setRaceNumber');
-    for (let i = 1; i <= 13; i++) {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `${i}R`;
-        if (String(i) === eventSettings.raceNumber) opt.selected = true;
-        raceNumSelect.appendChild(opt);
+function setupCustomDropdown(dropdownId, hiddenInputId, textId, optionsList, initialValue, onSelect) {
+    const dropdown = document.getElementById(dropdownId);
+    const trigger = dropdown ? dropdown.querySelector('.dropdown-trigger') : null;
+    const menu = document.getElementById(dropdownId + 'Menu') || (dropdown ? dropdown.querySelector('.dropdown-menu') : null);
+    const hiddenInput = document.getElementById(hiddenInputId);
+    const textSpan = document.getElementById(textId);
+
+    if (!dropdown || !trigger || !menu) return;
+
+    menu.innerHTML = '';
+    const allSelectableOptions = [];
+
+    function addOptionItem(val, label) {
+        allSelectableOptions.push({ value: String(val), label: String(label) });
+
+        const itemBtn = document.createElement('button');
+        itemBtn.type = 'button';
+        itemBtn.className = 'dropdown-item';
+        itemBtn.dataset.value = val;
+        itemBtn.textContent = label;
+        if (String(val) === String(initialValue)) {
+            itemBtn.classList.add('active');
+        }
+
+        itemBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setCustomDropdownValue(dropdownId, hiddenInputId, textId, val, label);
+            dropdown.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+            if (onSelect) onSelect(val);
+        });
+
+        menu.appendChild(itemBtn);
     }
+
+    if (Array.isArray(optionsList)) {
+        optionsList.forEach(opt => {
+            if (opt && typeof opt === 'object' && opt.group && Array.isArray(opt.items)) {
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'dropdown-header';
+                headerDiv.textContent = opt.group;
+                menu.appendChild(headerDiv);
+
+                opt.items.forEach(item => {
+                    const val = typeof item === 'object' ? item.value : item;
+                    const label = typeof item === 'object' ? item.label : item;
+                    addOptionItem(val, label);
+                });
+            } else if (opt && typeof opt === 'object' && opt.isHeader) {
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'dropdown-header';
+                headerDiv.textContent = opt.label;
+                menu.appendChild(headerDiv);
+            } else {
+                const val = typeof opt === 'object' ? opt.value : opt;
+                const label = typeof opt === 'object' ? opt.label : opt;
+                addOptionItem(val, label);
+            }
+        });
+    }
+
+    const currentOpt = allSelectableOptions.find(opt => String(opt.value) === String(initialValue));
+    const initLabel = currentOpt ? currentOpt.label : initialValue;
+    if (hiddenInput) hiddenInput.value = initialValue;
+    if (textSpan) textSpan.textContent = initLabel;
+
+    if (!trigger._hasDropdownListener) {
+        trigger._hasDropdownListener = true;
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdown.classList.contains('open');
+            document.querySelectorAll('.custom-dropdown.open').forEach(d => {
+                if (d !== dropdown) {
+                    d.classList.remove('open');
+                    d.querySelector('.dropdown-trigger')?.setAttribute('aria-expanded', 'false');
+                }
+            });
+            dropdown.classList.toggle('open', !isOpen);
+            trigger.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+            if (!isOpen) {
+                scrollActiveItemToCenter(menu);
+            }
+        });
+    }
+}
+
+function setCustomDropdownValue(dropdownId, hiddenInputId, textId, value, customLabel) {
+    const dropdown = document.getElementById(dropdownId);
+    const hiddenInput = document.getElementById(hiddenInputId);
+    const textSpan = document.getElementById(textId);
+
+    if (hiddenInput) hiddenInput.value = value;
+
+    if (dropdown) {
+        const menu = dropdown.querySelector('.dropdown-menu');
+        if (menu) {
+            let matchedLabel = customLabel;
+            menu.querySelectorAll('.dropdown-item').forEach(item => {
+                if (String(item.dataset.value) === String(value)) {
+                    item.classList.add('active');
+                    if (!matchedLabel) matchedLabel = item.textContent;
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            if (textSpan && matchedLabel) {
+                textSpan.textContent = matchedLabel;
+            }
+        }
+    }
+}
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.custom-dropdown')) {
+        document.querySelectorAll('.custom-dropdown.open').forEach(d => {
+            d.classList.remove('open');
+            d.querySelector('.dropdown-trigger')?.setAttribute('aria-expanded', 'false');
+        });
+    }
+});
+
+let pickerYear = 2024;
+let pickerMonth = 10;
+let pickerDay = 27;
+
+function initDatePicker() {
+    const datePickerModal = document.getElementById('datePickerModal');
+    const openBtn = document.getElementById('openDatePickerBtn');
+    const cancelBtn = document.getElementById('cancelDatePickerBtn');
+    const confirmBtn = document.getElementById('confirmDatePickerBtn');
+    const prevMonthBtn = document.getElementById('prevMonthBtn');
+    const nextMonthBtn = document.getElementById('nextMonthBtn');
+    const eventDateInput = document.getElementById('setEventDate');
+
+    if (!datePickerModal || !openBtn) return;
+
+    function renderDatePickerCalendar() {
+        const grid = document.getElementById('calendarDaysGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        const daysInMonth = new Date(pickerYear, pickerMonth, 0).getDate();
+        if (pickerDay > daysInMonth) {
+            pickerDay = daysInMonth;
+        }
+
+        const firstDayIndex = new Date(pickerYear, pickerMonth - 1, 1).getDay();
+        const totalDaysFilled = firstDayIndex + daysInMonth;
+        const weeksCount = Math.ceil(totalDaysFilled / 7);
+
+        const targetRows = weeksCount === 6 ? 6 : 5;
+        grid.className = `calendar-days-grid rows-${targetRows}`;
+
+        for (let i = 0; i < firstDayIndex; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'calendar-day-btn empty';
+            grid.appendChild(emptyDiv);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dayBtn = document.createElement('button');
+            dayBtn.type = 'button';
+            dayBtn.className = 'calendar-day-btn';
+            dayBtn.textContent = d;
+
+            const dayOfWeek = (firstDayIndex + d - 1) % 7;
+            if (dayOfWeek === 0) dayBtn.classList.add('sun');
+            if (dayOfWeek === 6) dayBtn.classList.add('sat');
+            if (d === pickerDay) dayBtn.classList.add('active');
+
+            dayBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                pickerDay = d;
+                grid.querySelectorAll('.calendar-day-btn').forEach(b => b.classList.remove('active'));
+                dayBtn.classList.add('active');
+            });
+
+            grid.appendChild(dayBtn);
+        }
+
+        const totalCells = targetRows * 7;
+        const remainingCells = totalCells - totalDaysFilled;
+        for (let i = 0; i < remainingCells; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'calendar-day-btn empty';
+            grid.appendChild(emptyDiv);
+        }
+    }
+
+    function changeMonth(delta) {
+        let newM = pickerMonth + delta;
+        let newY = pickerYear;
+        if (newM < 1) {
+            newM = 12;
+            newY--;
+        } else if (newM > 12) {
+            newM = 1;
+            newY++;
+        }
+        if (newY < 1901) {
+            newY = 1901;
+            newM = 1;
+        } else if (newY > 2100) {
+            newY = 2100;
+            newM = 12;
+        }
+        pickerYear = newY;
+        pickerMonth = newM;
+
+        setCustomDropdownValue('datePickerYearDropdown', '', 'datePickerYearSelectedText', String(pickerYear), `${pickerYear}年`);
+        setCustomDropdownValue('datePickerMonthDropdown', '', 'datePickerMonthSelectedText', String(pickerMonth), `${pickerMonth}月`);
+        renderDatePickerCalendar();
+    }
+
+    function setupDatePickerDropdowns() {
+        const yearOptions = [];
+        for (let y = 1901; y <= 2100; y++) {
+            yearOptions.push({ value: String(y), label: `${y}年` });
+        }
+
+        setupCustomDropdown(
+            'datePickerYearDropdown',
+            '',
+            'datePickerYearSelectedText',
+            yearOptions,
+            String(pickerYear),
+            (val) => {
+                pickerYear = parseInt(val, 10);
+                renderDatePickerCalendar();
+            }
+        );
+
+        const monthOptions = [];
+        for (let m = 1; m <= 12; m++) {
+            monthOptions.push({ value: String(m), label: `${m}月` });
+        }
+
+        setupCustomDropdown(
+            'datePickerMonthDropdown',
+            '',
+            'datePickerMonthSelectedText',
+            monthOptions,
+            String(pickerMonth),
+            (val) => {
+                pickerMonth = parseInt(val, 10);
+                renderDatePickerCalendar();
+            }
+        );
+    }
+
+    setupDatePickerDropdowns();
+
+    openBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const currentDateVal = eventDateInput ? eventDateInput.value : eventSettings.date;
+        const formatted = parseAndFormatDate(currentDateVal);
+        if (formatted && isValidFormattedDate(formatted)) {
+            const parts = formatted.split('/');
+            pickerYear = parseInt(parts[0], 10);
+            pickerMonth = parseInt(parts[1], 10);
+            pickerDay = parseInt(parts[2], 10);
+        } else {
+            const today = new Date();
+            pickerYear = today.getFullYear();
+            pickerMonth = today.getMonth() + 1;
+            pickerDay = today.getDate();
+        }
+
+        setCustomDropdownValue('datePickerYearDropdown', '', 'datePickerYearSelectedText', String(pickerYear), `${pickerYear}年`);
+        setCustomDropdownValue('datePickerMonthDropdown', '', 'datePickerMonthSelectedText', String(pickerMonth), `${pickerMonth}月`);
+        renderDatePickerCalendar();
+        datePickerModal.classList.add('show');
+    });
+
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            changeMonth(-1);
+        });
+    }
+
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            changeMonth(1);
+        });
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            datePickerModal.classList.remove('show');
+        });
+    }
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => {
+            const y = pickerYear;
+            const m = String(pickerMonth).padStart(2, '0');
+            const d = String(pickerDay).padStart(2, '0');
+            if (eventDateInput) {
+                eventDateInput.value = `${y}/${m}/${d}`;
+            }
+            datePickerModal.classList.remove('show');
+        });
+    }
+}
+
+async function initEventSettings() {
+    const raceNumOptions = [];
+    for (let i = 1; i <= 13; i++) {
+        raceNumOptions.push({ value: String(i), label: `${i}R` });
+    }
+    setupCustomDropdown('raceNumberDropdown', 'setRaceNumber', 'raceNumberSelectedText', raceNumOptions, eventSettings.raceNumber);
 
     try {
         const optResponse = await fetch('./data/option_list.json?v=' + version);
@@ -2151,28 +2878,15 @@ async function initEventSettings() {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit'
-            }).format(date);
+            }).format(date).replace(/-/g, '/');
         }
 
         eventSettings.date = getNextSunday();
 
-        const courseSelect = document.getElementById('setRacecourse');
-        options.racecourse_name.forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name;
-            opt.textContent = name;
-            if (name === eventSettings.racecourse) opt.selected = true;
-            courseSelect.appendChild(opt);
-        });
+        setupCustomDropdown('racecourseDropdown', 'setRacecourse', 'racecourseSelectedText', options.racecourse_name, eventSettings.racecourse);
 
-        const gradeSelect = document.getElementById('setGrade');
-        options.grade_name.forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name;
-            opt.textContent = name;
-            if (name === eventSettings.grade) opt.selected = true;
-            gradeSelect.appendChild(opt);
-        });
+        const gradeOptions = options.grade_name.map(name => ({ value: name, label: name }));
+        setupCustomDropdown('gradeDropdown', 'setGrade', 'gradeSelectedText', gradeOptions, eventSettings.grade);
 
         const optionsRaceName = {};
         const raceGradeMap = {};
@@ -2259,12 +2973,7 @@ async function initEventSettings() {
                 item.appendChild(nameSpan);
 
                 const infoDiv = document.createElement('div');
-                infoDiv.style.display = 'flex';
-                infoDiv.style.alignItems = 'center';
-                infoDiv.style.justifyContent = 'center';
-                infoDiv.style.flexWrap = 'wrap';
-                infoDiv.style.gap = '4px';
-                infoDiv.style.marginTop = '4px';
+                infoDiv.className = 'race-item-info';
 
                 if (mappedGrade && mappedGrade !== '--') {
                     const badgeSpan = document.createElement('span');
@@ -2303,10 +3012,10 @@ async function initEventSettings() {
                     }
 
                     if (mappedGrade) {
-                        document.getElementById('setGrade').value = mappedGrade;
+                        setCustomDropdownValue('gradeDropdown', 'setGrade', 'gradeSelectedText', mappedGrade);
                     }
                     if (track) {
-                        document.getElementById('setRacecourse').value = track;
+                        setCustomDropdownValue('racecourseDropdown', 'setRacecourse', 'racecourseSelectedText', track);
                     }
 
                     raceListModal.classList.remove('show');
@@ -2327,6 +3036,28 @@ async function initEventSettings() {
             raceListModal.classList.remove('show');
         });
 
+        const eventDateInput = document.getElementById('setEventDate');
+        if (eventDateInput) {
+            eventDateInput.addEventListener('focus', (e) => {
+                e.target.select();
+            });
+            eventDateInput.addEventListener('mouseup', () => {});
+            eventDateInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    eventDateInput.blur();
+                }
+            });
+            eventDateInput.addEventListener('blur', () => {
+                const formatted = parseAndFormatDate(eventDateInput.value);
+                if (formatted) {
+                    eventDateInput.value = formatted;
+                }
+            });
+        }
+
+        initDatePicker();
+
     } catch (error) {
         console.error('オプションリストまたはレースリストの読み込みに失敗しました:', error);
     }
@@ -2337,9 +3068,9 @@ async function initEventSettings() {
 
 document.getElementById('openSettingsBtn').addEventListener('click', () => {
     document.getElementById('setEventDate').value = eventSettings.date;
-    document.getElementById('setRacecourse').value = eventSettings.racecourse;
-    document.getElementById('setRaceNumber').value = eventSettings.raceNumber;
-    document.getElementById('setGrade').value = eventSettings.grade;
+    setCustomDropdownValue('racecourseDropdown', 'setRacecourse', 'racecourseSelectedText', eventSettings.racecourse);
+    setCustomDropdownValue('raceNumberDropdown', 'setRaceNumber', 'raceNumberSelectedText', eventSettings.raceNumber);
+    setCustomDropdownValue('gradeDropdown', 'setGrade', 'gradeSelectedText', eventSettings.grade);
     document.getElementById('setRaceName').value = eventSettings.raceName;
 
     const currentRaceName = document.getElementById('setRaceName').value;
@@ -2352,13 +3083,15 @@ document.getElementById('closeSettingsBtn').addEventListener('click', () => {
 });
 
 document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
-    const inputDate = document.getElementById('setEventDate').value;
+    const rawDate = document.getElementById('setEventDate').value;
     const inputRaceName = document.getElementById('setRaceName').value;
 
-    if (!inputDate) {
-        showToast('エラー：開催日を入力してください');
+    const formattedDate = parseAndFormatDate(rawDate);
+    if (!formattedDate || !isValidFormattedDate(formattedDate)) {
+        showToast('エラー：開催日を正しい日付（例: 2024/10/27）で入力してください');
         return;
     }
+    document.getElementById('setEventDate').value = formattedDate;
 
     const flatRaceNames = allRaceData.map(r => r.race_name).filter(Boolean);
 
@@ -2367,7 +3100,7 @@ document.getElementById('saveSettingsBtn').addEventListener('click', async () =>
         return;
     }
 
-    eventSettings.date = inputDate;
+    eventSettings.date = formattedDate;
     eventSettings.racecourse = document.getElementById('setRacecourse').value;
     eventSettings.raceNumber = document.getElementById('setRaceNumber').value;
     eventSettings.grade = document.getElementById('setGrade').value;
@@ -2378,23 +3111,9 @@ document.getElementById('saveSettingsBtn').addEventListener('click', async () =>
     showToast('開催情報を更新しました');
 });
 
-document.querySelectorAll('input[name="displayMode"]').forEach(radio => {
-    radio.addEventListener('change', (e) => {
-        const mode = e.target.value;
-        const modeName = (mode === 'cast') ? 'キャスト名優先' : 'キャラ名優先';
-
-        showToast('表示モードを切り替え中...', 2000);
-
-        setTimeout(() => {
-            document.body.setAttribute('data-display-mode', mode);
-            updateCartUI();
-            if (typeof renderHistoryList === 'function') renderHistoryList();
-
-            showToast(`${modeName}モードに切り替えました`);
-        }, 50);
-    });
-});
-document.body.setAttribute('data-display-mode', document.querySelector('input[name="displayMode"]:checked').value);
+if (!document.body.getAttribute('data-display-mode')) {
+    document.body.setAttribute('data-display-mode', 'cast');
+}
 
 initEventSettings();
 

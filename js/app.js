@@ -1816,18 +1816,10 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
     updateInvertColorVisibility();
 
     // 1. 発券ボタン押下直後に即座にモーダルを表示し、ローディング状態にする
-    const loadingHint = document.getElementById('shareLoadingHint');
-    if (loadingHint) loadingHint.style.display = 'none';
-
     shareImagePreview.src = '';
     shareImagePreview.style.display = 'none';
     shareImageLoading.style.display = 'flex';
     shareModal.classList.add('show');
-
-    // 2. 生成に3秒以上かかった場合はモーダル内にヒントを表示
-    let loadingHintTimer = setTimeout(() => {
-        if (loadingHint) loadingHint.style.display = 'block';
-    }, 3000);
 
     // UIスレッドの描画更新（モーダル表示）を確実に完了させてから重い生成処理を開始
     await new Promise(resolve => setTimeout(resolve, 20));
@@ -1871,7 +1863,6 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
         );
 
         if (!_0xV) {
-            clearTimeout(loadingHintTimer);
             shareModal.classList.remove('show');
             currentGeneratingTicketParams = null;
             showToast('エラー：不正な値が検出されました');
@@ -1880,8 +1871,6 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
 
         const canvas = await captureBakenSlip(bakenDOM);
         const imgDataUrl = canvas.toDataURL('image/png');
-
-        clearTimeout(loadingHintTimer);
 
         shareImagePreview.src = imgDataUrl;
         shareImageLoading.style.display = 'none';
@@ -1914,7 +1903,6 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
         shareModal.classList.add('show');
 
     } catch (error) {
-        clearTimeout(loadingHintTimer);
         console.error('画像生成エラー:', error);
         shareImageLoading.innerText = 'エラー：推しバ券の生成に失敗しました';
     }

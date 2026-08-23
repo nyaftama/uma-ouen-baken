@@ -1194,8 +1194,12 @@ body[data-display-mode="cast"] .card-name-uma-sub {
 
 #shareImageLoading {
     display: none;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    text-align: center;
     position: absolute;
     top: 0;
     left: 0;
@@ -1205,10 +1209,54 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     border: 2px dashed #ccc;
     border-radius: 4px;
     background-color: #fafafa;
-    color: #666;
-    font-weight: bold;
+    color: #555;
+    font-weight: 700;
     font-size: 0.95rem;
     z-index: 1;
+}
+
+.loading-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid #e0e0e0;
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-main-text {
+    font-size: 0.95rem;
+    color: #444;
+}
+
+.loading-hint-text {
+    font-size: 0.78rem;
+    color: #666;
+    line-height: 1.4;
+    background: #eef2f5;
+    border: 1px solid #dce4ec;
+    padding: 8px 14px;
+    border-radius: 6px;
+    margin-top: 6px;
+    max-width: 90%;
+    animation: fadeInHint 0.3s ease;
+}
+
+@keyframes fadeInHint {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .modal-actions {

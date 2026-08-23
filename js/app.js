@@ -1815,9 +1815,20 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
 
     updateInvertColorVisibility();
 
-    shareModal.classList.add('show');
-    shareImageLoading.style.display = 'flex';
+    // 1. 発券ボタン押下直後に即座にモーダルを表示し、ローディング状態にする
+    shareImagePreview.src = '';
     shareImagePreview.style.display = 'none';
+    shareImageLoading.innerText = '推しバ券を生成中...';
+    shareImageLoading.style.display = 'flex';
+    shareModal.classList.add('show');
+
+    // 2. 生成に3秒以上かかった場合は広告ブロッカー・コンテンツブロッカーの注意トーストを表示
+    let adBlockToastTimer = setTimeout(() => {
+        showToast('生成に時間がかかっています。広告ブロッカーをオフにすると改善されるかもしれません。', 7000);
+    }, 3000);
+
+    // UIスレッドの描画更新（モーダル表示）を確実に完了させてから重い生成処理を開始
+    await new Promise(resolve => setTimeout(resolve, 20));
 
     const isMulti = Array.isArray(data);
     const firstData = isMulti ? data[0] : data;
@@ -1858,6 +1869,7 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
         );
 
         if (!_0xV) {
+            clearTimeout(adBlockToastTimer);
             shareModal.classList.remove('show');
             currentGeneratingTicketParams = null;
             showToast('エラー：不正な値が検出されました');
@@ -1866,6 +1878,8 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
 
         const canvas = await captureBakenSlip(bakenDOM);
         const imgDataUrl = canvas.toDataURL('image/png');
+
+        clearTimeout(adBlockToastTimer);
 
         shareImagePreview.src = imgDataUrl;
         shareImageLoading.style.display = 'none';
@@ -1898,6 +1912,7 @@ async function openTicketModal(data, amount, betType, isReissue = false) {
         shareModal.classList.add('show');
 
     } catch (error) {
+        clearTimeout(adBlockToastTimer);
         console.error('画像生成エラー:', error);
         shareImageLoading.innerText = 'エラー：推しバ券の生成に失敗しました';
     }
@@ -3041,7 +3056,7 @@ async function initEventSettings() {
             eventDateInput.addEventListener('focus', (e) => {
                 e.target.select();
             });
-            eventDateInput.addEventListener('mouseup', () => {});
+            eventDateInput.addEventListener('mouseup', () => { });
             eventDateInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();

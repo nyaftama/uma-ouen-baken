@@ -3137,6 +3137,12 @@ initEventSettings();
 
 
 async function captureBakenSlip(bakenDOM) {
+    if (document.fonts) {
+        try {
+            await document.fonts.ready;
+        } catch (e) { }
+    }
+
     const baseOptions = {
         useCORS: true,
         logging: false,
@@ -3147,6 +3153,10 @@ async function captureBakenSlip(bakenDOM) {
         scrollX: 0,
         scrollY: 0,
         onclone: (clonedDoc) => {
+            // html2canvasがクローン先でGoogle Fontsを再フェッチして15秒タイムアウト待機するのを防止
+            const fontLinks = clonedDoc.querySelectorAll('link[href*="fonts.googleapis.com"], link[href*="fonts.gstatic.com"]');
+            fontLinks.forEach(link => link.remove());
+
             const container = clonedDoc.querySelector('.container');
             if (container) container.style.display = 'none';
             const modals = clonedDoc.querySelectorAll('.modal-overlay');

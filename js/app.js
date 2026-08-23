@@ -3120,21 +3120,45 @@ initEventSettings();
 
 
 async function captureBakenSlip(bakenDOM) {
+    const baseOptions = {
+        useCORS: true,
+        logging: false,
+        width: 760,
+        height: 420,
+        windowWidth: 760,
+        windowHeight: 420,
+        scrollX: 0,
+        scrollY: 0,
+        onclone: (clonedDoc) => {
+            const container = clonedDoc.querySelector('.container');
+            if (container) container.style.display = 'none';
+            const modals = clonedDoc.querySelectorAll('.modal-overlay');
+            modals.forEach(m => m.style.display = 'none');
+
+            const bContainer = clonedDoc.getElementById('bakenContainer');
+            if (bContainer) {
+                bContainer.style.position = 'static';
+                bContainer.style.top = '0';
+                bContainer.style.left = '0';
+                bContainer.style.opacity = '1';
+                bContainer.style.zIndex = '1';
+            }
+        }
+    };
+
     if (advancedSettings.bitmapText) {
         bakenDOM.classList.add('capture-bg-only');
         const bgCanvas = await html2canvas(bakenDOM, {
-            scale: 3,
-            useCORS: true,
-            logging: false
+            ...baseOptions,
+            scale: 3
         });
         bakenDOM.classList.remove('capture-bg-only');
 
         bakenDOM.classList.add('capture-text-only');
         const textCanvas = await html2canvas(bakenDOM, {
+            ...baseOptions,
             scale: 1.25,
-            backgroundColor: '#ffffff',
-            useCORS: true,
-            logging: false
+            backgroundColor: '#ffffff'
         });
         bakenDOM.classList.remove('capture-text-only');
 
@@ -3175,10 +3199,9 @@ async function captureBakenSlip(bakenDOM) {
         return compositeCanvas;
     } else {
         return await html2canvas(bakenDOM, {
+            ...baseOptions,
             scale: 3,
-            backgroundColor: '#ffffff',
-            useCORS: true,
-            logging: false
+            backgroundColor: '#ffffff'
         });
     }
 }

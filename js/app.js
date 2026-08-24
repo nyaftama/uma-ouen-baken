@@ -368,6 +368,51 @@ function applyBakenThemeColor(data) {
 
 let currentTopView = 'event'; // 'event' or 'cart'
 
+function updateCartExpandBtnVisibility() {
+    const expandBtn = document.getElementById('cartExpandBtn');
+    const cartItemsEl = document.getElementById('cartItems');
+    if (!expandBtn || !cartItemsEl) return;
+
+    if (currentTopView !== 'cart' || cartItems.length === 0) {
+        expandBtn.style.display = 'none';
+        return;
+    }
+
+    let isOverflowing = false;
+    if (isCartExpanded) {
+        // 展開中の場合は全高が 136px (折りたたみ時max-height) を超えているか判定
+        isOverflowing = cartItemsEl.scrollHeight > 137;
+        if (!isOverflowing) {
+            isCartExpanded = false;
+            cartItemsEl.classList.remove('is-expanded');
+        }
+    } else {
+        // 折りたたみ時は scrollHeight が clientHeight より大きい場合にoverflowと判定
+        isOverflowing = cartItemsEl.scrollHeight > cartItemsEl.clientHeight;
+    }
+
+    if (isOverflowing) {
+        expandBtn.style.display = 'flex';
+        const iconExpand = expandBtn.querySelector('.cart-expand-icon.expand');
+        const iconCollapse = expandBtn.querySelector('.cart-expand-icon.collapse');
+        if (isCartExpanded) {
+            cartItemsEl.classList.add('is-expanded');
+            if (iconExpand) iconExpand.style.display = 'none';
+            if (iconCollapse) iconCollapse.style.display = 'block';
+            expandBtn.title = '連勝候補リストを縮小';
+        } else {
+            cartItemsEl.classList.remove('is-expanded');
+            if (iconExpand) iconExpand.style.display = 'block';
+            if (iconCollapse) iconCollapse.style.display = 'none';
+            expandBtn.title = '連勝候補リストを展開';
+        }
+    } else {
+        expandBtn.style.display = 'none';
+        isCartExpanded = false;
+        cartItemsEl.classList.remove('is-expanded');
+    }
+}
+
 function updateTopAreaView() {
     const switcher = document.getElementById('topInfoSwitcher');
     const eventArea = document.getElementById('eventSettingsArea');
@@ -389,6 +434,12 @@ function updateTopAreaView() {
     if (currentTopView === 'cart' && hasItems) {
         eventArea.style.display = 'none';
         cartArea.style.display = 'flex';
+        updateCartExpandBtnVisibility();
+
+        const cartQtySpan = document.getElementById('cartQtySpan');
+        if (cartQtySpan) {
+            adjustQtyDisplayScale(cartQtySpan);
+        }
         if (toggleBtn) {
             toggleBtn.title = '開催情報設定を表示';
         }
@@ -396,6 +447,8 @@ function updateTopAreaView() {
         currentTopView = 'event';
         eventArea.style.display = 'flex';
         cartArea.style.display = 'none';
+        updateCartExpandBtnVisibility();
+
         if (toggleBtn) {
             toggleBtn.title = '連勝候補リストを表示';
         }
@@ -427,6 +480,7 @@ function initCartBetTypeDropdown() {
             currentCartBetType = selectedVal;
             isCartBetTypeUserModified = true;
             updateCartHelpNotes();
+            updateCartIssueBtn();
         }
     });
 
@@ -475,6 +529,48 @@ function renderCartItems() {
     });
 }
 
+function getBetSummary(betType, amount, count = 1) {
+    let comboCount = 1;
+    if (betType === 'ouen') {
+        comboCount = 2;
+    } else if (betType === 'umaren_box') {
+        comboCount = (count >= 2) ? (count * (count - 1)) / 2 : 1;
+    } else if (betType === 'sanrenpuku_box') {
+        comboCount = (count >= 3) ? (count * (count - 1) * (count - 2)) / 6 : 1;
+    } else {
+        // tansho, umaren, sanrenpuku
+        comboCount = 1;
+    }
+    const totalAmount = amount * comboCount;
+    return { comboCount, totalAmount };
+}
+
+function updateCardIssueBtn(issueBtn, betType, amount) {
+    if (!issueBtn) return;
+    const summary = getBetSummary(betType, amount, 1);
+    issueBtn.innerHTML = `
+        <span class="issue-btn-label">発券</span>
+        <span class="issue-btn-info">
+            <span class="issue-btn-combos">${summary.comboCount} 組</span>
+            <span class="issue-btn-total">合計 ${summary.totalAmount}</span>
+        </span>
+    `;
+}
+
+function updateCartIssueBtn() {
+    const cartIssueBtn = document.getElementById('cartIssueBtn');
+    if (!cartIssueBtn) return;
+    const count = cartItems.length;
+    const summary = getBetSummary(currentCartBetType, cartAmount, count);
+    cartIssueBtn.innerHTML = `
+        <span class="issue-btn-label">発券</span>
+        <span class="issue-btn-info">
+            <span class="issue-btn-combos">${summary.comboCount} 組</span>
+            <span class="issue-btn-total">合計 ${summary.totalAmount}</span>
+        </span>
+    `;
+}
+
 function updateCartUI() {
     initCartBetTypeDropdown();
 
@@ -505,29 +601,9 @@ function updateCartUI() {
         cartCountBadge.textContent = ` (${count}/8)`;
     }
 
-    // スマホ用 展開/折りたたみボタンの制御（4件以上の時のみ表示）
-    const expandBtn = document.getElementById('cartExpandBtn');
-    const cartItemsEl = document.getElementById('cartItems');
-    if (expandBtn && cartItemsEl) {
-        if (count >= 4) {
-            expandBtn.style.display = 'flex';
-            const iconExpand = expandBtn.querySelector('.cart-expand-icon.expand');
-            const iconCollapse = expandBtn.querySelector('.cart-expand-icon.collapse');
-            if (isCartExpanded) {
-                cartItemsEl.classList.add('is-expanded');
-                if (iconExpand) iconExpand.style.display = 'none';
-                if (iconCollapse) iconCollapse.style.display = 'block';
-            } else {
-                cartItemsEl.classList.remove('is-expanded');
-                if (iconExpand) iconExpand.style.display = 'block';
-                if (iconCollapse) iconCollapse.style.display = 'none';
-            }
-        } else {
-            expandBtn.style.display = 'none';
-            isCartExpanded = false;
-            cartItemsEl.classList.remove('is-expanded');
-        }
-    }
+    // 展開/折りたたみボタンの表示更新（overflow時のみ表示）
+    updateCartExpandBtnVisibility();
+    requestAnimationFrame(updateCartExpandBtnVisibility);
 
     if (cartBetTypeDropdownObj) {
         if (count <= 1) {
@@ -572,6 +648,14 @@ function updateCartUI() {
     cartPlusBtn.disabled = !isReady;
     cartIssueBtn.disabled = !isReady;
     cartMinusBtn.disabled = !isReady || cartAmount <= 100;
+
+    const cartQtySpan = document.getElementById('cartQtySpan');
+    if (cartQtySpan) {
+        cartQtySpan.textContent = cartAmount;
+        adjustQtyDisplayScale(cartQtySpan);
+    }
+
+    updateCartIssueBtn();
 
     document.querySelectorAll('.item-card').forEach(card => {
         const castName = card.dataset.castName;
@@ -679,8 +763,6 @@ function addToCart(rowData) {
     cartItems.push(rowData);
     currentTopView = 'cart';
     updateCartUI();
-
-    document.getElementById('cartQtySpan').textContent = cartAmount;
 }
 
 let toastTimeout;
@@ -759,16 +841,24 @@ const MAX_BAKEN_QTY = 99999900;
 function adjustQtyDisplayScale(el) {
     if (!el) return;
     if (el.classList.contains('editing')) {
-        el.style.transform = 'none';
+        el.style.transform = '';
         return;
     }
+    el.style.transform = '';
     const text = el.textContent.trim();
     const len = text.length;
-    if (len > 6) {
-        const scale = 0.9 * (6 / len);
-        el.style.transform = `scaleX(${scale.toFixed(4)})`;
+
+    let scale = 1;
+    if (len === 7) {
+        scale = 0.82;
+    } else if (len >= 8) {
+        scale = 0.72;
+    }
+
+    if (scale < 1) {
+        el.innerHTML = `<span class="qty-text" style="transform: scaleX(${scale});">${text}</span>`;
     } else {
-        el.style.transform = 'scaleX(0.9)';
+        el.innerHTML = `<span class="qty-text">${text}</span>`;
     }
 }
 
@@ -804,74 +894,6 @@ function updateBkValScaling(totalAmount) {
     }
 }
 
-let warningTooltipTimeout = null;
-
-function showQtyTooltip(targetEl, msg) {
-    let tooltip = document.getElementById('qtyTooltip');
-    if (!tooltip) {
-        tooltip = document.createElement('div');
-        tooltip.id = 'qtyTooltip';
-        tooltip.className = 'qty-tooltip';
-        document.body.appendChild(tooltip);
-    }
-    tooltip.textContent = msg || '入力値 × 100 に換算されます';
-    tooltip.classList.remove('warning');
-    const rect = targetEl.getBoundingClientRect();
-    tooltip.style.left = `${rect.left + rect.width / 2}px`;
-    tooltip.style.top = `${rect.top}px`;
-    tooltip.offsetHeight;
-    tooltip.classList.add('show');
-}
-
-function showQtyWarningTooltip(targetEl, msg) {
-    let tooltip = document.getElementById('qtyTooltip');
-    if (!tooltip) {
-        tooltip = document.createElement('div');
-        tooltip.id = 'qtyTooltip';
-        tooltip.className = 'qty-tooltip';
-        document.body.appendChild(tooltip);
-    }
-    tooltip.textContent = msg || '8桁を超える金額は設定できません';
-    tooltip.classList.add('warning');
-    const rect = targetEl.getBoundingClientRect();
-    tooltip.style.left = `${rect.left + rect.width / 2}px`;
-    tooltip.style.top = `${rect.top}px`;
-    tooltip.offsetHeight;
-    tooltip.classList.add('show');
-
-    clearTimeout(warningTooltipTimeout);
-    warningTooltipTimeout = setTimeout(() => {
-        hideQtyTooltip();
-    }, 2500);
-}
-
-function hideQtyTooltip() {
-    clearTimeout(warningTooltipTimeout);
-    const tooltip = document.getElementById('qtyTooltip');
-    if (tooltip) {
-        tooltip.classList.remove('show');
-        tooltip.classList.remove('warning');
-    }
-}
-
-const handleQtyTooltipReposition = () => {
-    const activeInput = document.querySelector('.qty-display input');
-    if (activeInput) {
-        const qtyDisplay = activeInput.closest('.qty-display');
-        if (qtyDisplay) {
-            const tooltip = document.getElementById('qtyTooltip');
-            if (tooltip && tooltip.classList.contains('show')) {
-                const rect = qtyDisplay.getBoundingClientRect();
-                tooltip.style.left = `${rect.left + rect.width / 2}px`;
-                tooltip.style.top = `${rect.top}px`;
-            }
-        }
-    }
-};
-
-window.addEventListener('scroll', handleQtyTooltipReposition, { passive: true });
-window.addEventListener('resize', handleQtyTooltipReposition, { passive: true });
-
 function setupQtyDisplayEdit(qtySpan, getCurrentVal, onUpdateVal) {
     qtySpan.addEventListener('click', () => {
         if (qtySpan.querySelector('input')) return;
@@ -881,24 +903,48 @@ function setupQtyDisplayEdit(qtySpan, getCurrentVal, onUpdateVal) {
         const prevScrollY = window.scrollY || window.pageYOffset || 0;
 
         const currentVal = getCurrentVal();
-        const displayVal = Math.max(1, Math.floor(currentVal / 100));
+        let displayVal = Math.max(1, Math.floor(currentVal / 100));
+        if (displayVal > 999999) displayVal = 999999;
+        const initialStr = displayVal.toString();
+
+        const editContainer = document.createElement('div');
+        editContainer.className = 'qty-edit-container';
+
+        const prefixSpan = document.createElement('span');
+        prefixSpan.className = 'qty-zero-prefix';
+
         const input = document.createElement('input');
         input.type = 'text';
         input.setAttribute('inputmode', 'numeric');
         input.setAttribute('pattern', '[0-9]*');
-        input.value = displayVal;
-        input.style.width = '100%';
-        input.style.fontSize = 'inherit';
-        input.style.fontFamily = 'inherit';
-        input.style.fontWeight = 'inherit';
-        input.style.textAlign = 'center';
-        input.style.border = 'none';
-        input.style.background = 'transparent';
-        input.style.outline = 'none';
-        input.style.color = 'inherit';
-        input.style.padding = '0';
-        input.style.margin = '0';
-        input.style.boxSizing = 'border-box';
+        input.setAttribute('maxlength', '6');
+        input.value = initialStr;
+        input.className = 'qty-edit-input';
+
+        const suffixSpan = document.createElement('span');
+        suffixSpan.className = 'qty-zero-suffix';
+        suffixSpan.textContent = '00';
+
+        const updateEditPadding = () => {
+            let numStr = input.value.replace(/[^0-9]/g, '');
+            if (numStr.length > 6) {
+                numStr = numStr.slice(0, 6);
+            }
+            input.value = numStr;
+            const len = numStr.length;
+            if (len === 0) {
+                prefixSpan.textContent = '00000';
+                input.placeholder = '0';
+                input.style.width = '1ch';
+            } else {
+                prefixSpan.textContent = '0'.repeat(Math.max(0, 6 - len));
+                input.placeholder = '';
+                input.style.width = `${len}ch`;
+            }
+        };
+
+        updateEditPadding();
+        input.addEventListener('input', updateEditPadding);
 
         const wrapper = qtySpan.closest('.amount-control-wrapper');
         let mainBtns = [];
@@ -926,52 +972,22 @@ function setupQtyDisplayEdit(qtySpan, getCurrentVal, onUpdateVal) {
 
         qtySpan.classList.add('editing');
         qtySpan.textContent = '';
-        qtySpan.style.transform = 'none';
+        qtySpan.style.transform = '';
 
-        const editContainer = document.createElement('div');
-        editContainer.className = 'qty-edit-container';
-        editContainer.style.display = 'inline-flex';
-        editContainer.style.alignItems = 'center';
-        editContainer.style.justifyContent = 'center';
-        editContainer.style.width = '100%';
-
-        input.style.width = 'auto';
-        input.style.minWidth = '24px';
-        input.style.maxWidth = '90px';
-        input.style.textAlign = 'right';
-
-        const suffixSpan = document.createElement('span');
-        suffixSpan.className = 'qty-zero-suffix';
-        suffixSpan.textContent = '00';
-        suffixSpan.style.color = '#333';
-        suffixSpan.style.fontWeight = 'inherit';
-        suffixSpan.style.fontSize = 'inherit';
-        suffixSpan.style.marginLeft = '2px';
-        suffixSpan.style.flexShrink = '0';
-
+        editContainer.appendChild(prefixSpan);
         editContainer.appendChild(input);
         editContainer.appendChild(suffixSpan);
         qtySpan.appendChild(editContainer);
 
+        input.style.width = `${Math.max(1, initialStr.length)}ch`;
+
         input.focus();
         input.select();
-
-        input.addEventListener('input', () => {
-            let numStr = input.value.replace(/[^0-9]/g, '');
-            if (numStr.length > 6) {
-                numStr = numStr.slice(0, 6);
-                input.value = numStr;
-                showQtyWarningTooltip(qtySpan, '8桁を超える金額は設定できません');
-            } else {
-                input.value = numStr;
-            }
-        });
 
         let isFinished = false;
         const finishEdit = () => {
             if (isFinished) return;
             isFinished = true;
-            hideQtyTooltip();
 
             qtySpan.classList.remove('editing');
 
@@ -990,7 +1006,6 @@ function setupQtyDisplayEdit(qtySpan, getCurrentVal, onUpdateVal) {
             let val = units * 100;
             if (val > MAX_BAKEN_QTY) {
                 val = MAX_BAKEN_QTY;
-                showQtyWarningTooltip(qtySpan, '8桁を超える金額は設定できません');
             }
             qtySpan.textContent = val;
             adjustQtyDisplayScale(qtySpan);
@@ -1395,6 +1410,14 @@ function changeAllTicketTypes(targetType) {
         });
     });
 
+    document.querySelectorAll('.item-card').forEach(card => {
+        const key = card.dataset.castName ? `${card.dataset.umaName}_${card.dataset.castName}` : card.dataset.umaName;
+        const issueBtn = card.querySelector('.issue-btn');
+        if (issueBtn) {
+            updateCardIssueBtn(issueBtn, targetType, ticketAmounts[key] || 100);
+        }
+    });
+
     showToast(targetType === 'ouen' ? 'すべての券種を「応援バ券 (単+複)」に変更しました' : 'すべての券種を「単勝」に変更しました');
 }
 
@@ -1645,13 +1668,13 @@ function renderList(data) {
             if (newAmount < 100) newAmount = 100;
             if (newAmount > MAX_BAKEN_QTY) {
                 newAmount = MAX_BAKEN_QTY;
-                showQtyWarningTooltip(qtySpan, '8桁を超える金額は設定できません');
             }
             ticketAmounts[key] = newAmount;
             qtySpan.textContent = newAmount;
             adjustQtyDisplayScale(qtySpan);
             minusBtn.disabled = newAmount <= 100;
             plusBtn.disabled = newAmount >= MAX_BAKEN_QTY;
+            updateCardIssueBtn(issueBtn, ticketTypes[key], newAmount);
         };
         minusBtn.disabled = ticketAmounts[key] <= 100;
         plusBtn.disabled = ticketAmounts[key] >= MAX_BAKEN_QTY;
@@ -1662,6 +1685,11 @@ function renderList(data) {
         qtyMainRow.appendChild(minusBtn);
         qtyMainRow.appendChild(qtySpan);
         qtyMainRow.appendChild(plusBtn);
+
+        const issueBtn = document.createElement('button');
+        issueBtn.className = 'issue-btn';
+        updateCardIssueBtn(issueBtn, ticketTypes[key], ticketAmounts[key]);
+        issueBtn.addEventListener('click', () => generateTicket(getTicketData(), ticketAmounts[key], ticketTypes[key]));
 
         const betTypeOptions = [
             { value: 'ouen', label: '応援バ券 (単+複)' },
@@ -1683,17 +1711,13 @@ function renderList(data) {
                     changeAllTicketTypes('tansho');
                 } else {
                     ticketTypes[key] = selectedVal;
+                    updateCardIssueBtn(issueBtn, selectedVal, ticketAmounts[key]);
                 }
             }
         });
 
         amountControl.appendChild(betTypeDropdownObj.element);
         amountControl.appendChild(qtyMainRow);
-
-        const issueBtn = document.createElement('button');
-        issueBtn.className = 'issue-btn';
-        issueBtn.innerHTML = `発券`;
-        issueBtn.addEventListener('click', () => generateTicket(getTicketData(), ticketAmounts[key], ticketTypes[key]));
 
         rightDiv.appendChild(amountControl);
         rightDiv.appendChild(issueBtn);
@@ -2168,7 +2192,7 @@ function renderHistoryList() {
         let eventInfoStr = 'ーーー';
         if (entry.eventInfo) {
             const formattedDate = entry.eventInfo.date.replace(/-/g, '/');
-            eventInfoStr = `${formattedDate} | ${entry.eventInfo.racecourse} | ${entry.eventInfo.raceNumber}R | ${entry.eventInfo.grade} | ${entry.eventInfo.raceName}`;
+            eventInfoStr = `${formattedDate}｜${entry.eventInfo.racecourse}｜${entry.eventInfo.raceNumber}R｜${entry.eventInfo.grade}｜${entry.eventInfo.raceName}`;
         }
 
         const div = document.createElement('div');
@@ -2394,8 +2418,6 @@ const updateCartQty = (newAmount) => {
     if (newAmount < 100) newAmount = 100;
     if (newAmount > MAX_BAKEN_QTY) {
         newAmount = MAX_BAKEN_QTY;
-        const cartQtySpan = document.getElementById('cartQtySpan');
-        if (cartQtySpan) showQtyWarningTooltip(cartQtySpan, '8桁を超える金額は設定できません');
     }
     cartAmount = newAmount;
     const cartQtySpan = document.getElementById('cartQtySpan');
@@ -2407,6 +2429,7 @@ const updateCartQty = (newAmount) => {
     const isReady = cartItems.length >= 2;
     document.getElementById('cartMinusBtn').disabled = !isReady || cartAmount <= 100;
     document.getElementById('cartPlusBtn').disabled = !isReady || cartAmount >= MAX_BAKEN_QTY;
+    updateCartIssueBtn();
 };
 
 const cartQtySpan = document.getElementById('cartQtySpan');
@@ -2417,6 +2440,18 @@ if (cartQtySpan) {
 setupLongPress(document.getElementById('cartMinusBtn'), () => updateCartQty(cartAmount - 100));
 setupLongPress(document.getElementById('cartPlusBtn'), () => updateCartQty(cartAmount + 100));
 
+const cartClearBtn = document.getElementById('cartClearBtn');
+if (cartClearBtn) {
+    cartClearBtn.addEventListener('click', () => {
+        if (cartItems.length === 0) return;
+        cartItems = [];
+        currentTopView = 'event';
+        isCartExpanded = false;
+        updateCartUI();
+        showToast('連勝候補リストをクリアしました');
+    });
+}
+
 const cartExpandBtn = document.getElementById('cartExpandBtn');
 if (cartExpandBtn) {
     cartExpandBtn.addEventListener('click', () => {
@@ -2424,6 +2459,10 @@ if (cartExpandBtn) {
         updateCartUI();
     });
 }
+
+window.addEventListener('resize', () => {
+    updateCartExpandBtnVisibility();
+});
 
 document.getElementById('cartIssueBtn').addEventListener('click', () => {
     const count = cartItems.length;
@@ -2543,7 +2582,7 @@ let eventSettings = {
 function updateEventSettingsUI() {
     const formattedDate = eventSettings.date.replace(/-/g, '/');
     document.getElementById('currentEventInfo').textContent =
-        `${formattedDate} | ${eventSettings.racecourse} | ${eventSettings.raceNumber}R | ${eventSettings.grade} | ${eventSettings.raceName}`;
+        `${formattedDate}｜${eventSettings.racecourse}｜${eventSettings.raceNumber}R｜${eventSettings.grade}｜${eventSettings.raceName}`;
 }
 
 function formatPeriod(key) {

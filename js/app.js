@@ -551,7 +551,7 @@ function updateCardIssueBtn(issueBtn, betType, amount) {
     issueBtn.innerHTML = `
         <span class="issue-btn-label">発券</span>
         <span class="issue-btn-info">
-            <span class="issue-btn-combos">${summary.comboCount} 組</span>
+            <span class="issue-btn-combos">${summary.comboCount} 点</span>
             <span class="issue-btn-total">合計 ${summary.totalAmount}</span>
         </span>
     `;
@@ -565,7 +565,7 @@ function updateCartIssueBtn() {
     cartIssueBtn.innerHTML = `
         <span class="issue-btn-label">発券</span>
         <span class="issue-btn-info">
-            <span class="issue-btn-combos">${summary.comboCount} 組</span>
+            <span class="issue-btn-combos">${summary.comboCount} 点</span>
             <span class="issue-btn-total">合計 ${summary.totalAmount}</span>
         </span>
     `;

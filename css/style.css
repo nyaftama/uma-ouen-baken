@@ -742,7 +742,11 @@ body[data-display-mode="cast"] .card-name-uma-sub {
 }
 
 .issue-btn {
+    position: relative;
     background-color: var(--primary-color);
+    background-image: linear-gradient(305deg, transparent 0 40%, rgb(0 0 0 / 0.1) 50%, transparent 50% 100%);
+    background-position: 20px 0;
+    background-repeat: no-repeat;
     color: white;
     border: none;
     border-radius: 6px;
@@ -758,6 +762,31 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     white-space: nowrap;
     box-sizing: border-box;
     user-select: none;
+}
+
+.issue-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(235deg, transparent 0 40%, rgb(0 0 0 / 0.1) 50%, transparent 50% 100%);
+    -webkit-mask-image: linear-gradient(305deg, transparent 0 50%, black 50% 100%);
+    mask-image: linear-gradient(305deg, transparent 0 50%, black 50% 100%);
+    background-position: 20px 0;
+    background-repeat: no-repeat;
+    -webkit-mask-position: 20px 0;
+    mask-position: 20px 0;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+
+.issue-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background-image: linear-gradient(25deg, rgb(0 0 0 / 0.1), transparent);
+    pointer-events: none;
 }
 
 .issue-btn-label {

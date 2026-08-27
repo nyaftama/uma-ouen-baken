@@ -1398,7 +1398,7 @@ function changeAllTicketTypes(targetType) {
     });
 
     const label = (targetType === 'ouen') ? '応援バ券 (単+複)' : '単勝';
-    document.querySelectorAll('.bet-type-dropdown').forEach(dropdown => {
+    document.querySelectorAll('.item-card .bet-type-dropdown').forEach(dropdown => {
         const textSpan = dropdown.querySelector('.dropdown-selected-text');
         if (textSpan) textSpan.textContent = label;
         dropdown.querySelectorAll('.dropdown-menu .dropdown-item').forEach(item => {
@@ -1695,8 +1695,8 @@ function renderList(data) {
             { value: 'ouen', label: '応援バ券 (単+複)' },
             { value: 'tansho', label: '単勝' },
             { divider: true },
-            { value: 'all_ouen', label: 'すべて応援バ券に変更...', isAction: true },
-            { value: 'all_tansho', label: 'すべて単勝に変更...', isAction: true }
+            { value: 'all_ouen', label: 'すべて応援バ券に変更', isAction: true },
+            { value: 'all_tansho', label: 'すべて単勝に変更', isAction: true }
         ];
 
         const betTypeDropdownObj = createCustomDropdown({

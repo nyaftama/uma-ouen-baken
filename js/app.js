@@ -2644,6 +2644,64 @@ function formatPeriods(periods) {
     return parts.join(', ');
 }
 
+function formatPeriodShort(key) {
+    if (key === 'special') return 'スペシャル';
+    const match = key.match(/^y(0[1-3])_m(0[1-9]|1[0-2])_(early|late)$/);
+    if (!match) return key;
+
+    const yearMap = { '01': 'ジュニア', '02': 'クラシック', '03': 'シニア' };
+    const year = yearMap[match[1]] || '';
+    const month = parseInt(match[2], 10) + '月';
+
+    return `${year}${month}`;
+}
+
+function formatPeriodsShort(periods) {
+    if (!periods || periods.length === 0) return '';
+    if (periods.length === 1) return formatPeriodShort(periods[0]);
+
+    const parsed = periods.map(p => {
+        if (p === 'special') return { type: 'special', label: 'スペシャル' };
+        const match = p.match(/^y(0[1-3])_m(0[1-9]|1[0-2])_(early|late)$/);
+        if (!match) return { type: 'unknown', label: p };
+        return {
+            type: 'standard',
+            year: match[1],
+            month: parseInt(match[2], 10)
+        };
+    });
+
+    const groups = {};
+    const others = [];
+
+    parsed.forEach(item => {
+        if (item.type === 'standard') {
+            const monthKey = `${item.month}月`;
+            if (!groups[monthKey]) {
+                groups[monthKey] = [];
+            }
+            if (!groups[monthKey].includes(item.year)) {
+                groups[monthKey].push(item.year);
+            }
+        } else {
+            if (!others.includes(item.label)) {
+                others.push(item.label);
+            }
+        }
+    });
+
+    const yearLabelMap = { '01': 'ジュニア', '02': 'クラシック', '03': 'シニア' };
+    const parts = [];
+
+    for (const [monthKey, years] of Object.entries(groups)) {
+        const yearLabels = years.map(y => yearLabelMap[y]).filter(Boolean);
+        const yearStr = yearLabels.join('/');
+        parts.push(`${yearStr}${monthKey}`);
+    }
+
+    return [...parts, ...others].join(' / ');
+}
+
 function mapCsvGradeToUiGrade(grade) {
     if (!grade) return '';
     if (grade === 'G1') return 'GI';
@@ -2693,7 +2751,7 @@ function setupRaceNameSuggestion(optionsList) {
             const div = document.createElement('div');
             div.className = 'suggestion-item';
 
-            const periodStr = formatPeriods(match.periods);
+            const periodStr = formatPeriodsShort(match.periods);
             const mappedGrade = mapCsvGradeToUiGrade(match.grade);
             const gradeClass = match.grade ? match.grade.toLowerCase().replace('-', '_') : '';
             const showBadge = mappedGrade && mappedGrade !== '--';
@@ -2704,7 +2762,10 @@ function setupRaceNameSuggestion(optionsList) {
                         ${badgeHtml}
                         <span>${match.name}</span>
                     </div>
-                    <span class="suggestion-sub-value" style="font-size: 0.8rem; color: #888; white-space: nowrap; margin-left: 10px;">${periodStr}</span>
+                    <div class="suggestion-sub-value">
+                        ${periodStr ? `<span class="suggestion-sub-period">${periodStr}</span>` : ''}
+                        ${match.track ? `<span class="suggestion-sub-track">${match.track}</span>` : ''}
+                    </div>
                 </div>
             `;
 
@@ -2714,10 +2775,10 @@ function setupRaceNameSuggestion(optionsList) {
                 boxEl.style.display = 'none';
                 clearBtn.style.display = 'block';
                 if (mappedGrade) {
-                    document.getElementById('setGrade').value = mappedGrade;
+                    setCustomDropdownValue('gradeDropdown', 'setGrade', 'gradeSelectedText', mappedGrade);
                 }
                 if (match.track) {
-                    document.getElementById('setRacecourse').value = match.track;
+                    setCustomDropdownValue('racecourseDropdown', 'setRacecourse', 'racecourseSelectedText', match.track);
                 }
             });
             boxEl.appendChild(div);
@@ -2740,10 +2801,10 @@ function setupRaceNameSuggestion(optionsList) {
                 clearBtn.style.display = 'block';
                 const mappedGrade = mapCsvGradeToUiGrade(matches[0].grade);
                 if (mappedGrade) {
-                    document.getElementById('setGrade').value = mappedGrade;
+                    setCustomDropdownValue('gradeDropdown', 'setGrade', 'gradeSelectedText', mappedGrade);
                 }
                 if (matches[0].track) {
-                    document.getElementById('setRacecourse').value = matches[0].track;
+                    setCustomDropdownValue('racecourseDropdown', 'setRacecourse', 'racecourseSelectedText', matches[0].track);
                 }
             } else {
                 boxEl.innerHTML = '';

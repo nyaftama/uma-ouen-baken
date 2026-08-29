@@ -27,6 +27,10 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-x: clip;
+}
+
 body {
     font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: var(--text-main);
@@ -891,8 +895,8 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     position: absolute;
     top: 5px;
     left: 5px;
-    width: 100%;
-    height: 100%;
+    right: -5px;
+    bottom: -5px;
     background: #fafafa;
     border: 2px solid #ccc;
     border-radius: 8px;
@@ -2451,6 +2455,21 @@ body[data-display-mode="cast"] .card-name-uma-sub {
     #gradeDropdown .dropdown-menu,
     #gradeDropdownMenu {
         max-height: 150px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .item-list {
+        padding: 0;
+    }
+
+    .top-info-switcher {
+        margin: 0 0 15px 0;
+    }
+
+    .item-card {
+        padding: 10px 10px 10px 16px;
+        gap: 6px;
     }
 }
 

@@ -1,224 +1,226 @@
-uma_name,cast_name,cast_name_kana,main_color,sub_color,is_primary,is_additional,note,tags
-スペシャルウィーク,和氣あず未,わきあずみ,#ee6dcb,#ffdef9,TRUE,FALSE,,
-サイレンススズカ,高野麻里佳,こうのまりか,#29bd70,#ffce48,TRUE,FALSE,,
-トウカイテイオー,Machico,まちこ,#3376d2,#ff99d0,TRUE,FALSE,,
-マルゼンスキー,Lynn,りん,#ea504a,#ffcd00,TRUE,FALSE,,#シングレ
-フジキセキ,松井恵理子,まついえりこ,#444745,#33b839,TRUE,FALSE,,
-オグリキャップ,高柳知葉,たかやなぎともよ,#3a7ad2,#ece7e7,TRUE,FALSE,,#シングレ
-ゴールドシップ,上田瞳,うえだひとみ,#da3c57,#e9da36,TRUE,FALSE,,
-ウオッカ,大橋彩香,おおはしあやか,#d4c200,#3dd1d7,TRUE,FALSE,,
-ダイワスカーレット,木村千咲,きむらちさ,#4f64d8,#e73472,TRUE,FALSE,,
-タイキシャトル,大坪由佳,おおつぼゆか,#73c032,#ffac42,TRUE,FALSE,,
-グラスワンダー,前田玲奈,まえだれな,#3a34ac,#e3493f,TRUE,FALSE,,
-ヒシアマゾン,巽悠衣子,たつみゆいこ,#2185d0,#e6453a,TRUE,FALSE,,
-メジロマックイーン,大西沙織,おおにしさおり,#00b5be,#dfc8e7,TRUE,FALSE,,
-エルコンドルパサー,髙橋ミナミ,たかはしみなみ,#dd4e31,#efdb28,TRUE,FALSE,,
-テイエムオペラオー,徳井青空,とくいそら,#f271c4,#fbe415,TRUE,FALSE,,
-ナリタブライアン,衣川里佳,きぬがわりか,#75358c,#d638a3,TRUE,FALSE,,
-シンボリルドルフ,田所あずさ,たどころあずさ,#1c7763,#c6314b,TRUE,FALSE,,#シングレ
-エアグルーヴ,青木瑠璃子,あおきるりこ,#0092cb,#fae053,TRUE,FALSE,,
-アグネスデジタル,鈴木みのり,すずきみのり,#f37f96,#f9f189,TRUE,FALSE,,
-セイウンスカイ,鬼頭明里,きとうあかり,#65d283,#f4da40,TRUE,FALSE,,
-タマモクロス,大空直美,おおぞらなおみ,#3290d6,#c6dae7,TRUE,FALSE,,#シングレ
-ファインモーション,橋本ちなみ,はしもとちなみ,#20a95c,#ee5340,TRUE,FALSE,,
-ビワハヤヒデ,近藤唯,こんどうゆい,#b03d81,#e776b6,TRUE,FALSE,,
-マヤノトップガン,星谷美緒,ほしたにみお,#f57d38,#ffc845,TRUE,FALSE,,
-マンハッタンカフェ,小倉唯,おぐらゆい,#494541,#e8dd4c,TRUE,FALSE,,
-ミホノブルボン,長谷川育美,はせがわいくみ,#ee60a1,#f0ed41,TRUE,FALSE,,
-メジロライアン,土師亜文,はしあふみ,#14baae,#7c4d3a,TRUE,FALSE,,
-ヒシアケボノ,松嵜麗,まつざきれい,#208bcd,#fa6f8b,TRUE,FALSE,,
-ユキノビジン,山本希望,やまもとのぞみ,#af7e51,#c8d8eb,TRUE,FALSE,,
-ライスシャワー,石見舞菜香,いわみまなか,#384a86,#ca3e6d,TRUE,FALSE,,
-アイネスフウジン,長江里加,ながえりか,#f078c5,#54ae1b,TRUE,FALSE,,
-アグネスタキオン,上坂すみれ,うえさかすみれ,#35b2b6,#e2e868,TRUE,FALSE,,
-アドマイヤベガ,咲々木瞳,ささきひとみ,#3865a1,#78d5e1,TRUE,FALSE,,
-イナリワン,井上遥乃,いのうえはるの,#ae419e,#ec86d0,TRUE,FALSE,,#シングレ
-ウイニングチケット,渡部優衣,わたなべゆい,#dd3d5b,#ede233,TRUE,FALSE,,
-エアシャカール,津田美波,つだみなみ,#2459b4,#e1e000,TRUE,FALSE,,
-エイシンフラッシュ,藤野彩水,ふじのあやみ,#3d3b3a,#e33067,TRUE,FALSE,,
-カレンチャン,篠原侑,ささはらゆう,#f86669,#47423e,TRUE,FALSE,,
-カワカミプリンセス,高橋花林,たかはしかりん,#e146a7,#00c7b1,TRUE,FALSE,,
-ゴールドシチー,香坂さき,こうさかさき,#245099,#e63c5c,TRUE,FALSE,,
-サクラバクシンオー,三澤紗千香,みさわさちか,#ee6fab,#f2d4d7,TRUE,FALSE,,
-シーキングザパール,福原綾香,ふくはらあやか,#b02d40,#1690d4,TRUE,FALSE,,
-シンコウウインディ,高田憂希,たかだゆうき,#63666a,#6f2678,TRUE,FALSE,,
-スイープトウショウ,杉浦しおり,すぎうらしおり,#926dda,#bc204b,TRUE,FALSE,,
-スーパークリーク,優木かな,ゆうきかな,#5693da,#c8c9c7,TRUE,FALSE,,#シングレ
-スマートファルコン,大和田仁美,おおわだひとみ,#f8587b,#403a35,TRUE,FALSE,,
-ゼンノロブロイ,照井春佳,てるいはるか,#5f9b26,#f3ea5d,TRUE,FALSE,,
-トーセンジョーダン,鈴木絵理,すずきえり,#25b8ae,#1c57b9,TRUE,FALSE,,
-ナカヤマフェスタ,下地紫野,しもじしの,#c0453f,#236192,TRUE,FALSE,,
-ナリタタイシン,渡部恵子,わたなべけいこ,#e575ce,#f3dd6d,TRUE,FALSE,,
-ニシノフラワー,河井晴菜,かわいはるな,#e26ecb,#f6eb61,TRUE,FALSE,,
-ハルウララ,首藤志奈,しゅとうゆきな,#fa7395,#ede04b,TRUE,FALSE,,
-バンブーメモリー,藍原ことみ,あいはらことみ,#366965,#2d2926,TRUE,FALSE,,
-ビコーペガサス,田中あいみ,たなかあいみ,#e7396f,#d162b8,TRUE,FALSE,,
-マーベラスサンデー,三宅麻理恵,みやけまりえ,#ca46b0,#b52542,TRUE,FALSE,,
-マチカネフクキタル,新田ひより,にったひより,#3d89e9,#f8a717,TRUE,FALSE,,
-ミスターシービー,天海由梨奈,あまみゆりな,#6fc346,#fbe122,TRUE,FALSE,,#シングレ
-メイショウドトウ,和多田美咲,わただみさき,#46449b,#d64388,TRUE,FALSE,,
-メジロドーベル,久保田ひかり,くぼたひかり,#19b49e,#6f3b42,TRUE,FALSE,,
-ナイスネイチャ,前田佳織里,まえだかおり,#28a959,#b82720,TRUE,FALSE,,
-キングヘイロー,佐伯伊織,さえきいおり,#0e9451,#1c57a5,TRUE,FALSE,,
-マチカネタンホイザ,遠野ひかる,とおのひかる,#0f8dce,#ee5b56,TRUE,FALSE,,
-イクノディクタス,田澤茉純,たざわますみ,#49b73f,#c6d1d5,TRUE,FALSE,,
-メジロパーマー,のぐちゆり,のぐちゆり,#27c79c,#865432,TRUE,FALSE,,
-ダイタクヘリオス,山根綺,やまねあや,#5b64d5,#fbe247,TRUE,FALSE,,
-ツインターボ,花井美春,はないみはる,#1985d2,#27b784,TRUE,FALSE,,
-サトノダイヤモンド,立花日菜,たちばなひな,#94bf01,#f9eb39,TRUE,FALSE,,
-キタサンブラック,矢野妃菜喜,やのひなき,#5a6065,#fc6d31,TRUE,FALSE,,
-サクラチヨノオー,野口瑠璃子,のぐちるりこ,#f9879d,#f7dde2,TRUE,FALSE,,#シングレ
-シリウスシンボリ,ファイルーズあい,ふぁいるーずあい,#248379,#e3628c,TRUE,FALSE,,#シングレ
-メジロアルダン,会沢紗弥,あいざわさや,#28baa5,#bfe4eb,TRUE,FALSE,,#シングレ
-ヤエノムテキ,日原あゆみ,ひのはらあゆみ,#da483a,#ffda93,TRUE,FALSE,,#シングレ
-ツルマルツヨシ,青山吉能,あおやまよしの,#8f4dac,#f5cd47,TRUE,FALSE,,
-メジロブライト,大西綺華,おおにしあやか,#45c5c1,#9f5f54,TRUE,FALSE,,
-デアリングタクト,羊宮妃那,ようみやひな,#79c6db,#6c5953,TRUE,FALSE,,
-サクラローレル,真野美月,まのみづき,#f0638a,#fecdc9,TRUE,FALSE,,
-ナリタトップロード,中村カンナ,なかむらかんな,#ea5bc0,#8f3d7d,TRUE,FALSE,,
-ヤマニンゼファー,今泉りおな,いまいずみりおな,#5192c1,#ae4544,TRUE,FALSE,,
-フリオーソ,西連寺亜希,さいれんじあき,#3f54bf,#dd3543,TRUE,FALSE,,
-トランセンド,塚田悠衣,つかだゆい,#13a9b0,#f8475f,TRUE,FALSE,,
-エスポワールシチー,亜咲花,あさか,#d93842,#293aab,TRUE,FALSE,,
-ノースフライト,指出毬亜,さしでまりあ,#ca3b61,#32b5d6,TRUE,FALSE,,
-シンボリクリスエス,春川芽生,はるかわめいく,#12762f,#292d45,TRUE,FALSE,,
-タニノギムレット,松岡美里,まつおかみさと,#dab610,#173061,TRUE,FALSE,,
-ダイイチルビー,礒部花凜,いそべかりん,#d2445d,#6946a9,TRUE,FALSE,,
-メジロラモーヌ,東山奈央,とうやまなお,#4bb6af,#3c5161,TRUE,FALSE,,
-アストンマーチャン,井上ほの花,いのうえほのか,#cf4436,#e1dccb,TRUE,FALSE,,
-サトノクラウン,鈴代紗弓,すずしろさゆみ,#21713a,#f3f19d,TRUE,FALSE,,
-シュヴァルグラン,夏吉ゆうこ,なつよしゆうこ,#64c3c1,#1e3872,TRUE,FALSE,,
-ヴィルシーナ,奥野香耶,おくのかや,#4747cc,#84c6e7,TRUE,FALSE,,
-ヴィブロス,伊藤彩沙,いとうあやさ,#404fb1,#84d4e3,TRUE,FALSE,,
-ダンツフレーム,福嶋晴菜,ふくしまはるな,#e97d97,#119d76,TRUE,FALSE,,
-ケイエスミラクル,佐藤日向,さとうひなた,#85aae1,#ebd64a,TRUE,FALSE,,
-ジャングルポケット,藤本侑里,ふじもとゆり,#6ac43c,#e6d734,TRUE,FALSE,,
-ビリーヴ,秋山実咲,あきやまみさき,#4baece,#c63663,TRUE,FALSE,,
-ノーリーズン,河野ひより,こうのひより,#cb243e,#9ad2f5,TRUE,FALSE,,
-スティルインラブ,宮下早紀,みやしたさき,#d83a43,#6fbbf1,TRUE,FALSE,,
-コパノリッキー,稲垣好,いながきこのみ,#eeb42a,#d93c49,TRUE,FALSE,,
-ホッコータルマエ,菊池紗矢香,きくちさやか,#d94149,#cddee0,TRUE,FALSE,,
-ワンダーアキュート,須藤叶希,すどうかのこ,#d85081,#d8d2d9,TRUE,FALSE,,
-サムソンビッグ,根本京里,ねもとみやり,#3dc3c2,#f0688e,TRUE,FALSE,,
-サウンズオブアース,MAKIKO,まきこ,#ca4640,#305991,TRUE,FALSE,,
-ロイスアンドロイス,田辺留依,たなべるい,#e69a22,#cc382e,TRUE,FALSE,,
-カツラギエース,藤原夏海,ふじわらなつみ,#7db0e0,#f77696,TRUE,FALSE,,
-ネオユニヴァース,白石晴香,しらいしはるか,#5abae6,#f8db55,TRUE,FALSE,,
-ヒシミラクル,春日さくら,かすがさくら,#4a71b2,#bdd1e9,TRUE,FALSE,,
-タップダンスシチー,篠田みなみ,しのだみなみ,#d44853,#4840ad,TRUE,FALSE,,#シングレ
-ドゥラメンテ,秋奈,あきな,#bf3344,#4e4e4e,TRUE,FALSE,,
-ラインクラフト,小島菜々恵,こじまななえ,#f15b75,#2c9679,TRUE,FALSE,,
-シーザリオ,佐藤榛夏,さとうはるか,#948eab,#0a3874,TRUE,FALSE,,
-エアメサイア,根本優奈,ねもとゆな,#2c2f9d,#fffd8c,TRUE,FALSE,,
-デアリングハート,希水しお,きすいしお,#d0ba00,#38312b,TRUE,FALSE,,
-フサイチパンドラ,佳原萌枝,かはらもえ,#fd637f,#fbd872,TRUE,FALSE,,
-ブエナビスタ,和泉風花,いずみふうか,#c0af3b,#583d3e,TRUE,FALSE,,
-オルフェーヴル,日笠陽子,ひかさようこ,#be4134,#ecd898,TRUE,FALSE,,
-ジェンティルドンナ,芹澤優,せりざわゆう,#cf2f2b,#533c3d,TRUE,FALSE,,
-ウインバリアシオン,月城日花,つきしろひか,#c1213c,#bad7f4,TRUE,FALSE,,
-アドマイヤグルーヴ,鈴木日菜,すずきひな,#344d99,#5cbac8,TRUE,FALSE,,
-ドリームジャーニー,吉岡茉祐,よしおかまゆ,#332d1f,#e6e08a,TRUE,FALSE,,
-カルストンライトオ,望月ゆみこ,もちづきゆみこ,#131b4c,#f7eb49,TRUE,FALSE,,
-デュランダル,野木奏,のぎかな,#efa605,#d22630,TRUE,FALSE,,
-ジェニュイン,福島美里衣,ふくしまみりい,#d3b927,#e17fa5,TRUE,FALSE,,
-バブルガムフェロー,神谷早矢佳,かみたにさやか,#e5bd00,#0047bb,TRUE,FALSE,,
-サクラチトセオー,明智璃子,あけちりこ,#fa83cb,#d8c8d1,TRUE,FALSE,,
-フェノーメノ,日比優理香,ひびゆりか,#574a74,#f4db4e,TRUE,FALSE,,
-ブラストワンピース,紫月杏朱彩,しづきあずさ,#009cbd,#0cb85f,TRUE,FALSE,,
-アーモンドアイ,石原夏織,いしはらかおり,#69a9e9,#cc3300,TRUE,FALSE,,
-ラッキーライラック,中島由貴,なかじまゆき,#454152,#907594,TRUE,FALSE,,
-グランアレグリア,夏目妃菜,なつめひな,#53565a,#ef4d60,TRUE,FALSE,,
-ラヴズオンリーユー,久保田未夢,くぼたみゆ,#424840,#268745,TRUE,FALSE,,
-クロノジェネシス,真名瀬日和,まなせひより,#464647,#50a19f,TRUE,FALSE,,
-カレンブーケドール,小田杏樹,おだあんじゅ,#8e8180,#473d3c,TRUE,FALSE,,
-ステイゴールド,松田颯水,まつださつみ,#bfb33e,#49699c,TRUE,FALSE,,
-レッドディザイア,関根瞳,せきねひとみ,#cb3a43,#802f2d,TRUE,FALSE,,
-キセキ,星希成奏,ほしきせえな,#2c9c46,#c8dbe9,TRUE,FALSE,,
-フォーエバーヤング,海弓シュリ,みゆみしゅり,#822b4a,#d8ced2,TRUE,FALSE,,
-マルシュロレーヌ,近貞月乃,ちかさだつきの,#8b1538,#e9a2b2,TRUE,FALSE,,
-エピファネイア,千賀光莉,せんがひかり,#17af87,#d0dee8,TRUE,FALSE,,
-ロゴタイプ,髙橋美空,たかはしみそら,#7e2d40,#bd9b60,TRUE,FALSE,,
-ヴィクトワールピサ,嶋野花,しまのはな,#4146b8,#f1eb9d,TRUE,FALSE,,
-ローズキングダム,菊池ゆりな,きくちゆりな,#cb363d,#52606b,TRUE,FALSE,,
-ルーラーシップ,海野水玉,うみのみずたま,#beab08,#3a4c5c,TRUE,FALSE,,
-タイトルホルダー,華成結,かなりゆい,#4ea547,#ebe367,TRUE,FALSE,,
-ハッピーミーク,吉咲みゆ,よしさきみゆ,#729cdb,#b8b2b9,FALSE,FALSE,,
-ビターグラッセ,島田愛野,しまだあいの,#ed4f44,#674445,FALSE,FALSE,,
-リトルココン,白砂沙帆,しらすさほ,#6973ab,#61c9f5,FALSE,FALSE,,
-ヴェニュスパーク,折原日菜,おりはらひな,#215a95,#db4977,FALSE,FALSE,,
-リガントーナ,井料愛良,いりょうあいら,#da6642,#755151,FALSE,FALSE,,
-ソノンエルフィー,小清水亜美,こしみずあみ,#f07736,#ffa6d1,FALSE,FALSE,,
-駿川たづな,藤井ゆきよ,ふじいゆきよ,#44a705,#f3cd00,FALSE,FALSE,,
-秋川やよい,水橋かおり,みずはしかおり,#fc8056,#d1bdba,FALSE,FALSE,,
-乙名史悦子,陶山恵実里,すやまえみり,#4575bf,#986d64,FALSE,FALSE,,
-桐生院葵,岡咲美保,おかさきみほ,#464ed2,#e48cfa,FALSE,FALSE,,
-安心沢刺々美,井上喜久子,いのうえきくこ,#df4945,#c3cacd,FALSE,FALSE,,
-樫本理子,朴璐美,ぱくろみ,#54498c,#8b9096,FALSE,FALSE,,
-ライトハロー,植田佳奈,うえだかな,#f482a2,#92ddcd,FALSE,FALSE,,
-ダーレーアラビアン,進藤尚美,しんどうなおみ,#d84556,#ddaa4d,FALSE,FALSE,,
-ゴドルフィンバルブ,佐藤聡美,さとうさとみ,#3381d8,#20c8cf,FALSE,FALSE,,
-バイアリーターク,斎賀みつき,さいがみつき,#bba61d,#7874c9,FALSE,FALSE,,
-佐岳メイ,堀江由衣,ほりえゆい,#e4ac34,#5e4b3c,FALSE,FALSE,,
-都留岐涼花,佐藤利奈,さとうりな,#b26fbd,#ffad93,FALSE,FALSE,,
-シュガーライツ,石川由依,いしかわゆい,#5cc0ad,#c85382,FALSE,FALSE,,
-セントライト,能登麻美子,のとまみこ,#5bb1de,#ebc6ac,FALSE,FALSE,,
-スピードシンボリ,沢城みゆき,さわしろみゆき,#10a546,#e3e3e3,FALSE,FALSE,,
-ハイセイコー,丹下桜,たんげさくら,#c23c94,#e3f5ff,FALSE,FALSE,,
-タッカーブライン,小林ゆう,こばやしゆう,#c4b076,#00857d,FALSE,FALSE,,
-保科健子,高垣彩陽,たかがきあやひ,#316757,#343f3e,FALSE,FALSE,,
-ユノハナブルーム,豊崎愛生,とよさきあき,#ed718c,#d7d2d5,FALSE,FALSE,,
-カジノドライヴ,愛美,あいみ,#5198b0,#dde4e2,FALSE,FALSE,,
-赤坂美聡,明坂聡美,あけさかさとみ,#2a8e6e,#d75938,FALSE,FALSE,,
-細江純子,細江純子,ほそえじゅんこ,#485cc7,#d8ceda,FALSE,FALSE,,
-トレーナー,沖野晃司,,,,FALSE,TRUE,チームスピカのトレーナー,
-東条ハナ,豊口めぐみ,,,,FALSE,TRUE,チームリギルのトレーナー,
-南坂トレーナー,古川慎,,,,FALSE,TRUE,チームカノープスのトレーナー,
-黒沼トレーナー,黒田崇矢,,#ee60a1,#f0ed41,FALSE,TRUE,ミホノブルボン所属チームのトレーナー,
-サトノのトレーナー,長谷川明子,,#94bf01,#f9eb39,FALSE,TRUE,チームカペラのトレーナー,
-お母ちゃん,斉藤佑圭,,#ee6dcb,#ffdef9,FALSE,TRUE,スペシャルウィークの育ての親,
-医者,宇垣秀成,,#3376d2,#ff99d0,FALSE,TRUE,トウカイテイオーの主治医,
-じいや,梅津秀行,,#00b5be,#dfc8e7,FALSE,TRUE,メジロ家の老執事,
-主治医,古川慎,,#00b5be,#dfc8e7,FALSE,TRUE,メジロ家の主治医,
-おばあさま,榊原良子,,#00b5be,#dfc8e7,FALSE,TRUE,メジロ家の当主,
-SP隊長,呉羽藍依,,#20a95c,#ee5340,FALSE,TRUE,ファインモーションSP部隊の隊長,
-マネージャー,福沙奈恵,,#245099,#e63c5c,FALSE,TRUE,ゴールドシチーのマネージャー,
-ビューティー安心沢,井上喜久子,,#df4945,#c3cacd,FALSE,TRUE,ビューティードリームカップの主催者,
-ベルノライト,根本京里,,#f3ce3c,#e03c32,FALSE,TRUE,ボイスコミック版,#シングレ
-ベルノライト,瀬戸桃子,,#f3ce3c,#e03c32,FALSE,TRUE,アニメ版,#シングレ
-北原穣,中村章吾,,#3a7ad2,#ece7e7,FALSE,TRUE,オグリキャップの担当トレーナー ボイスコミック版,#シングレ
-北原穣,小西克幸,,#3a7ad2,#ece7e7,FALSE,TRUE,オグリキャップの担当トレーナー アニメ版,#シングレ
-六平銀次郎,大塚芳忠,,#3a7ad2,#ece7e7,FALSE,TRUE,北原穣の叔父,#シングレ
-フジマサマーチ,伊瀬茉莉也,,#2e4088,#d3e0d6,FALSE,TRUE,,#シングレ
-ノルンエース,渋谷彩乃,,#cb7875,#eabc9e,FALSE,TRUE,,#シングレ
-ルディレモーノ,西川舞,,#f3e49d,#515f87,FALSE,TRUE,ボイスコミック版,#シングレ
-ルディレモーノ,大地葉,,#f3e49d,#515f87,FALSE,TRUE,アニメ版,#シングレ
-ミニーザレディ,井澤詩織,,#f6de7e,#c56752,FALSE,TRUE,,#シングレ
-ディクタストライカ,花守ゆみり,,#ecea37,#e07e3d,FALSE,TRUE,,#シングレ
-トニビアンカ,甲斐田裕子,,#467b5c,#99514c,FALSE,TRUE,,#シングレ
-オベイユアマスター,石上静香,,#eccc70,#596fb5,FALSE,TRUE,,#シングレ
-ムーンライトルナシー,関根明良,,#6b59ad,#934e61,FALSE,TRUE,,#シングレ
-ミシェルマイベイビー,高垣彩陽,,#4e54b1,#de8441,FALSE,TRUE,,#シングレ
-エラズリープライド,富田美憂,,#c0dae7,#c94b5d,FALSE,TRUE,,#シングレ
-ブラッキーエール,森なな子,,#474a69,#cfb181,FALSE,TRUE,,#シングレ
-メイクンツカサ,風間万裕子,,#b55f5d,#d9ba76,FALSE,TRUE,,#シングレ
-クラフトユニヴァ,田中貴子,,#4a4657,#3f60a3,FALSE,TRUE,,#シングレ
-ゴッドハンニバル,鷄冠井美智子,,#536161,#253451,FALSE,TRUE,,#シングレ
-アキツテイオー,久次米渚,,#286e51,#7a2b29,FALSE,TRUE,,#シングレ
-ダイナムヒロイン,大久保瑠美,,#6f75ae,#b0575f,FALSE,TRUE,,#シングレ
-ロードロイヤル,山村響,,#c64b3e,#d9c051,FALSE,TRUE,,#シングレ
-ヤマノサウザン,田村睦心,,#b14846,#d593f2,FALSE,TRUE,,#シングレ
-柴崎宏壱,柴崎哲志,,#2e4088,#d3e0d6,FALSE,TRUE,カサマツトレセン学園所属トレーナー ボイスコミック版,#シングレ
-柴崎宏壱,浪川大輔,,#2e4088,#d3e0d6,FALSE,TRUE,カサマツトレセン学園所属トレーナー アニメ版,#シングレ
-川村日和,生天目仁美,,#dcbe8a,#c64733,FALSE,TRUE,ノルンエース/ルディレモーノ/ミニーザレディの担当トレーナー,#シングレ
-巌唯一,竹内良太,,#677d64,#c5cb9d,FALSE,TRUE,,#シングレ
-師範代,宝亀克寿,,#da483a,#ffda93,FALSE,TRUE,ヤエノムテキの担当トレーナー,#シングレ
-小宮山勝美,白石涼子,,#3290d6,#c6dae7,FALSE,TRUE,タマモクロスの担当トレーナー,#シングレ
-奈瀬文乃,嶋村侑,,#5693da,#c8c9c7,FALSE,TRUE,スーパークリークの担当トレーナー,#シングレ
-小内忠,阿座上洋平,,#ecea37,#e07e3d,FALSE,TRUE,ディクタストライカの担当トレーナー,#シングレ
-檮原龍子,くじら,,#ae419e,#ec86d0,FALSE,TRUE,イナリワンの担当トレーナー,#シングレ
-檮原太郎,榎木淳弥,,#ae419e,#ec86d0,FALSE,TRUE,イナリワンの担当トレーナー,#シングレ
-藤井泉助,高橋大輔,,#ba6852,#9399a3,FALSE,TRUE,ウマ娘レース新聞の記者,#シングレ
-オグリキャップの母,皆口裕子,,#3a7ad2,#ece7e7,FALSE,TRUE,オグリキャップの母,#シングレ
-タマモクロスの母,遠藤綾,,#3290d6,#c6dae7,FALSE,TRUE,タマモクロスの母,#シングレ
-フランク＝マクモナハン,楠見尚己,,#eccc70,#596fb5,FALSE,TRUE,オベイユアマスターの担当トレーナー,#シングレ
-トレセン学園料理主任,斉藤貴美子,,#bfb6ae,#ea7a93,FALSE,TRUE,中央トレセン学園料理主任,#シングレ
+uma_name,uma_name_eng,cast_name,cast_name_kana,main_color,sub_color,is_primary,is_additional,note,tags
+スペシャルウィーク,Special Week,和氣あず未,わきあずみ,#ee6dcb,#ffdef9,TRUE,FALSE,,
+サイレンススズカ,Silence Suzuka,高野麻里佳,こうのまりか,#29bd70,#ffce48,TRUE,FALSE,,
+トウカイテイオー,Tokai Teio,Machico,まちこ,#3376d2,#ff99d0,TRUE,FALSE,,
+マルゼンスキー,Maruzensky,Lynn,りん,#ea504a,#ffcd00,TRUE,FALSE,,#シングレ
+フジキセキ,Fuji Kiseki,松井恵理子,まついえりこ,#444745,#33b839,TRUE,FALSE,,
+オグリキャップ,Oguri Cap,高柳知葉,たかやなぎともよ,#3a7ad2,#ece7e7,TRUE,FALSE,,#シングレ
+ゴールドシップ,Gold Ship,上田瞳,うえだひとみ,#da3c57,#e9da36,TRUE,FALSE,,
+ウオッカ,Vodka,大橋彩香,おおはしあやか,#d4c200,#3dd1d7,TRUE,FALSE,,
+ダイワスカーレット,Daiwa Scarlet,木村千咲,きむらちさ,#4f64d8,#e73472,TRUE,FALSE,,
+タイキシャトル,Taiki Shuttle,大坪由佳,おおつぼゆか,#73c032,#ffac42,TRUE,FALSE,,
+グラスワンダー,Grass Wonder,前田玲奈,まえだれな,#3a34ac,#e3493f,TRUE,FALSE,,
+ヒシアマゾン,Hishi Amazon,巽悠衣子,たつみゆいこ,#2185d0,#e6453a,TRUE,FALSE,,
+メジロマックイーン,Mejiro McQueen,大西沙織,おおにしさおり,#00b5be,#dfc8e7,TRUE,FALSE,,
+エルコンドルパサー,El Condor Pasa,髙橋ミナミ,たかはしみなみ,#dd4e31,#efdb28,TRUE,FALSE,,
+テイエムオペラオー,T.M. Opera O,徳井青空,とくいそら,#f271c4,#fbe415,TRUE,FALSE,,
+ナリタブライアン,Narita Brian,衣川里佳,きぬがわりか,#75358c,#d638a3,TRUE,FALSE,,
+シンボリルドルフ,Symboli Rudolf,田所あずさ,たどころあずさ,#1c7763,#c6314b,TRUE,FALSE,,#シングレ
+エアグルーヴ,Air Groove,青木瑠璃子,あおきるりこ,#0092cb,#fae053,TRUE,FALSE,,
+アグネスデジタル,Agnes Digital,鈴木みのり,すずきみのり,#f37f96,#f9f189,TRUE,FALSE,,
+セイウンスカイ,Seiun Sky,鬼頭明里,きとうあかり,#65d283,#f4da40,TRUE,FALSE,,
+タマモクロス,Tamamo Cross,大空直美,おおぞらなおみ,#3290d6,#c6dae7,TRUE,FALSE,,#シングレ
+ファインモーション,Fine Motion,橋本ちなみ,はしもとちなみ,#20a95c,#ee5340,TRUE,FALSE,,
+ビワハヤヒデ,Biwa Hayahide,近藤唯,こんどうゆい,#b03d81,#e776b6,TRUE,FALSE,,
+マヤノトップガン,Mayano Top Gun,星谷美緒,ほしたにみお,#f57d38,#ffc845,TRUE,FALSE,,
+マンハッタンカフェ,Manhattan Cafe,小倉唯,おぐらゆい,#494541,#e8dd4c,TRUE,FALSE,,
+ミホノブルボン,Mihono Bourbon,長谷川育美,はせがわいくみ,#ee60a1,#f0ed41,TRUE,FALSE,,
+メジロライアン,Mejiro Ryan,土師亜文,はしあふみ,#14baae,#7c4d3a,TRUE,FALSE,,
+ヒシアケボノ,Hishi Akebono,松嵜麗,まつざきれい,#208bcd,#fa6f8b,TRUE,FALSE,,
+ユキノビジン,Yukino Bijin,山本希望,やまもとのぞみ,#af7e51,#c8d8eb,TRUE,FALSE,,
+ライスシャワー,Rice Shower,石見舞菜香,いわみまなか,#384a86,#ca3e6d,TRUE,FALSE,,
+アイネスフウジン,Ines Fujin,長江里加,ながえりか,#f078c5,#54ae1b,TRUE,FALSE,,
+アグネスタキオン,Agnes Tachyon,上坂すみれ,うえさかすみれ,#35b2b6,#e2e868,TRUE,FALSE,,
+アドマイヤベガ,Admire Vega,咲々木瞳,ささきひとみ,#3865a1,#78d5e1,TRUE,FALSE,,
+イナリワン,Inari One,井上遥乃,いのうえはるの,#ae419e,#ec86d0,TRUE,FALSE,,#シングレ
+ウイニングチケット,Winning Ticket,渡部優衣,わたなべゆい,#dd3d5b,#ede233,TRUE,FALSE,,
+エアシャカール,Air Shakur,津田美波,つだみなみ,#2459b4,#e1e000,TRUE,FALSE,,
+エイシンフラッシュ,Eishin Flash,藤野彩水,ふじのあやみ,#3d3b3a,#e33067,TRUE,FALSE,,
+カレンチャン,Curren Chan,篠原侑,ささはらゆう,#f86669,#47423e,TRUE,FALSE,,
+カワカミプリンセス,Kawakami Princess,高橋花林,たかはしかりん,#e146a7,#00c7b1,TRUE,FALSE,,
+ゴールドシチー,Gold City,香坂さき,こうさかさき,#245099,#e63c5c,TRUE,FALSE,,
+サクラバクシンオー,Sakura Bakushin O,三澤紗千香,みさわさちか,#ee6fab,#f2d4d7,TRUE,FALSE,,
+シーキングザパール,Seeking the Pearl,福原綾香,ふくはらあやか,#b02d40,#1690d4,TRUE,FALSE,,
+シンコウウインディ,Shinko Windy,高田憂希,たかだゆうき,#63666a,#6f2678,TRUE,FALSE,,
+スイープトウショウ,Sweep Tosho,杉浦しおり,すぎうらしおり,#926dda,#bc204b,TRUE,FALSE,,
+スーパークリーク,Super Creek,優木かな,ゆうきかな,#5693da,#c8c9c7,TRUE,FALSE,,#シングレ
+スマートファルコン,Smart Falcon,大和田仁美,おおわだひとみ,#f8587b,#403a35,TRUE,FALSE,,
+ゼンノロブロイ,Zenno Rob Roy,照井春佳,てるいはるか,#5f9b26,#f3ea5d,TRUE,FALSE,,
+トーセンジョーダン,Tosen Jordan,鈴木絵理,すずきえり,#25b8ae,#1c57b9,TRUE,FALSE,,
+ナカヤマフェスタ,Nakayama Festa,下地紫野,しもじしの,#c0453f,#236192,TRUE,FALSE,,
+ナリタタイシン,Narita Taishin,渡部恵子,わたなべけいこ,#e575ce,#f3dd6d,TRUE,FALSE,,
+ニシノフラワー,Nishino Flower,河井晴菜,かわいはるな,#e26ecb,#f6eb61,TRUE,FALSE,,
+ハルウララ,Haru Urara,首藤志奈,しゅとうゆきな,#fa7395,#ede04b,TRUE,FALSE,,
+バンブーメモリー,Bamboo Memory,藍原ことみ,あいはらことみ,#366965,#2d2926,TRUE,FALSE,,
+ビコーペガサス,Biko Pegasus,田中あいみ,たなかあいみ,#e7396f,#d162b8,TRUE,FALSE,,
+マーベラスサンデー,Marvelous Sunday,三宅麻理恵,みやけまりえ,#ca46b0,#b52542,TRUE,FALSE,,
+マチカネフクキタル,Matikanefukukitaru,新田ひより,にったひより,#3d89e9,#f8a717,TRUE,FALSE,,
+ミスターシービー,Mr. C.B.,天海由梨奈,あまみゆりな,#6fc346,#fbe122,TRUE,FALSE,,#シングレ
+メイショウドトウ,Meisho Doto,和多田美咲,わただみさき,#46449b,#d64388,TRUE,FALSE,,
+メジロドーベル,Mejiro Dober,久保田ひかり,くぼたひかり,#19b49e,#6f3b42,TRUE,FALSE,,
+ナイスネイチャ,Nice Nature,前田佳織里,まえだかおり,#28a959,#b82720,TRUE,FALSE,,
+キングヘイロー,King Halo,佐伯伊織,さえきいおり,#0e9451,#1c57a5,TRUE,FALSE,,
+マチカネタンホイザ,Matikanetannhauser,遠野ひかる,とおのひかる,#0f8dce,#ee5b56,TRUE,FALSE,,
+イクノディクタス,Ikuno Dictus,田澤茉純,たざわますみ,#49b73f,#c6d1d5,TRUE,FALSE,,
+メジロパーマー,Mejiro Palmer,のぐちゆり,のぐちゆり,#27c79c,#865432,TRUE,FALSE,,
+ダイタクヘリオス,Daitaku Helios,山根綺,やまねあや,#5b64d5,#fbe247,TRUE,FALSE,,
+ツインターボ,Twin Turbo,花井美春,はないみはる,#1985d2,#27b784,TRUE,FALSE,,
+サトノダイヤモンド,Satono Diamond,立花日菜,たちばなひな,#94bf01,#f9eb39,TRUE,FALSE,,
+キタサンブラック,Kitasan Black,矢野妃菜喜,やのひなき,#5a6065,#fc6d31,TRUE,FALSE,,
+サクラチヨノオー,Sakura Chiyono O,野口瑠璃子,のぐちるりこ,#f9879d,#f7dde2,TRUE,FALSE,,#シングレ
+シリウスシンボリ,Sirius Symboli,ファイルーズあい,ふぁいるーずあい,#248379,#e3628c,TRUE,FALSE,,#シングレ
+メジロアルダン,Mejiro Ardan,会沢紗弥,あいざわさや,#28baa5,#bfe4eb,TRUE,FALSE,,#シングレ
+ヤエノムテキ,Yaeno Muteki,日原あゆみ,ひのはらあゆみ,#da483a,#ffda93,TRUE,FALSE,,#シングレ
+ツルマルツヨシ,Tsurumaru Tsuyoshi,青山吉能,あおやまよしの,#8f4dac,#f5cd47,TRUE,FALSE,,
+メジロブライト,Mejiro Bright,大西綺華,おおにしあやか,#45c5c1,#9f5f54,TRUE,FALSE,,
+デアリングタクト,Daring Tact,羊宮妃那,ようみやひな,#79c6db,#6c5953,TRUE,FALSE,,
+サクラローレル,Sakura Laurel,真野美月,まのみづき,#f0638a,#fecdc9,TRUE,FALSE,,
+ナリタトップロード,Narita Top Road,中村カンナ,なかむらかんな,#ea5bc0,#8f3d7d,TRUE,FALSE,,
+ヤマニンゼファー,Yamanin Zephyr,今泉りおな,いまいずみりおな,#5192c1,#ae4544,TRUE,FALSE,,
+フリオーソ,Furioso,西連寺亜希,さいれんじあき,#3f54bf,#dd3543,TRUE,FALSE,,
+トランセンド,Transcend,塚田悠衣,つかだゆい,#13a9b0,#f8475f,TRUE,FALSE,,
+エスポワールシチー,Espoir City,亜咲花,あさか,#d93842,#293aab,TRUE,FALSE,,
+ノースフライト,North Flight,指出毬亜,さしでまりあ,#ca3b61,#32b5d6,TRUE,FALSE,,
+シンボリクリスエス,Symboli Kris S,春川芽生,はるかわめいく,#12762f,#292d45,TRUE,FALSE,,
+タニノギムレット,Tanino Gimlet,松岡美里,まつおかみさと,#dab610,#173061,TRUE,FALSE,,
+ダイイチルビー,Daiichi Ruby,礒部花凜,いそべかりん,#d2445d,#6946a9,TRUE,FALSE,,
+メジロラモーヌ,Mejiro Ramonu,東山奈央,とうやまなお,#4bb6af,#3c5161,TRUE,FALSE,,
+アストンマーチャン,Aston Machan,井上ほの花,いのうえほのか,#cf4436,#e1dccb,TRUE,FALSE,,
+サトノクラウン,Satono Crown,鈴代紗弓,すずしろさゆみ,#21713a,#f3f19d,TRUE,FALSE,,
+シュヴァルグラン,Cheval Grand,夏吉ゆうこ,なつよしゆうこ,#64c3c1,#1e3872,TRUE,FALSE,,
+ヴィルシーナ,Verxina,奥野香耶,おくのかや,#4747cc,#84c6e7,TRUE,FALSE,,
+ヴィブロス,Vivlos,伊藤彩沙,いとうあやさ,#404fb1,#84d4e3,TRUE,FALSE,,
+ダンツフレーム,Dantsu Flame,福嶋晴菜,ふくしまはるな,#e97d97,#119d76,TRUE,FALSE,,
+ケイエスミラクル,K.S.Miracle,佐藤日向,さとうひなた,#85aae1,#ebd64a,TRUE,FALSE,,
+ジャングルポケット,Jungle Pocket,藤本侑里,ふじもとゆり,#6ac43c,#e6d734,TRUE,FALSE,,
+ビリーヴ,Believe,秋山実咲,あきやまみさき,#4baece,#c63663,TRUE,FALSE,,
+ノーリーズン,No Reason,河野ひより,こうのひより,#cb243e,#9ad2f5,TRUE,FALSE,,
+スティルインラブ,Still in Love,宮下早紀,みやしたさき,#d83a43,#6fbbf1,TRUE,FALSE,,
+コパノリッキー,Copano Rickey,稲垣好,いながきこのみ,#eeb42a,#d93c49,TRUE,FALSE,,
+ホッコータルマエ,Hokko Tarumae,菊池紗矢香,きくちさやか,#d94149,#cddee0,TRUE,FALSE,,
+ワンダーアキュート,Wonder Acute,須藤叶希,すどうかのこ,#d85081,#d8d2d9,TRUE,FALSE,,
+サムソンビッグ,Samson Big,根本京里,ねもとみやり,#3dc3c2,#f0688e,TRUE,FALSE,,
+サウンズオブアース,Sounds of Earth,MAKIKO,まきこ,#ca4640,#305991,TRUE,FALSE,,
+ロイスアンドロイス,Royce and Royce,田辺留依,たなべるい,#e69a22,#cc382e,TRUE,FALSE,,
+カツラギエース,Katsuragi Ace,藤原夏海,ふじわらなつみ,#7db0e0,#f77696,TRUE,FALSE,,
+ネオユニヴァース,Neo Universe,白石晴香,しらいしはるか,#5abae6,#f8db55,TRUE,FALSE,,
+ヒシミラクル,Hishi Miracle,春日さくら,かすがさくら,#4a71b2,#bdd1e9,TRUE,FALSE,,
+タップダンスシチー,Tap Dance City,篠田みなみ,しのだみなみ,#d44853,#4840ad,TRUE,FALSE,,#シングレ
+ドゥラメンテ,Duramente,秋奈,あきな,#bf3344,#4e4e4e,TRUE,FALSE,,
+ラインクラフト,Rhein Kraft,小島菜々恵,こじまななえ,#f15b75,#2c9679,TRUE,FALSE,,
+シーザリオ,Cesario,佐藤榛夏,さとうはるか,#948eab,#0a3874,TRUE,FALSE,,
+エアメサイア,Air Messiah,根本優奈,ねもとゆな,#2c2f9d,#fffd8c,TRUE,FALSE,,
+デアリングハート,Daring Heart,希水しお,きすいしお,#d0ba00,#38312b,TRUE,FALSE,,
+フサイチパンドラ,Fusaichi Pandora,佳原萌枝,かはらもえ,#fd637f,#fbd872,TRUE,FALSE,,
+ブエナビスタ,Buena Vista,和泉風花,いずみふうか,#c0af3b,#583d3e,TRUE,FALSE,,
+オルフェーヴル,Orfevre,日笠陽子,ひかさようこ,#be4134,#ecd898,TRUE,FALSE,,
+ジェンティルドンナ,Gentildonna,芹澤優,せりざわゆう,#cf2f2b,#533c3d,TRUE,FALSE,,
+ウインバリアシオン,Win Variation,月城日花,つきしろひか,#c1213c,#bad7f4,TRUE,FALSE,,
+アドマイヤグルーヴ,Admire Groove,鈴木日菜,すずきひな,#344d99,#5cbac8,TRUE,FALSE,,
+ドリームジャーニー,Dream Journey,吉岡茉祐,よしおかまゆ,#332d1f,#e6e08a,TRUE,FALSE,,
+カルストンライトオ,Calstone Light O,望月ゆみこ,もちづきゆみこ,#131b4c,#f7eb49,TRUE,FALSE,,
+デュランダル,Durandal,野木奏,のぎかな,#efa605,#d22630,TRUE,FALSE,,
+ジェニュイン,Genuine,福島美里衣,ふくしまみりい,#d3b927,#e17fa5,TRUE,FALSE,,
+バブルガムフェロー,Bubble Gum Fellow,神谷早矢佳,かみたにさやか,#e5bd00,#0047bb,TRUE,FALSE,,
+サクラチトセオー,Sakura Chitose O,明智璃子,あけちりこ,#fa83cb,#d8c8d1,TRUE,FALSE,,
+フェノーメノ,Fenomeno,日比優理香,ひびゆりか,#574a74,#f4db4e,TRUE,FALSE,,
+ブラストワンピース,Blast Onepiece,紫月杏朱彩,しづきあずさ,#009cbd,#0cb85f,TRUE,FALSE,,
+アーモンドアイ,Almond Eye,石原夏織,いしはらかおり,#69a9e9,#cc3300,TRUE,FALSE,,
+ラッキーライラック,Lucky Lilac,中島由貴,なかじまゆき,#454152,#907594,TRUE,FALSE,,
+グランアレグリア,Gran Alegria,夏目妃菜,なつめひな,#53565a,#ef4d60,TRUE,FALSE,,
+ラヴズオンリーユー,Loves Only You,久保田未夢,くぼたみゆ,#424840,#268745,TRUE,FALSE,,
+クロノジェネシス,Chrono Genesis,真名瀬日和,まなせひより,#464647,#50a19f,TRUE,FALSE,,
+カレンブーケドール,Curren Bouquetd'or,小田杏樹,おだあんじゅ,#8e8180,#473d3c,TRUE,FALSE,,
+ステイゴールド,Stay Gold,松田颯水,まつださつみ,#bfb33e,#49699c,TRUE,FALSE,,
+レッドディザイア,Red Desire,関根瞳,せきねひとみ,#cb3a43,#802f2d,TRUE,FALSE,,
+キセキ,Kiseki,星希成奏,ほしきせえな,#2c9c46,#c8dbe9,TRUE,FALSE,,
+フォーエバーヤング,Forever Young,海弓シュリ,みゆみしゅり,#822b4a,#d8ced2,TRUE,FALSE,,
+マルシュロレーヌ,Marche Lorraine,近貞月乃,ちかさだつきの,#8b1538,#e9a2b2,TRUE,FALSE,,
+エピファネイア,Epiphaneia,千賀光莉,せんがひかり,#17af87,#d0dee8,TRUE,FALSE,,
+ロゴタイプ,Logotype,髙橋美空,たかはしみそら,#7e2d40,#bd9b60,TRUE,FALSE,,
+ヴィクトワールピサ,Victoire Pisa,嶋野花,しまのはな,#4146b8,#f1eb9d,TRUE,FALSE,,
+ローズキングダム,Rose Kingdom,菊池ゆりな,きくちゆりな,#cb363d,#52606b,TRUE,FALSE,,
+ルーラーシップ,Rulership,海野水玉,うみのみずたま,#beab08,#3a4c5c,TRUE,FALSE,,
+エフフォーリア,Efforia,香里有佐,,#3cbba7,#b33137,TRUE,FALSE,,
+タイトルホルダー,Titleholder,華成結,かなりゆい,#4ea547,#ebe367,TRUE,FALSE,,
+ファレノプシス,Phalaenopsis,浅見春那,,#5ba4d9,#ae4555,TRUE,FALSE,,
+ハッピーミーク,Happy Meek,吉咲みゆ,よしさきみゆ,#729cdb,#b8b2b9,FALSE,FALSE,,
+ビターグラッセ,Bitter Glasse,島田愛野,しまだあいの,#ed4f44,#674445,FALSE,FALSE,,
+リトルココン,Little Cocon,白砂沙帆,しらすさほ,#6973ab,#61c9f5,FALSE,FALSE,,
+ヴェニュスパーク,Venus Paques,折原日菜,おりはらひな,#215a95,#db4977,FALSE,FALSE,,
+リガントーナ,Rigantona,井料愛良,いりょうあいら,#da6642,#755151,FALSE,FALSE,,
+ソノンエルフィー,Sonon Elfie,小清水亜美,こしみずあみ,#f07736,#ffa6d1,FALSE,FALSE,,
+駿川たづな,Hayakawa Tazuna,藤井ゆきよ,ふじいゆきよ,#44a705,#f3cd00,FALSE,FALSE,,
+秋川やよい,Akikawa Yayoi,水橋かおり,みずはしかおり,#fc8056,#d1bdba,FALSE,FALSE,,
+乙名史悦子,Otonashi Etsuko,陶山恵実里,すやまえみり,#4575bf,#986d64,FALSE,FALSE,,
+桐生院葵,Kiryuin Aoi,岡咲美保,おかさきみほ,#464ed2,#e48cfa,FALSE,FALSE,,
+安心沢刺々美,Anshinzawa Sasami,井上喜久子,いのうえきくこ,#df4945,#c3cacd,FALSE,FALSE,,
+樫本理子,Kashimoto Riko,朴璐美,ぱくろみ,#54498c,#8b9096,FALSE,FALSE,,
+ライトハロー,Light Hello,植田佳奈,うえだかな,#f482a2,#92ddcd,FALSE,FALSE,,
+ダーレーアラビアン,Darley Arabian,進藤尚美,しんどうなおみ,#d84556,#ddaa4d,FALSE,FALSE,,
+ゴドルフィンバルブ,Godolphin Barb,佐藤聡美,さとうさとみ,#3381d8,#20c8cf,FALSE,FALSE,,
+バイアリーターク,Byerley Turk,斎賀みつき,さいがみつき,#bba61d,#7874c9,FALSE,FALSE,,
+佐岳メイ,Satake Mei,堀江由衣,ほりえゆい,#e4ac34,#5e4b3c,FALSE,FALSE,,
+都留岐涼花,Tsurugi Ryoka,佐藤利奈,さとうりな,#b26fbd,#ffad93,FALSE,FALSE,,
+シュガーライツ,Sugar Lights,石川由依,いしかわゆい,#5cc0ad,#c85382,FALSE,FALSE,,
+セントライト,Saint Lite,能登麻美子,のとまみこ,#5bb1de,#ebc6ac,FALSE,FALSE,,
+スピードシンボリ,Speed Symboli,沢城みゆき,さわしろみゆき,#10a546,#e3e3e3,FALSE,FALSE,,
+ハイセイコー,Haiseiko,丹下桜,たんげさくら,#c23c94,#e3f5ff,FALSE,FALSE,,
+タッカーブライン,Tucker Bryne,小林ゆう,こばやしゆう,#c4b076,#00857d,FALSE,FALSE,,
+保科健子,Hoshina Kiyoko,高垣彩陽,たかがきあやひ,#316757,#343f3e,FALSE,FALSE,,
+ユノハナブルーム,Yunohana Bloom,豊崎愛生,とよさきあき,#ed718c,#d7d2d5,FALSE,FALSE,,
+カジノドライヴ,Casino Drive,愛美,あいみ,#5198b0,#dde4e2,FALSE,FALSE,,
+赤坂美聡,Akasaka Misato,明坂聡美,あけさかさとみ,#2a8e6e,#d75938,FALSE,FALSE,,
+細江純子,Hosoe Junko,細江純子,ほそえじゅんこ,#485cc7,#d8ceda,FALSE,FALSE,,
+トレーナー,,沖野晃司,,,,FALSE,TRUE,チームスピカのトレーナー,
+東条ハナ,,豊口めぐみ,,,,FALSE,TRUE,チームリギルのトレーナー,
+南坂トレーナー,,古川慎,,,,FALSE,TRUE,チームカノープスのトレーナー,
+黒沼トレーナー,,黒田崇矢,,#ee60a1,#f0ed41,FALSE,TRUE,ミホノブルボン所属チームのトレーナー,
+サトノのトレーナー,,長谷川明子,,#94bf01,#f9eb39,FALSE,TRUE,チームカペラのトレーナー,
+お母ちゃん,,斉藤佑圭,,#ee6dcb,#ffdef9,FALSE,TRUE,スペシャルウィークの育ての親,
+医者,,宇垣秀成,,#3376d2,#ff99d0,FALSE,TRUE,トウカイテイオーの主治医,
+じいや,,梅津秀行,,#00b5be,#dfc8e7,FALSE,TRUE,メジロ家の老執事,
+主治医,,古川慎,,#00b5be,#dfc8e7,FALSE,TRUE,メジロ家の主治医,
+おばあさま,,榊原良子,,#00b5be,#dfc8e7,FALSE,TRUE,メジロ家の当主,
+SP隊長,,呉羽藍依,,#20a95c,#ee5340,FALSE,TRUE,ファインモーションSP部隊の隊長,
+マネージャー,,福沙奈恵,,#245099,#e63c5c,FALSE,TRUE,ゴールドシチーのマネージャー,
+ビューティー安心沢,,井上喜久子,,#df4945,#c3cacd,FALSE,TRUE,ビューティードリームカップの主催者,
+ベルノライト,,根本京里,,#f3ce3c,#e03c32,FALSE,TRUE,ボイスコミック版,#シングレ
+ベルノライト,,瀬戸桃子,,#f3ce3c,#e03c32,FALSE,TRUE,アニメ版,#シングレ
+北原穣,,中村章吾,,#3a7ad2,#ece7e7,FALSE,TRUE,オグリキャップの担当トレーナー ボイスコミック版,#シングレ
+北原穣,,小西克幸,,#3a7ad2,#ece7e7,FALSE,TRUE,オグリキャップの担当トレーナー アニメ版,#シングレ
+六平銀次郎,,大塚芳忠,,#3a7ad2,#ece7e7,FALSE,TRUE,北原穣の叔父,#シングレ
+フジマサマーチ,,伊瀬茉莉也,,#2e4088,#d3e0d6,FALSE,TRUE,,#シングレ
+ノルンエース,,渋谷彩乃,,#cb7875,#eabc9e,FALSE,TRUE,,#シングレ
+ルディレモーノ,,西川舞,,#f3e49d,#515f87,FALSE,TRUE,ボイスコミック版,#シングレ
+ルディレモーノ,,大地葉,,#f3e49d,#515f87,FALSE,TRUE,アニメ版,#シングレ
+ミニーザレディ,,井澤詩織,,#f6de7e,#c56752,FALSE,TRUE,,#シングレ
+ディクタストライカ,,花守ゆみり,,#ecea37,#e07e3d,FALSE,TRUE,,#シングレ
+トニビアンカ,,甲斐田裕子,,#467b5c,#99514c,FALSE,TRUE,,#シングレ
+オベイユアマスター,,石上静香,,#eccc70,#596fb5,FALSE,TRUE,,#シングレ
+ムーンライトルナシー,,関根明良,,#6b59ad,#934e61,FALSE,TRUE,,#シングレ
+ミシェルマイベイビー,,高垣彩陽,,#4e54b1,#de8441,FALSE,TRUE,,#シングレ
+エラズリープライド,,富田美憂,,#c0dae7,#c94b5d,FALSE,TRUE,,#シングレ
+ブラッキーエール,,森なな子,,#474a69,#cfb181,FALSE,TRUE,,#シングレ
+メイクンツカサ,,風間万裕子,,#b55f5d,#d9ba76,FALSE,TRUE,,#シングレ
+クラフトユニヴァ,,田中貴子,,#4a4657,#3f60a3,FALSE,TRUE,,#シングレ
+ゴッドハンニバル,,鷄冠井美智子,,#536161,#253451,FALSE,TRUE,,#シングレ
+アキツテイオー,,久次米渚,,#286e51,#7a2b29,FALSE,TRUE,,#シングレ
+ダイナムヒロイン,,大久保瑠美,,#6f75ae,#b0575f,FALSE,TRUE,,#シングレ
+ロードロイヤル,,山村響,,#c64b3e,#d9c051,FALSE,TRUE,,#シングレ
+ヤマノサウザン,,田村睦心,,#b14846,#d593f2,FALSE,TRUE,,#シングレ
+柴崎宏壱,,柴崎哲志,,#2e4088,#d3e0d6,FALSE,TRUE,カサマツトレセン学園所属トレーナー ボイスコミック版,#シングレ
+柴崎宏壱,,浪川大輔,,#2e4088,#d3e0d6,FALSE,TRUE,カサマツトレセン学園所属トレーナー アニメ版,#シングレ
+川村日和,,生天目仁美,,#dcbe8a,#c64733,FALSE,TRUE,ノルンエース/ルディレモーノ/ミニーザレディの担当トレーナー,#シングレ
+巌唯一,,竹内良太,,#677d64,#c5cb9d,FALSE,TRUE,,#シングレ
+師範代,,宝亀克寿,,#da483a,#ffda93,FALSE,TRUE,ヤエノムテキの担当トレーナー,#シングレ
+小宮山勝美,,白石涼子,,#3290d6,#c6dae7,FALSE,TRUE,タマモクロスの担当トレーナー,#シングレ
+奈瀬文乃,,嶋村侑,,#5693da,#c8c9c7,FALSE,TRUE,スーパークリークの担当トレーナー,#シングレ
+小内忠,,阿座上洋平,,#ecea37,#e07e3d,FALSE,TRUE,ディクタストライカの担当トレーナー,#シングレ
+檮原龍子,,くじら,,#ae419e,#ec86d0,FALSE,TRUE,イナリワンの担当トレーナー,#シングレ
+檮原太郎,,榎木淳弥,,#ae419e,#ec86d0,FALSE,TRUE,イナリワンの担当トレーナー,#シングレ
+藤井泉助,,高橋大輔,,#ba6852,#9399a3,FALSE,TRUE,ウマ娘レース新聞の記者,#シングレ
+オグリキャップの母,,皆口裕子,,#3a7ad2,#ece7e7,FALSE,TRUE,オグリキャップの母,#シングレ
+タマモクロスの母,,遠藤綾,,#3290d6,#c6dae7,FALSE,TRUE,タマモクロスの母,#シングレ
+フランク＝マクモナハン,,楠見尚己,,#eccc70,#596fb5,FALSE,TRUE,オベイユアマスターの担当トレーナー,#シングレ
+トレセン学園料理主任,,斉藤貴美子,,#bfb6ae,#ea7a93,FALSE,TRUE,中央トレセン学園料理主任,#シングレ
